@@ -1255,9 +1255,11 @@
     /* Filtre catégorie */
     .cat-filter-row { padding: 10px 14px }
 
-    /* Tableau H2H : colonnes date et catégorie masquées sur très petit écran */
+    /* Tableau H2H : colonnes date et catégorie masquées sur très petit écran.
+       Vue « Manches communes » : la colonne manche reste visible. */
     .h2h-table .ev-date { display: none }
     .h2h-table .ev-cat { display: none }
+    .h2h-table.races-table .ev-cat { display: table-cell }
   }
 
   @media (max-width:480px) {
@@ -1265,6 +1267,8 @@
     .h2h-table td:nth-child(1),
     .h2h-table th:nth-child(3),
     .h2h-table td:nth-child(3) { display: none }
+    .h2h-table.races-table th:nth-child(3),
+    .h2h-table.races-table td:nth-child(3) { display: table-cell }
   }
 
   footer{
@@ -2182,7 +2186,7 @@ function renderH2HTable(confrontations) {
       <td class="rank-a${aWins?' winner':''}">${rankACellContent}</td>
       <td class="rank-b${bWins?' winner':''}">${rankBCellContent}</td>
       <td class="win-icon">${winIcon}</td>
-    </tr>${renderSharedRaces(c.shared)}`;
+    </tr>`;
   }).join('');
 
   return `<div style="overflow-x:auto;padding:0 18px 18px">
@@ -2422,7 +2426,7 @@ function renderRaceTable(races) {
   }).join('');
 
   return `<div style="overflow-x:auto;padding:0 18px 18px">
-    <table class="h2h-table">
+    <table class="h2h-table races-table">
       <thead>
         <tr>
           <th>Date</th>
