@@ -1,0 +1,2606 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later
+     Copyright (c) 2026 ludovic.socie -->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%234a7ab5'/><text x='16' y='23' font-family='system-ui' font-size='20' font-weight='800' fill='white' text-anchor='middle'>S</text></svg>">
+<title>BMX-Race · Head to Head</title>
+<meta name="description" content="Comparez les performances de deux pilotes BMX Race face à face : victoires, podiums et évolution dans le temps.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ludsoc.github.io/bmx-race-tools/h2h/">
+<meta property="og:title" content="BMX-Race · Head to Head">
+<meta property="og:description" content="Comparez les performances de deux pilotes BMX Race face à face : victoires, podiums et évolution dans le temps.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BMX-Race · Head to Head">
+<meta name="twitter:description" content="Comparez les performances de deux pilotes BMX Race face à face : victoires, podiums et évolution dans le temps.">
+<script>
+  (() => {
+    const saved = localStorage.getItem('theme');
+    const isDark = saved === 'dark' ||
+      (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('dark', isDark);
+    if (saved) document.documentElement.dataset.themePref = saved;
+  })();
+</script>
+<link rel="stylesheet" href="../theme.css">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0; padding:0}
+
+  /* Focus clavier accessible — visible uniquement sur navigation Tab, pas au clic souris */
+  :focus{outline:none}
+  .btn:focus-visible,
+  .recent-chip:focus-visible,
+  .recent-clear:focus-visible,
+  .section-toggle:focus-visible{
+    outline:2px solid var(--accent-hi);
+    outline-offset:3px;
+  }
+  /* Les inputs gardent leur propre style de focus (border + box-shadow) */
+  .control:focus-visible{outline:none}
+  .topbar :focus-visible{outline-color:#fff}
+  body{
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+  }
+  .topbar{
+    position:relative; overflow:hidden; z-index:1;
+    color:#fff; padding:48px 24px 128px;
+    background:linear-gradient(135deg, #2e4158 0%, #3f566f 35%, #6a8caf 70%, #8aa6c2 100%);
+    transition:padding .25s ease, min-height .25s ease;
+  }
+  .topbar::after{
+    /* lueur douce en haut */
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(circle at 80% 0%, rgba(255,255,255,.22), transparent 55%),
+               radial-gradient(circle at 10% 100%, rgba(30,50,80,.35), transparent 45%);
+  }
+  .topbar-inner{
+    max-width:1180px; margin:0 auto; position:relative; z-index:1;
+  }
+  .brand-row{display:flex; align-items:center; justify-content:space-between; gap:12px}
+  .brand{display:flex; align-items:center; gap:12px; font-weight:600; letter-spacing:.2px; color:#fff}
+
+  body.has-results .topbar .brand-row{
+    width:100%; margin:0;
+  }
+  .theme-btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:36px; height:36px; padding:0;
+    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.22);
+    color:#fff; border-radius:10px;
+    cursor:pointer; font-size:18px; line-height:1;
+    transition:background .15s, border-color .15s, transform .15s;
+  }
+  .theme-btn:hover{background:rgba(255,255,255,.2); border-color:rgba(255,255,255,.4)}
+  .theme-btn:active{transform:scale(.95)}
+  .donate-btn{display:inline-flex;align-items:center;gap:5px;padding:0 12px;height:36px;background:linear-gradient(135deg,rgba(255,210,150,.9),rgba(251,146,60,.75));border:1px solid rgba(251,146,60,.6);color:#7c3405;box-shadow:0 2px 8px rgba(251,146,60,.35),inset 0 1px 0 rgba(255,255,255,.3);border-radius:10px;font-size:.8rem;font-weight:600;text-decoration:none;transition:background .15s,border-color .15s,transform .15s;white-space:nowrap}
+  .donate-btn:hover{background:linear-gradient(135deg,rgba(255,210,150,1),rgba(251,146,60,.95));border-color:rgba(251,146,60,.9);box-shadow:0 3px 10px rgba(251,146,60,.45),inset 0 1px 0 rgba(255,255,255,.3);}
+  .donate-btn:active{transform:scale(.95)}
+  .donate-icon{font-size:1.15rem;display:inline-flex;align-items:center}
+  @media(max-width:520px){.donate-btn .donate-label{display:none}}
+  .hub-back{display:inline-flex;align-items:center;gap:6px;margin-top:14px;color:#fff;font-size:13px;font-weight:600;text-decoration:none;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);padding:6px 12px;border-radius:99px}
+  .hub-back:hover{background:rgba(255,255,255,.28)}
+  #retryBtn:not([hidden]){display:block;margin:8px auto 0;padding:6px 18px;background:var(--accent,#4e80ee);color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer}
+  #retryBtn:hover{opacity:.85}
+  .brand .logo{
+    width:40px; height:40px; border-radius:12px;
+    background:rgba(255,255,255,.22); color:#fff;
+    display:grid; place-items:center; font-weight:800; font-size:14px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.45);
+    backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  }
+  .topbar h1{margin:24px 0 8px; font-size:34px; font-weight:800; letter-spacing:-1px; color:#fff; text-shadow:0 2px 14px rgba(20,35,60,.45)}
+  .topbar p{margin:0; font-size:15px; max-width:min(600px,100%); color:#dce8f2; text-shadow:0 1px 6px rgba(20,35,60,.35); line-height:1.5}
+
+  main{max-width:1180px; margin:-80px auto 40px; padding:0 24px 32px; position:relative; z-index:10;}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px; box-shadow:var(--shadow); margin-bottom:18px;
+  }
+  .filters{padding:20px}
+  .grid{display:grid; gap:14px}
+  .filters .grid{grid-template-columns:repeat(12,1fr)}
+  .field{display:flex; flex-direction:column; min-width:0}
+  .field.col-name{grid-column:span 10}
+  .field.col-btn{grid-column:span 2; align-items:stretch}
+  @media (max-width:880px){
+    .field.col-name,.field.col-btn{grid-column:span 12}
+  }
+
+  /* Skeleton loaders */
+  .skeleton{
+    background:linear-gradient(90deg,
+      var(--card-soft) 0%,
+      color-mix(in srgb, var(--line) 80%, var(--card-soft)) 50%,
+      var(--card-soft) 100%);
+    background-size:200% 100%;
+    animation:shimmer 1.4s infinite linear;
+    border-radius:6px;
+  }
+  @keyframes shimmer{
+    0%{background-position:200% 0}
+    100%{background-position:-200% 0}
+  }
+  .skeleton-card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:16px 18px; box-shadow:var(--shadow);
+  }
+  .skeleton-line{height:14px; margin-bottom:8px; width:100%}
+  .skeleton-line.h1{height:24px; width:60%; margin-bottom:14px}
+  .skeleton-line.h2{height:34px; width:45%; margin-bottom:10px}
+  .skeleton-line.sm{height:11px; width:80%}
+  .skeleton-card:last-child .skeleton-line:last-child{margin-bottom:0}
+
+  /* Recherches récentes */
+  .recent-row{
+    margin-top:14px; padding-top:14px; border-top:1px dashed var(--line);
+    display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+  }
+  .recent-row[hidden]{display:none}
+  .recent-label{
+    font-size:11px; font-weight:600; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.5px; flex-shrink:0;
+  }
+  .recent-chip{
+    font:inherit; cursor:pointer; padding:5px 12px; border-radius:99px;
+    background:var(--card-soft); border:1px solid var(--line);
+    color:var(--ink); font-size:12.5px; display:inline-flex; gap:6px; align-items:baseline;
+    transition:border-color .15s, background .15s;
+  }
+  .recent-chip:hover{
+    border-color:var(--accent);
+    background:color-mix(in srgb,var(--accent) 10%, transparent);
+  }
+  .recent-chip .recent-meta{
+    color:var(--muted); font-size:11px; font-weight:400;
+  }
+  .recent-clear{
+    margin-left:auto; background:none; border:none; color:var(--muted); cursor:pointer;
+    font-size:12px; padding:4px 8px; border-radius:6px;
+  }
+  .recent-clear:hover{color:var(--bad); background:color-mix(in srgb,var(--bad) 10%, transparent)}
+
+  /* Results filter bar */
+  .results-filters{padding:14px 18px; display:flex; gap:18px; flex-wrap:wrap; align-items:flex-end}
+  .results-filters .field{flex:1 1 180px; max-width:260px}
+  .results-filters .summary-info{
+    flex:1 1 100%; font-size:12px; color:var(--muted);
+    border-top:1px solid var(--line); padding-top:10px; margin-top:2px;
+  }
+  @media (max-width:640px){
+    .results-filters .field{max-width:none}
+  }
+  label{font-size:11px; font-weight:600; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px}
+  .control{
+    font:inherit; padding:10px 12px; border:1px solid var(--line);
+    border-radius:9px; background:var(--card); color:var(--ink);
+    transition:border-color .15s, box-shadow .15s, background .15s;
+  }
+  .control:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%, transparent)}
+  .control:disabled{background:var(--card-soft); color:var(--muted); cursor:not-allowed}
+  select.control,input.control{width:100%}
+  .btn{
+    font:inherit; font-weight:600; padding:11px 18px; border:none; border-radius:9px;
+    background:var(--accent); color:var(--accent-ink); cursor:pointer;
+    transition:background .15s, transform .05s;
+  }
+  .btn:hover:not(:disabled){background:var(--accent-hi)}
+  .btn:active:not(:disabled){transform:translateY(1px)}
+  .btn:disabled{background:var(--line-strong); color:var(--card); cursor:not-allowed}
+  .btn.btn-danger{background:var(--bad)}
+  .btn.btn-danger:hover:not(:disabled){background:color-mix(in srgb, var(--bad) 80%, black)}
+  .btn-ghost{background:transparent; color:var(--accent); padding:4px 6px; font-size:12px}
+  .btn-ghost:hover:not(:disabled){background:color-mix(in srgb,var(--accent) 10%, transparent)}
+  .hint{font-size:12px; color:var(--muted); margin-top:6px}
+  .status{font-size:13px; color:var(--muted); margin-top:14px; min-height:18px}
+  .status.error{color:var(--bad)}
+  .status.loading{font-size:15px; color:var(--accent); font-weight:600; display:flex; align-items:center; gap:8px}
+  .status.loading::before{content:''; display:inline-block; width:16px; height:16px; border:2px solid color-mix(in srgb,var(--accent) 30%,transparent); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; flex-shrink:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .progress{
+    height:6px; background:var(--card-soft); border:1px solid var(--line);
+    border-radius:99px; overflow:hidden; margin-top:10px;
+  }
+  .progress > div{
+    height:100%; width:0; transition:width .2s;
+    background:linear-gradient(90deg,var(--teal),var(--sky),var(--lavender));
+  }
+
+  /* Stats */
+  .stats-hero{
+    display:grid; gap:14px; margin-bottom:16px;
+    grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+  }
+  .stats-detail{display:flex; flex-direction:column; gap:16px; margin-bottom:20px}
+  .stat-group{display:flex; flex-direction:column; gap:8px}
+  .stat-group-title{
+    font-size:11px; font-weight:600; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.6px;
+  }
+  .stat.stat-hero{padding:18px 20px}
+  .stat.stat-hero .k{font-size:12px}
+  .stat.stat-hero .v{font-size:34px}
+  .stat.stat-hero .sub{font-size:12.5px}
+  .stat[title]{cursor:help}
+
+  .stats{display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:12px; margin-bottom:0}
+  .stat{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:14px 16px; box-shadow:var(--shadow); position:relative; overflow:hidden;
+  }
+  .stat::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:4px;
+    background:var(--stat-color, var(--accent)); opacity:.85;
+  }
+  .stat::after{
+    /* lavis très léger pour suggérer la teinte sans saturer */
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(135deg,
+      color-mix(in srgb, var(--stat-color, var(--accent)) 7%, transparent),
+      transparent 55%);
+  }
+  .stat.gold      { --stat-color: var(--gold) }
+  .stat.silver    { --stat-color: var(--silver) }
+  .stat.bronze    { --stat-color: var(--bronze) }
+  .stat.good      { --stat-color: var(--mint) }
+  .stat.mint      { --stat-color: var(--mint) }
+  .stat.peach     { --stat-color: var(--peach) }
+  .stat.apricot   { --stat-color: var(--apricot) }
+  .stat.butter    { --stat-color: var(--butter) }
+  .stat.lime      { --stat-color: var(--lime) }
+  .stat.teal      { --stat-color: var(--teal) }
+  .stat.sky       { --stat-color: var(--sky) }
+  .stat.blueberry { --stat-color: var(--blueberry) }
+  .stat.lav       { --stat-color: var(--lavender) }
+  .stat.lilac     { --stat-color: var(--lilac) }
+  .stat.lavender  { --stat-color: var(--lavender) }
+  .stat.berry     { --stat-color: var(--berry) }
+  .stat.rose      { --stat-color: var(--rose) }
+  .stat.coral     { --stat-color: var(--coral) }
+  .stat.grape     { --stat-color: var(--grape) }
+  .stat.sage      { --stat-color: var(--good) }
+  .stat .k{font-size:11px; color:var(--muted); text-transform:uppercase; font-weight:600; letter-spacing:.5px; position:relative}
+  .stat .v{
+    font-size:24px; font-weight:700; margin-top:2px; line-height:1.1; position:relative;
+    color:var(--ink);
+  }
+  .stat .sub{font-size:12px; color:var(--muted); margin-top:2px; position:relative}
+
+  /* Graphiques (SVG natif) */
+  .charts-grid{
+    display:grid; gap:14px; margin-bottom:20px;
+    grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));
+  }
+  .chart-card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:16px 18px; box-shadow:var(--shadow);
+  }
+  .chart-card.chart-full{grid-column:1 / -1}
+  .chart-title{font-weight:600; font-size:14px; color:var(--ink); margin-bottom:2px}
+  .chart-sub{font-size:11px; color:var(--muted); margin-bottom:10px; text-transform:uppercase; letter-spacing:.5px}
+  .chart{width:100%; height:auto; display:block; font-family:inherit}
+  .chart .grid{stroke:var(--line-strong); stroke-width:1; opacity:.6}
+  .chart .axis{stroke:var(--ink-2); stroke-width:1.25}
+  .chart .axis-label{font-size:13px; fill:var(--ink-2); font-weight:500}
+  .chart .axis-label.muted{fill:var(--muted); font-weight:400}
+  .chart .zone{opacity:.35}
+  .chart .line{fill:none; stroke:var(--accent); stroke-width:2.5; stroke-linejoin:round; stroke-linecap:round}
+  .chart .line-mean{fill:none; stroke:var(--accent-hi); stroke-width:1.5; stroke-dasharray:4 4; opacity:.7}
+  .chart .area{fill:color-mix(in srgb,var(--accent) 18%, transparent); stroke:none}
+  .chart .point{fill:var(--card); stroke:var(--accent); stroke-width:2; transition:r .15s, stroke-width .15s}
+  .chart .point:hover{r:6; stroke-width:2.5}
+  .chart .bar{transition:opacity .15s; stroke:rgba(0,0,0,.04); stroke-width:1}
+  .chart .bar:hover{opacity:.85}
+  .chart .bar.gold{fill:var(--gold)}
+  .chart .bar.silver{fill:var(--silver)}
+  .chart .bar.bronze{fill:var(--bronze)}
+  .chart .bar.mint{fill:var(--mint)}
+  .chart .bar.sky{fill:var(--sky)}
+  .chart .bar.lilac{fill:var(--lilac)}
+  .chart .bar.lavender{fill:var(--lavender)}
+  .chart .bar-value{font-size:15px; fill:var(--ink); font-weight:700}
+  .chart .bar-label{font-size:13px; fill:var(--ink-2); font-weight:500}
+  .chart .donut-center{font-size:30px; font-weight:700; fill:var(--ink)}
+  .chart .donut-center-sub{font-size:11px; fill:var(--muted); text-transform:uppercase; letter-spacing:.5px; font-weight:600}
+  .donut-wrap{display:flex; gap:18px; align-items:center; flex-wrap:wrap}
+  .donut-wrap .chart.donut{flex:0 0 220px; max-width:220px}
+  .legend{list-style:none; padding:0; margin:0; flex:1; min-width:160px; font-size:13px; color:var(--ink-2); max-height:240px; overflow:auto}
+  .legend li{display:flex; align-items:center; gap:8px; padding:4px 0}
+  .legend .dot{width:12px; height:12px; border-radius:4px; flex-shrink:0}
+  .legend .legend-name{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .legend .legend-num{color:var(--muted); font-variant-numeric:tabular-nums; font-size:12px; flex-shrink:0}
+  .chart-empty{padding:24px 0; text-align:center; color:var(--muted); font-size:13px}
+  @media (max-width:640px){
+    .donut-wrap{flex-direction:column; align-items:flex-start}
+    .donut-wrap .chart.donut{max-width:180px}
+  }
+
+  /* Section title */
+  h2.section-title, h3.stat-group-title, h3.chart-title{margin:0}
+  .section-title{
+    display:flex; align-items:baseline; gap:10px; margin:8px 0 12px;
+    font-size:14px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.6px;
+  }
+  .section-title .meta{font-weight:400; text-transform:none; letter-spacing:0; font-size:12px}
+  .section-title .section-toggle{margin-left:auto; font-size:12px; padding:4px 10px; text-transform:none; letter-spacing:0}
+  .chart-title{margin-bottom:2px}
+
+  /* Event card */
+  .event{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    margin-bottom:12px; overflow:hidden; box-shadow:var(--shadow);
+  }
+  .event-head{
+    padding:14px 16px; background:var(--card-soft); border-bottom:1px solid var(--line);
+    display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;
+  }
+  .event-head .left{display:flex; flex-direction:column; gap:4px; min-width:0}
+  .event-head .name{font-weight:600; font-size:15px; color:var(--ink)}
+  .bmx-link{color:inherit; text-decoration:none; border-bottom:1px solid transparent; transition:border-color .15s, color .15s}
+  .bmx-link:hover{color:var(--accent-hi); border-bottom-color:color-mix(in srgb,var(--accent) 40%, transparent)}
+  .bmx-link::after{
+    content:"↗"; font-size:.75em; margin-left:4px; color:var(--muted);
+    transition:color .15s; vertical-align:baseline;
+  }
+  .bmx-link:hover::after{color:var(--accent-hi)}
+  .event-head .right{display:flex; flex-direction:column; align-items:flex-end; gap:4px}
+  .event-head .date{
+    font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums;
+    background:var(--card); padding:3px 8px; border-radius:99px; border:1px solid var(--line);
+  }
+  .org-badge{
+    display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:500;
+    padding:3px 9px; border-radius:99px;
+    background:color-mix(in srgb,var(--teal) 16%, transparent);
+    color:color-mix(in srgb,var(--teal) 75%, var(--ink));
+    border:1px solid color-mix(in srgb,var(--teal) 22%, transparent);
+  }
+  .event-body{padding:6px 16px 12px}
+  .class-line{
+    display:flex; gap:14px; padding:10px 0; border-bottom:1px dashed var(--line);
+    align-items:center; justify-content:space-between; flex-wrap:wrap;
+  }
+  .class-line:last-child{border-bottom:none}
+  .cl-info{flex:1; min-width:0}
+  .class-name{font-weight:600; font-size:14px; color:var(--ink)}
+  .meta{font-size:12px; color:var(--muted)}
+  .phases{display:flex; gap:6px; flex-wrap:wrap; margin-top:8px}
+  .phase{
+    background:var(--card-soft); border:1px solid var(--line); padding:3px 9px;
+    border-radius:99px; font-size:12px; display:inline-flex; gap:6px; align-items:baseline;
+    color:var(--muted);
+  }
+  .phase b{color:var(--ink); font-weight:600}
+  .phase .gate{opacity:.65; font-size:11px}
+  .phase.pos-1 b{color:var(--gold)}
+  .phase.pos-2 b{color:var(--silver)}
+  .phase.pos-3 b{color:var(--bronze)}
+  .phase.is-moto{
+    background:color-mix(in srgb,var(--lavender) 10%, var(--card-soft));
+    border-color:color-mix(in srgb,var(--lavender) 25%, var(--line));
+    color:color-mix(in srgb,var(--lavender) 60%, var(--muted));
+  }
+  .phase.is-final{
+    background:color-mix(in srgb,var(--peach) 12%, var(--card-soft));
+    border-color:color-mix(in srgb,var(--peach) 30%, var(--line));
+    color:color-mix(in srgb,var(--peach) 55%, var(--ink));
+    font-weight:500;
+  }
+  a.phase{text-decoration:none; cursor:pointer; transition:border-color .15s, background .15s, transform .05s; border-color:color-mix(in srgb,var(--accent) 35%, var(--line))}
+  a.phase::after{content:'↗'; font-size:10px; opacity:.5; margin-left:1px; line-height:1}
+  a.phase:hover{border-color:var(--accent); background:color-mix(in srgb,var(--accent) 10%, transparent)}
+  a.phase:hover::after{opacity:1}
+  a.phase.is-moto{border-color:color-mix(in srgb,var(--lavender) 45%, var(--line))}
+  a.phase.is-moto:hover{border-color:var(--lavender); background:color-mix(in srgb,var(--lavender) 18%, transparent)}
+  a.phase.is-final{border-color:color-mix(in srgb,var(--peach) 55%, var(--line))}
+  a.phase.is-final:hover{border-color:var(--peach); background:color-mix(in srgb,var(--peach) 20%, transparent)}
+
+  .rank-pill{
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width:42px; height:42px; border-radius:50%; font-weight:700; font-size:16px;
+    background:var(--card-soft); border:2px solid var(--line); color:var(--ink);
+    font-variant-numeric:tabular-nums;
+  }
+  .rank-pill.r1{background:linear-gradient(135deg,#fff2c8,#e8c574); border-color:var(--gold); color:#7a5a18}
+  .rank-pill.r2{background:linear-gradient(135deg,#f4f6fa,#cdd2dc); border-color:var(--silver); color:#4a5260}
+  .rank-pill.r3{background:linear-gradient(135deg,#f7dcc4,#d4a07c); border-color:var(--bronze); color:#7a4a2a}
+  .rank-pill.r8{
+    background:linear-gradient(135deg, color-mix(in srgb,var(--teal) 18%, var(--card-soft)), color-mix(in srgb,var(--sky) 22%, var(--card-soft)));
+    border-color:var(--teal);
+    color:color-mix(in srgb,var(--teal) 75%, var(--ink));
+  }
+  .cl-right{display:flex; align-items:center; gap:12px}
+  .cl-meta-r{display:flex; flex-direction:column; align-items:flex-end; gap:2px; font-size:12px; color:var(--muted)}
+  .cl-meta-r .lbl{text-transform:uppercase; letter-spacing:.5px; font-size:10px; font-weight:600}
+  .top-pct{
+    display:inline-block; font-size:11px; font-weight:600;
+    padding:1px 8px; border-radius:99px; margin-top:2px;
+    background:color-mix(in srgb,var(--sky) 16%, transparent);
+    color:color-mix(in srgb,var(--sky) 70%, var(--ink));
+  }
+  .top-pct.elite{background:color-mix(in srgb,var(--gold) 24%, transparent); color:#78350f}
+  .top-pct.good{background:color-mix(in srgb,var(--good) 22%, transparent); color:#14532d}
+
+  /* Championnats — réutilise .event/.event-head/.event-body, n'ajoute que les spécificités */
+  .championship{
+    border-left:3px solid var(--gold);
+  }
+  .org-badges{display:flex; flex-wrap:wrap; gap:4px}
+  .championship .event-head{
+    background:linear-gradient(180deg, color-mix(in srgb,var(--gold) 14%, var(--card)) 0%, var(--card) 100%);
+  }
+
+  /* Ligne de championnat : grille à 2 colonnes sur desktop, 1 col empilée sur mobile */
+  .champ-line{
+    display:grid;
+    grid-template-columns:1fr auto;
+    grid-template-areas:
+      "category rank"
+      "summary  rank"
+      "details  details";
+    gap:6px 18px;
+    padding:4px 0 4px;
+    align-items:start;
+  }
+  .champ-category{grid-area:category; min-width:0; display:flex; flex-direction:column; gap:2px}
+  .champ-category .class-name{font-weight:600; font-size:14px; color:var(--ink)}
+  .champ-category .meta{font-size:12px; color:var(--muted)}
+  .champ-rank{
+    grid-area:rank;
+    display:flex; flex-direction:row-reverse; align-items:center; gap:12px;
+    align-self:start;
+  }
+  .champ-rank-text{text-align:right}
+  .champ-rank-text .lbl{
+    display:block;
+    text-transform:uppercase; letter-spacing:.5px; font-size:10px; font-weight:600;
+    color:var(--muted);
+  }
+  .champ-rank-sub{font-size:12px; color:var(--muted); margin-top:2px}
+
+  .champ-summary{
+    grid-area:summary;
+    margin-top:2px; font-size:13px; color:var(--ink-2);
+    display:flex; flex-wrap:wrap; align-items:baseline; gap:6px;
+  }
+  .champ-summary .lbl{
+    text-transform:uppercase; letter-spacing:.5px; font-size:10px; font-weight:600;
+    color:var(--muted);
+  }
+  .champ-summary b{font-weight:700; color:var(--ink)}
+  .champ-summary .sep{color:var(--line-strong)}
+  .champ-summary .muted{color:var(--muted); font-size:12px}
+
+  .champ-details{
+    grid-area:details;
+    margin-top:8px;
+    border:1px solid var(--line); border-radius:10px;
+    background:var(--card-soft);
+  }
+  .champ-details > summary{
+    cursor:pointer; padding:8px 12px; font-size:12px; font-weight:600;
+    color:var(--ink-2); list-style:none;
+    user-select:none;
+  }
+  .champ-details > summary::-webkit-details-marker{display:none}
+  .champ-details > summary::before{
+    content:"▸"; display:inline-block; margin-right:6px;
+    transition:transform .15s ease;
+    color:var(--muted);
+  }
+  .champ-details[open] > summary::before{transform:rotate(90deg)}
+  .champ-details > summary:hover{color:var(--accent-hi)}
+  .champ-details[open] .sum-show{display:none}
+  .champ-details:not([open]) .sum-hide{display:none}
+
+  .champ-stages{
+    width:100%; border-collapse:collapse; font-size:12.5px;
+    border-top:1px solid var(--line);
+  }
+  .champ-stages th, .champ-stages td{
+    padding:6px 10px; text-align:left;
+    border-bottom:1px solid var(--line);
+  }
+  .champ-stages th{
+    font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.5px;
+    color:var(--muted); background:transparent;
+  }
+  .champ-stages tr:last-child td{border-bottom:none}
+  .champ-stages .st-date{color:var(--muted); white-space:nowrap; width:1%}
+  .champ-stages .st-name{color:var(--ink)}
+  .champ-stages .st-rank{font-weight:600; width:1%; white-space:nowrap}
+  .champ-stages .st-pts{width:1%; white-space:nowrap; color:var(--ink-2)}
+  .champ-stages .st-tally{width:1%; text-align:center}
+  .champ-stages tr.absent td{color:var(--muted); font-style:italic}
+  .champ-stages tr.absent .st-name{font-style:normal}
+  .champ-stages .muted{color:var(--muted)}
+  .special-result{font-size:.85em; font-weight:700; letter-spacing:.04em}
+  .phase.dnx{background:#fff1f2; color:#9f1239; border-color:#fecdd3}
+  a.phase.dnx,a.phase.dnx:hover{border-color:#fecdd3; background:#fff1f2}
+  .phase.dnx b{color:#9f1239}
+
+  .tally{
+    display:inline-block; min-width:18px; height:18px; line-height:18px; text-align:center;
+    font-size:11px; font-weight:700; border-radius:50%;
+  }
+  .tally-on{
+    background:color-mix(in srgb,var(--good) 35%, transparent);
+    color:#14532d;
+  }
+  .tally-off{
+    background:transparent; color:var(--muted);
+    border:1px solid var(--line-strong);
+  }
+  :root.dark .tally-on{color:#bfe6d0}
+
+  /* Sélecteur de pilote (homonymes) */
+  .pilot-picker{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px 20px; margin-bottom:18px; box-shadow:var(--shadow);
+  }
+  .pilot-picker-title{
+    font-size:12px; font-weight:600; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.5px; margin-bottom:12px;
+  }
+  .pilot-picker-list{
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .pilot-pick-btn{
+    display:flex; align-items:center; gap:12px;
+    width:100%; text-align:left; background:var(--card-soft);
+    border:1.5px solid var(--line); border-radius:12px;
+    padding:10px 14px; cursor:pointer; transition:border-color .15s, background .15s;
+  }
+  .pilot-pick-btn:hover{ border-color:var(--accent); background:var(--accent-soft) }
+  .pilot-pick-btn.active{ border-color:var(--accent); background:var(--accent-soft) }
+  .ppav{
+    width:36px; height:36px; border-radius:50%; flex-shrink:0;
+    display:grid; place-items:center;
+    font-weight:800; font-size:11px; color:#fff; letter-spacing:.3px;
+  }
+  .ppinfo{ flex:1; min-width:0 }
+  .ppname{ font-size:13px; font-weight:700; color:var(--ink) }
+  .ppmeta{ font-size:11.5px; color:var(--muted); margin-top:1px }
+  .ppcount{ font-size:11px; font-weight:600; color:var(--muted); white-space:nowrap }
+  @media(max-width:640px){
+    .pilot-picker{ padding:12px 14px }
+    .pilot-pick-btn{ padding:8px 12px; gap:10px }
+  }
+
+  /* Carte pilote — Profile Hero Card */
+  .pilot-card{
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    gap:24px; align-items:center;
+    padding:28px 32px; margin-bottom:18px;
+    background:linear-gradient(135deg,
+      var(--card) 0%,
+      color-mix(in srgb, var(--pilot-color, var(--accent)) 6%, var(--card)) 60%,
+      color-mix(in srgb, var(--pilot-color, var(--accent)) 12%, var(--card)) 100%);
+    border:1px solid color-mix(in srgb, var(--pilot-color, var(--accent)) 30%, var(--line));
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-xl, var(--shadow));
+    position:relative; overflow:hidden;
+  }
+  .pilot-card::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse at 95% 50%,
+      color-mix(in srgb, var(--pilot-color, var(--accent)) 10%, transparent),
+      transparent 60%);
+  }
+  .pilot-avatar{
+    width:72px; height:72px; border-radius:50%;
+    display:grid; place-items:center;
+    font-weight:800; font-size:24px; letter-spacing:-.5px;
+    color:#fff; flex-shrink:0;
+    background:var(--pilot-color, var(--accent));
+    box-shadow:0 0 0 3px var(--card), 0 0 0 5px var(--pilot-color, var(--accent)), 0 6px 20px rgba(0,0,0,.22);
+    animation:avatar-in .3s ease both;
+    position:relative; z-index:1;
+  }
+  @keyframes avatar-in{
+    from{transform:scale(.8); opacity:0}
+    to{transform:scale(1); opacity:1}
+  }
+  .pilot-info{ flex:1; min-width:0; position:relative; z-index:1 }
+  .pilot-name{
+    font-size:26px; font-weight:800; color:var(--ink);
+    line-height:1.1; margin-bottom:10px; letter-spacing:-.6px;
+  }
+  .pilot-badges{ display:flex; gap:8px; flex-wrap:wrap; align-items:center }
+  .pilot-plate{
+    font-size:12px; font-weight:700; letter-spacing:.4px;
+    padding:4px 12px; border-radius:99px;
+    background:var(--pilot-color, var(--accent)); color:#fff;
+    font-variant-numeric:tabular-nums;
+  }
+  .pilot-club{
+    font-size:12.5px; font-weight:500; color:var(--ink-2);
+    padding:4px 12px; border-radius:99px;
+    background:var(--card-soft); border:1px solid var(--line);
+    display:inline-flex; align-items:center; gap:5px;
+  }
+  .pilot-age{
+    font-size:12.5px; font-weight:600; color:var(--pilot-color, var(--accent));
+    padding:4px 12px; border-radius:99px;
+    background:color-mix(in srgb, var(--pilot-color, var(--accent)) 12%, var(--card-soft));
+    border:1px solid color-mix(in srgb, var(--pilot-color, var(--accent)) 30%, var(--line));
+    display:inline-flex; align-items:center; gap:5px;
+  }
+  .pilot-qs{
+    display:flex; gap:0; flex-shrink:0; position:relative; z-index:1;
+    border-left:1px solid var(--line); padding-left:20px;
+    align-self:stretch; align-items:center;
+  }
+  .pilot-qs-item{
+    text-align:center; padding:0 16px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .pilot-qs-item:not(:last-child){ border-right:1px solid var(--line) }
+  .pilot-qs-item .qv{
+    font-size:36px; font-weight:800; color:var(--ink);
+    line-height:1; font-variant-numeric:tabular-nums;
+    min-width:2ch; display:block;
+  }
+  .pilot-qs-item .qk{
+    font-size:10px; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.6px; margin-top:5px;
+  }
+  @media (max-width:860px){
+    .pilot-card{ grid-template-columns:auto 1fr; gap:16px; padding:20px 20px }
+    .pilot-qs{
+      grid-column:1/-1; border-left:none; padding-left:0;
+      border-top:1px solid var(--line); padding-top:14px;
+      justify-content:space-around;
+    }
+    .pilot-qs-item{ padding:0 12px }
+    .pilot-qs-item .qv{ font-size:28px }
+  }
+  @media (max-width:640px){
+    .pilot-card{ gap:12px; padding:16px 14px }
+    .pilot-avatar{ width:56px; height:56px; font-size:18px }
+    .pilot-name{ font-size:20px; margin-bottom:8px }
+    .pilot-qs-item .qv{ font-size:22px }
+  }
+
+  /* Onglets — visibles sur tous les écrans */
+  .tabs-nav{
+    display:flex; gap:0; overflow-x:auto; scrollbar-width:none;
+    padding:0; margin:0;
+    background:color-mix(in srgb, var(--bg) 94%, transparent);
+    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    border-bottom:2px solid var(--line);
+  }
+  .tabs-nav::-webkit-scrollbar{ display:none }
+  .tab-btn{
+    flex:0 0 auto; padding:14px 22px;
+    background:transparent; border:none;
+    border-bottom:3px solid transparent; margin-bottom:-2px;
+    color:var(--muted); font-family:inherit; font-weight:500;
+    font-size:14px; line-height:1; cursor:pointer;
+    white-space:nowrap; transition:color .15s, border-color .2s;
+    border-radius:0;
+  }
+  .tab-btn .tab-badge{
+    display:inline-block; font-weight:700; font-size:11px;
+    padding:1px 6px; margin-left:6px; border-radius:99px;
+    background:color-mix(in srgb, var(--accent) 18%, transparent);
+    color:var(--accent-hi); vertical-align:1px;
+  }
+  .tab-btn:hover{ color:var(--ink) }
+  .tab-btn.active{
+    color:var(--ink); font-weight:600;
+    border-bottom-color:var(--accent);
+  }
+  .tab-btn[disabled]{ opacity:.35; cursor:default; pointer-events:none }  .tab-panel{ display:none }
+  .tab-panel.active{ display:block }
+  .tab-panel > h2.section-title:first-child{ margin-top:4px }
+
+  .empty{padding:36px; text-align:center; color:var(--muted)}
+  .summary{font-size:13px; color:var(--muted); margin:0 0 12px}
+
+  .samerace-row{display:flex; gap:8px; align-items:center; padding:0 18px 12px; font-size:13px; color:var(--muted); cursor:pointer}
+  .samerace-row input{accent-color:var(--accent)}
+  .samerace-count{font-weight:700; color:var(--accent-hi)}
+  .shared-races-row td{font-size:12px; color:var(--muted); padding:0 18px 10px 18px}
+  .shared-race{white-space:nowrap}
+  .shared-race .sr-phase{color:var(--ink-2)}
+  .shared-race b{color:var(--ink)}
+  .sr-sep{opacity:.5; margin:0 2px}
+
+  /* Responsive mobile */
+  @media (max-width:640px){
+    .topbar{padding:28px 18px 92px}
+    .topbar h1{font-size:24px}
+    .topbar p{font-size:13px}
+    main{padding:0 16px 24px; margin-top:-60px}
+    .card{padding:14px}
+    .filters{padding:16px}
+
+    .stats-hero{grid-template-columns:repeat(2, 1fr); gap:10px}
+    .stat.stat-hero{padding:14px 16px}
+    .stat.stat-hero .v{font-size:26px}
+    .stat.stat-hero .sub{font-size:12px}
+    .stats{grid-template-columns:repeat(2, 1fr); gap:10px}
+
+    /* Phases : wrap sur plusieurs lignes pour tout voir sans scroll latéral */
+    .phases{flex-wrap:wrap; gap:5px}
+    .phase{flex-shrink:1; max-width:100%}
+
+    /* Class-line plus compacte */
+    .class-line{gap:10px; padding:8px 0}
+    .cl-right{gap:8px}
+    .rank-pill{min-width:36px; height:36px; font-size:14px}
+
+    /* Event head : col plutôt que row si étroit */
+    .event-head .right{align-items:flex-start}
+
+    /* Ligne de championnat : tout empilé, rang en bandeau au-dessus */
+    .champ-line{
+      grid-template-columns:1fr;
+      grid-template-areas:
+        "rank"
+        "category"
+        "summary"
+        "details";
+      gap:10px;
+      padding:8px 0 6px;
+    }
+    .champ-rank{
+      flex-direction:row;
+      gap:12px;
+      padding:8px 12px;
+      background:color-mix(in srgb, var(--gold) 12%, var(--card-soft));
+      border:1px solid color-mix(in srgb, var(--gold) 28%, var(--line));
+      border-radius:10px;
+    }
+    .champ-rank-text{text-align:left; flex:1; min-width:0}
+    .champ-rank-text .lbl{font-size:11px}
+    .champ-rank-sub{font-size:13px; color:var(--ink-2); font-weight:500}
+    .champ-summary{font-size:13px}
+
+    /* Manches : layout liste verticale (une ligne par manche, robuste, pas de flex-wrap) */
+    .champ-details{min-width:0; max-width:100%; overflow:hidden}
+    .champ-details > summary{padding:10px 12px}
+    .champ-stages, .champ-stages tbody{
+      display:block; border:none;
+      width:100%; max-width:100%; box-sizing:border-box;
+    }
+    .champ-stages thead{display:none}
+    .champ-stages tr{
+      display:block;
+      padding:9px 12px;
+      border:none;
+      border-top:1px solid var(--line);
+      background:transparent;
+      width:100%; box-sizing:border-box;
+      overflow:hidden;
+    }
+    .champ-stages tr:first-child{border-top:none}
+    .champ-stages td{
+      padding:0; border:none;
+      font-size:13px;
+      width:auto;
+    }
+    .champ-stages .st-name{
+      display:block; width:auto;
+      font-weight:600; color:var(--ink);
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+      max-width:100%;
+    }
+    .champ-stages .st-date{
+      display:block; width:auto;
+      color:var(--muted); font-size:12px;
+      margin-top:1px;
+    }
+    .champ-stages .st-rank{
+      display:inline-block; width:auto; margin-top:4px;
+      font-weight:600; color:var(--ink-2);
+    }
+    .champ-stages .st-rank::before{
+      content:"Classement "; font-weight:400; color:var(--muted); font-size:11px;
+      text-transform:uppercase; letter-spacing:.4px; margin-right:2px;
+    }
+    .champ-stages .st-pts{
+      display:inline-block; width:auto; margin-top:4px; margin-left:10px;
+      color:var(--ink-2);
+    }
+    .champ-stages .st-pts::before{
+      content:"· "; color:var(--line-strong); margin-right:4px;
+    }
+    .champ-stages .st-tally{
+      display:inline-block; width:auto; margin-top:4px; margin-left:10px;
+      vertical-align:middle;
+    }
+    .champ-stages tr.absent{opacity:.55}
+    .champ-stages tr.absent .st-rank::before{content:"DNS "; font-style:normal; color:var(--muted)}
+    .champ-stages tr.absent .st-rank > *,
+    .champ-stages tr.absent .st-pts,
+    .champ-stages tr.absent .st-tally{display:none}
+
+    .champ-summary{font-size:12px}
+
+    /* Onglets mobiles — ajustements de taille uniquement */
+    .tabs-nav{
+      margin:0 -14px 16px; padding:0 4px;
+      border-radius:0;
+    }
+    .tab-btn{
+      padding:10px 12px; font-size:12.5px;
+    }
+  }
+  @media (max-width:380px){
+    .stats-hero{grid-template-columns:1fr}
+    .stats{grid-template-columns:1fr}
+  }
+
+  /* Comparaison de pilotes */
+  .compare-section{
+    padding:14px 0 4px;
+    border-top:1px solid var(--line);
+    margin-top:12px;
+  }
+  .compare-section-hd{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .compare-section-hd span{
+    font-size:12px; font-weight:600; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.5px;
+  }
+  .compare-close-btn{
+    background:none; border:none; color:var(--muted); cursor:pointer;
+    font-size:16px; padding:3px 8px; border-radius:6px; line-height:1;
+  }
+  .compare-close-btn:hover{color:var(--bad); background:color-mix(in srgb,var(--bad) 10%, transparent)}
+  .compare-pilots{
+    display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;
+  }
+  @media(max-width:640px){.compare-pilots{grid-template-columns:1fr}}
+  .compare-pilot{
+    display:flex; align-items:center; gap:10px; padding:10px 12px;
+    background:var(--card-soft); border-radius:10px; border:1px solid var(--line);
+  }
+  .cav{
+    width:42px; height:42px; border-radius:50%; flex-shrink:0;
+    background:var(--cp-color, var(--accent)); color:#fff;
+    display:grid; place-items:center; font-weight:800; font-size:12px; letter-spacing:.3px;
+  }
+  .cpname{font-weight:700; font-size:13px; color:var(--ink); line-height:1.2}
+  .cpsub{font-size:11px; color:var(--muted); margin-top:2px}
+  .compare-rows{display:flex; flex-direction:column; gap:5px}
+  .compare-row{display:grid; grid-template-columns:52px 1fr 52px; gap:8px; align-items:center}
+  .cv{font-size:13px; font-weight:700; color:var(--ink-2); font-variant-numeric:tabular-nums}
+  .cv.p1{text-align:right}
+  .cv.p2{text-align:left}
+  .cv.better{color:var(--ink)}
+  .cbar-wrap{
+    position:relative; height:20px; border-radius:99px;
+    background:var(--card-soft); border:1px solid var(--line); overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .cbar-p1{
+    position:absolute; right:50%; top:0; bottom:0; border-radius:99px;
+    background:var(--cp1, var(--teal)); opacity:.65;
+  }
+  .cbar-p2{
+    position:absolute; left:50%; top:0; bottom:0; border-radius:99px;
+    background:var(--cp2, var(--berry)); opacity:.65;
+  }
+  .clabel{
+    position:relative; z-index:1; font-size:10px; font-weight:600;
+    color:var(--muted); text-transform:uppercase; letter-spacing:.4px; white-space:nowrap;
+  }
+  @media(max-width:640px){
+    .compare-row{grid-template-columns:38px 1fr 38px; gap:4px}
+    .cv{font-size:11px}
+    .clabel{font-size:9px}
+  }
+  @media(max-width:380px){
+    .compare-row{grid-template-columns:1fr; grid-template-rows:auto auto auto; gap:4px}
+    .cv.p1{text-align:left}
+    .cv.p2{text-align:left}
+    .cbar-wrap{order:-1}
+  }
+  .compare-input-card{padding:14px 18px}
+.compare-input-row{display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap}
+  .compare-input-row .field{flex:1 1 140px; min-width:0}
+  .compare-input-row .compare-btn-group{display:flex; gap:10px; align-items:flex-end; flex-shrink:0}
+
+  /* Bouton retour en haut */
+  #backToTop{
+    position:fixed; bottom:24px; right:24px; z-index:100;
+    width:44px; height:44px; border-radius:50%; border:none;
+    background:var(--accent); color:#fff;
+    display:grid; place-items:center;
+    cursor:pointer; font-size:20px; line-height:1;
+    box-shadow:0 4px 16px rgba(0,0,0,.22);
+    opacity:0; pointer-events:none;
+    transition:opacity .2s, transform .2s, background .15s;
+    transform:translateY(8px);
+  }
+  #backToTop.visible{ opacity:1; pointer-events:auto; transform:translateY(0) }
+  #backToTop:hover{ background:var(--accent-hi) }
+  #backToTop:active{ transform:translateY(2px) }
+  @media (max-width:640px){
+    #backToTop{ bottom:16px; right:16px; width:40px; height:40px; font-size:18px }
+  }
+  footer{
+    text-align:center; padding:28px 24px 36px;
+    font-size:12.5px; color:var(--muted);
+    border-top:1px solid var(--line);
+    display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  footer a{ color:var(--accent); text-decoration:none }
+  footer a:hover{ text-decoration:underline }
+  .footer-sep{ color:var(--line-strong) }
+
+
+  /* ===== TIMELINE VERTICALE ===== */
+  .timeline{ position:relative; margin-bottom:20px }
+  .timeline-year-sep{
+    display:flex; align-items:center; gap:14px;
+    margin:28px 0 16px; font-size:12px; font-weight:700;
+    color:var(--muted); text-transform:uppercase; letter-spacing:1px;
+  }
+  .timeline-year-sep::after{
+    content:""; flex:1; height:1px; background:var(--line-strong);
+  }
+  .timeline-line-wrap{
+    position:relative; padding-left:40px;
+  }
+  .timeline-line-wrap::before{
+    content:""; position:absolute; left:12px; top:0; bottom:0; width:2px;
+    background:linear-gradient(to bottom,
+      var(--pilot-color, var(--accent)) 0%,
+      color-mix(in srgb, var(--pilot-color, var(--accent)) 30%, var(--line)) 100%);
+    border-radius:2px;
+  }
+  .timeline-item{
+    position:relative; margin-bottom:14px;
+    opacity:0; transform:translateX(16px);
+    transition:opacity .35s ease, transform .35s ease;
+  }
+  .timeline-item.visible{ opacity:1; transform:translateX(0) }
+  .timeline-dot{
+    position:absolute; left:-29px; top:16px;
+    width:14px; height:14px; border-radius:50%;
+    background:var(--pilot-color, var(--accent));
+    border:3px solid var(--card);
+    box-shadow:0 0 0 2px var(--pilot-color, var(--accent));
+    z-index:1;
+  }
+  .timeline-dot.r1{ background:var(--gold); box-shadow:0 0 0 2px var(--gold) }
+  .timeline-dot.r2{ background:var(--silver); box-shadow:0 0 0 2px var(--silver) }
+  .timeline-dot.r3{ background:var(--bronze); box-shadow:0 0 0 2px var(--bronze) }
+
+  /* Event card: hover elevation */
+  .event{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    margin-bottom:0; overflow:hidden; box-shadow:var(--shadow);
+    transition:transform .15s ease, box-shadow .15s ease, border-color .15s;
+  }
+  .event:hover{
+    transform:translateY(-2px);
+    box-shadow:var(--shadow-xl, var(--shadow));
+    border-color:color-mix(in srgb, var(--accent) 30%, var(--line));
+  }
+
+  /* ===== STATS DASHBOARD ===== */
+  .stats-dashboard{
+    display:grid; grid-template-columns:repeat(2,1fr);
+    gap:14px; margin-bottom:20px;
+  }
+  .stats-dashboard-panel{
+    background:var(--card); border:1px solid var(--line);
+    border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow);
+  }
+  .stats-dashboard-panel-title{
+    font-size:11px; font-weight:700; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.8px;
+    margin-bottom:12px; padding-bottom:8px;
+    border-bottom:1px solid var(--line);
+  }
+  .stats-dashboard-row{
+    display:flex; align-items:baseline; gap:8px; padding:7px 0;
+  }
+  .stats-dashboard-row:not(:last-child){
+    border-bottom:1px dashed var(--line);
+  }
+  .stats-dashboard-icon{ font-size:16px; line-height:1; flex-shrink:0 }
+  .stats-dashboard-val{
+    font-size:22px; font-weight:800; color:var(--ink);
+    line-height:1; font-variant-numeric:tabular-nums; min-width:2ch;
+  }
+  .stats-dashboard-label{ font-size:12px; color:var(--muted); flex:1 }
+  .stats-dashboard-pct{
+    font-size:11px; font-weight:600; color:var(--accent); margin-left:auto;
+    white-space:nowrap;
+  }
+  @media (max-width:768px){
+    .stats-dashboard{ grid-template-columns:1fr }
+  }
+
+  /* Stat card: subtle hover */
+  .stat{ transition:transform .15s ease, box-shadow .15s ease }
+  .stat:hover{ transform:translateY(-1px); box-shadow:var(--shadow-xl, var(--shadow)) }
+
+  /* Carte filtre sticky quand has-results */
+  body.has-results .card.filters{
+    margin-bottom:20px;
+  }
+  .pilot-sticky-header{
+    position:sticky; top:52px; z-index:8;
+    background:var(--bg);
+    margin-bottom:18px;
+    box-shadow:0 4px 16px rgba(60,90,120,.10);
+  }
+  .pilot-sticky-header .pilot-card{ margin-bottom:0; border-radius:var(--radius) var(--radius) 0 0 }
+  .pilot-sticky-header .tabs-nav{ border-radius:0 }
+
+  /* Mobile onglets — override au-dessus du CSS global des onglets */
+  @media (max-width:640px){
+    .pilot-sticky-header{ top:0 }
+    .topbar{ padding:32px 18px 100px }
+    .topbar h1{ font-size:26px; margin-top:18px }
+    main{ padding:0 14px 24px; margin-top:-70px }
+    .tab-btn{ padding:12px 14px; font-size:13px }
+    .timeline-line-wrap{ padding-left:32px }
+    .timeline-line-wrap::before{ left:10px }
+    .timeline-dot{ left:-23px }
+  }
+  @media (max-width:380px){
+    .stats-dashboard{ grid-template-columns:1fr }
+  }
+
+  /* ── H2H Specific ─────────────────────────────── */
+  .autocomplete-wrap { position:relative }
+  .autocomplete-dropdown {
+    position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:100;
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    box-shadow:var(--shadow-xl, var(--shadow)); max-height:240px; overflow-y:auto;
+    display:none;
+  }
+  .autocomplete-dropdown.open { display:block }
+  .ac-item {
+    padding:10px 14px; cursor:pointer; display:flex; flex-direction:column; gap:2px;
+    border-bottom:1px solid var(--line); transition:background .1s;
+  }
+  .ac-item:last-child { border-bottom:none }
+  .ac-item:hover, .ac-item.focused { background:var(--accent-soft) }
+  .ac-item .ac-name { font-weight:600; font-size:14px; color:var(--ink) }
+  .ac-item .ac-meta { font-size:11.5px; color:var(--muted) }
+
+  .pilot-selected-badge {
+    display:flex; align-items:center; gap:10px;
+    padding:10px 14px; border-radius:10px;
+    background:color-mix(in srgb,var(--accent) 8%, var(--card));
+    border:1.5px solid color-mix(in srgb,var(--accent) 30%, var(--line));
+  }
+  .pilot-selected-badge .psb-name { font-weight:700; color:var(--ink); flex:1; min-width:0 }
+  .pilot-selected-badge .psb-meta { font-size:12px; color:var(--muted) }
+  .pilot-selected-badge .psb-clear {
+    background:none; border:none; cursor:pointer; color:var(--muted);
+    padding:4px 6px; border-radius:6px; font-size:13px; flex-shrink:0;
+    transition:color .12s, background .12s;
+  }
+  .pilot-selected-badge .psb-clear:hover { color:var(--bad); background:color-mix(in srgb,var(--bad) 10%,transparent) }
+
+  .suggestions-list {
+    display:flex; flex-direction:column; gap:8px; margin-top:12px;
+  }
+  .suggestion-item {
+    display:flex; align-items:center; gap:12px;
+    padding:10px 14px; border-radius:10px; cursor:pointer;
+    background:var(--card-soft); border:1px solid var(--line);
+    transition:border-color .12s, background .12s;
+  }
+  .suggestion-item:hover { border-color:var(--accent); background:var(--accent-soft) }
+  .suggestion-item .si-name { font-weight:600; color:var(--ink); flex:1; min-width:0 }
+  .suggestion-item .si-meta { font-size:12px; color:var(--muted) }
+  .suggestion-item .si-score {
+    font-size:12px; font-weight:600; color:var(--muted);
+    white-space:nowrap; text-align:right;
+  }
+  .suggestion-item .si-badge {
+    font-size:11px; padding:2px 8px; border-radius:99px; white-space:nowrap;
+    background:color-mix(in srgb,var(--sky) 18%, transparent);
+    color:color-mix(in srgb,var(--sky) 65%, var(--ink));
+  }
+
+  /* H2H Header VS */
+  .h2h-header {
+    display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:center;
+    padding:24px; margin-bottom:0;
+  }
+  .h2h-pilot {
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .h2h-pilot.right { text-align:right; align-items:flex-end }
+  .h2h-pilot .hp-name { font-size:18px; font-weight:800; color:var(--ink) }
+  .h2h-pilot .hp-club { font-size:12px; color:var(--muted) }
+  .h2h-pilot .hp-wins {
+    font-size:28px; font-weight:900; color:var(--muted);
+    line-height:1;
+  }
+  .h2h-pilot .hp-wins.leader { color:var(--good) }
+  .h2h-vs {
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+  }
+  .h2h-vs .vs-label {
+    font-size:20px; font-weight:900; color:var(--muted);
+    letter-spacing:1px;
+  }
+  .h2h-vs .vs-sub { font-size:11px; color:var(--muted); text-align:center }
+
+
+  .h2h-table { width:100%; border-collapse:collapse; font-size:13.5px }
+  .h2h-table th {
+    padding:8px 10px; text-align:left; font-size:11px; font-weight:600;
+    text-transform:uppercase; letter-spacing:.5px; color:var(--muted);
+    border-bottom:2px solid var(--line);
+  }
+  .h2h-table td { padding:10px; border-bottom:1px solid var(--line); vertical-align:middle }
+  .h2h-table tr:last-child td { border-bottom:none }
+  .h2h-table tr.dnx-row td { color:var(--muted); font-style:italic }
+  .h2h-table td.chrono-gap{white-space:nowrap;color:var(--muted)}
+  .h2h-table tbody tr:focus { outline:none }
+  .h2h-table tbody tr:focus-visible {
+    outline:2px solid var(--accent);
+    outline-offset:-2px;
+    border-radius:4px;
+  }
+  .h2h-table .rank-a, .h2h-table .rank-b { font-weight:700; font-variant-numeric:tabular-nums }
+  .h2h-table .rank-a.winner { color:var(--good) }
+  .h2h-table .rank-b.winner { color:var(--good) }
+  .h2h-table .win-icon { text-align:center; font-size:16px }
+  .h2h-table .ev-name { font-weight:600; color:var(--ink) }
+  .h2h-table .ev-cat { font-size:12px; color:var(--muted) }
+  .h2h-table .ev-date { font-size:12px; color:var(--muted); white-space:nowrap }
+
+  .invert-btn {
+    display:flex; align-items:center; gap:6px; margin:0 auto;
+    background:none; border:1px solid var(--line); border-radius:99px;
+    padding:6px 14px; font-size:13px; color:var(--ink); cursor:pointer;
+    transition:border-color .12s, background .12s;
+  }
+  .invert-btn:hover { border-color:var(--accent); background:var(--accent-soft) }
+  
+  
+  .h2h-share-btn {
+    display:inline-flex; align-items:center; gap:6px;
+    background:none; border:1px solid var(--line); border-radius:99px;
+    padding:6px 14px; font-size:13px; color:var(--ink-2); cursor:pointer;
+    transition:border-color .12s, background .12s, color .12s;
+    font-family:inherit;
+  }
+  .h2h-share-btn:hover { border-color:var(--accent); background:var(--accent-soft); color:var(--ink) }
+  .h2h-share-btn.copied { border-color:var(--good); color:color-mix(in srgb,var(--good) 70%, var(--ink)) }
+  .share-row {
+    display:flex; justify-content:flex-end; padding:0 18px 14px; gap:8px;
+  }
+
+  .cat-filter-row {
+    display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+    padding:12px 18px; border-top:1px solid var(--line);
+  }
+  .cat-pill {
+    padding:4px 12px; border-radius:99px; font-size:12px; font-weight:600;
+    cursor:pointer; border:1.5px solid var(--line);
+    background:var(--card-soft); color:var(--muted);
+    transition:border-color .12s, background .12s, color .12s;
+  }
+  .cat-pill:hover { border-color:var(--accent) }
+  .cat-pill.active {
+    border-color:var(--accent);
+    background:color-mix(in srgb,var(--accent) 14%,transparent);
+    color:var(--ink);
+  }
+  .year-filter-row{
+    display:flex; gap:8px; align-items:center;
+    padding:12px 18px 0; font-size:13px; color:var(--muted);
+  }
+  .year-filter-row select{
+    padding:5px 10px; border-radius:10px; font-size:13px; font-weight:600;
+    border:1.5px solid var(--line); background:var(--card-soft); color:var(--ink);
+  }
+
+  .empty-state {
+    text-align:center; padding:48px 24px; color:var(--muted);
+  }
+  .empty-state .es-icon { font-size:40px; margin-bottom:12px }
+  .empty-state .es-title { font-size:16px; font-weight:600; color:var(--ink); margin-bottom:8px }
+  .empty-state .es-text { font-size:13px; line-height:1.6 }
+
+  @media (max-width:640px) {
+    /* Grille pilote A / VS / pilote B → empilement vertical */
+    #pilotGridWrap { padding: 14px !important }
+    #pilotGrid {
+      grid-template-columns: 1fr !important;
+      gap: 10px !important;
+    }
+    #pilotGrid > div:nth-child(2) {
+      flex-direction: row !important;
+      justify-content: center;
+      padding: 4px 0 !important;
+      gap: 12px !important;
+    }
+
+    /* Header H2H → centré, empilé */
+    .h2h-header {
+      grid-template-columns: 1fr;
+      text-align: center;
+      padding: 16px;
+      gap: 8px;
+    }
+    .h2h-pilot { align-items: center }
+    .h2h-pilot.right { text-align: center; align-items: center }
+    .h2h-vs { flex-direction: row; justify-content: center; padding: 4px 0; gap: 16px }
+    .h2h-vs .vs-sub { text-align: center }
+
+    /* Stats cards */
+    .stats { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) }
+
+    /* Suggestions */
+    #suggestionsSection { padding: 0 14px 14px !important }
+    .suggestion-item { padding: 8px 10px }
+
+    /* Filtre catégorie */
+    .cat-filter-row { padding: 10px 14px }
+
+    /* Tableau H2H : colonnes date et catégorie masquées sur très petit écran */
+    .h2h-table .ev-date { display: none }
+    .h2h-table .ev-cat { display: none }
+  }
+
+  @media (max-width:480px) {
+    .h2h-table th:nth-child(1),
+    .h2h-table td:nth-child(1),
+    .h2h-table th:nth-child(3),
+    .h2h-table td:nth-child(3) { display: none }
+  }
+
+  footer{
+    text-align:center; padding:28px 24px 36px;
+    font-size:12.5px; color:var(--muted);
+    border-top:1px solid var(--line);
+    display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  footer a{ color:var(--accent); text-decoration:none }
+  footer a:hover{ text-decoration:underline }
+  .footer-sep{ color:var(--line-strong) }
+
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand-row">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </span>
+        BMX-Race · Head to Head
+      </div>
+      
+      <div style="display:flex; gap:8px; align-items:center">
+      <a href="https://ko-fi.com/sqorz_tools" target="_blank" rel="noopener noreferrer" class="donate-btn" title="Soutenir le projet sur Ko-fi"><span class="donate-icon">☕</span><span class="donate-label">Soutenir</span></a>
+      <button type="button" id="themeBtn" class="theme-btn" aria-label="Changer le thème" title="Changer le thème (auto / clair / sombre)"></button>
+      </div>
+    </div>
+    <a class="hub-back" id="hubBackLink" href="#" aria-label="Retour au BMX-Race Hub">← BMX-Race Hub</a>
+    <h1>BMX-Race · Head to Head</h1>
+    <p>Comparez deux pilotes BMX sur leurs confrontations directes — événements communs, victoires, classements.</p>
+  </div>
+</div>
+
+<main>
+  <!-- Carte chargement / statut -->
+  <div class="card" id="statusCard" style="padding:18px">
+    <div class="status loading" id="statusEl">Chargement des données…</div>
+    <div class="progress" id="progressWrap" hidden><div id="progressBar"></div></div>
+    <button id="retryBtn" hidden>Réessayer</button>
+  </div>
+
+  <!-- Sélection des pilotes -->
+  <div class="card" id="selectionCard" hidden>
+    <div id="pilotGridWrap" style="padding:20px">
+      <div style="display:grid; grid-template-columns:1fr auto 1fr; gap:16px; align-items:end" id="pilotGrid">
+        <!-- Pilote A -->
+        <div>
+          <label for="inputA" style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Pilote A</label>
+          <div class="autocomplete-wrap" id="wrapA">
+            <input id="inputA" class="control" style="width:100%" type="text" placeholder="Nom du pilote…" autocomplete="off">
+            <div class="autocomplete-dropdown" id="dropdownA"></div>
+          </div>
+          <div id="badgeA" hidden></div>
+        </div>
+
+        <!-- VS + Inverser -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding-bottom:2px">
+          <span style="font-size:15px;font-weight:900;color:var(--muted);letter-spacing:1px" aria-hidden="true">VS</span>
+          <button type="button" class="invert-btn" id="invertBtn" disabled title="Inverser A et B" aria-label="Inverser les deux pilotes"><span aria-hidden="true">⇄</span></button>
+        </div>
+
+        <!-- Pilote B -->
+        <div>
+          <label for="inputB" style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Pilote B</label>
+          <div class="autocomplete-wrap" id="wrapB">
+            <input id="inputB" class="control" style="width:100%" type="text" placeholder="Nom du pilote…" autocomplete="off" disabled>
+            <div class="autocomplete-dropdown" id="dropdownB"></div>
+          </div>
+          <div id="badgeB" hidden></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Adversaires suggérés -->
+    <div id="suggestionsSection" hidden style="padding:0 20px 20px">
+      <div class="section-title" style="margin-top:4px">
+        Adversaires fréquents
+        <span class="meta" id="suggestionsSubtitle"></span>
+      </div>
+      <div class="suggestions-list" id="suggestionsList"></div>
+    </div>
+  </div>
+
+  <!-- Résultats H2H -->
+  <div id="h2hResults"></div>
+</main>
+
+<script src="../common.js"></script>
+<script>
+(() => {
+'use strict';
+if (!window.BmxCommon) throw new Error('[h2h] common.js introuvable — recharge la page.');
+// Socle partagé (common.js) : utils, expansion d'index, chargeur à cache, dates.
+const { norm, escape, humanError, loadIndexCached, renderDataDates, setTextStatus, setBarProgress, isNotTimedPhase, num } = window.BmxCommon;
+// --- Noms complets des clubs (clubs.json, cf. club_stats/tools/clubs/README.md) ---
+// Normalisation compatible club_stats (conserve '-' et la ponctuation : JOUE-T ≠ JOUE T).
+const normClubCode = s => (s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+let clubFullNames = new Map();
+async function loadClubNames() {
+  try {
+    const r = await fetch('../clubs.json', { cache: 'no-cache' });
+    if (!r.ok) return;
+    const j = await r.json();
+    const m = (j && j.mapping) || j || {};
+    for (const [k, v] of Object.entries(m)) {
+      if (k === '_meta' || !v || !v.name) continue;
+      clubFullNames.set(normClubCode(k), v.name);
+    }
+  } catch { /* repli : codes seuls */ }
+}
+// « BMX BESANCON (BESANC) » — repli sur le code seul si inconnu.
+function clubDisplayName(raw) {
+  const code = (raw || '').trim();
+  const full = clubFullNames.get(normClubCode(code));
+  return full ? `${full} (${code})` : code;
+}
+
+const INDEX_SOURCES = [
+  'https://pub-7af06f138c97425f8062b881846803cb.r2.dev/pilots-index.json',
+  'https://github.com/LudSoc/bmx-race-stats/releases/latest/download/pilots-index.json',
+  'https://raw.githubusercontent.com/LudSoc/bmx-race-stats/main/pilots-index.json',
+];
+// Index UEC (JSTiming — Coupe/Championnats d'Europe) : mêmes sources, optionnel.
+const UEC_INDEX_SOURCES = [
+  'https://pub-7af06f138c97425f8062b881846803cb.r2.dev/uec-index.json',
+  'https://github.com/LudSoc/bmx-race-stats/releases/latest/download/uec-index.json',
+  'https://raw.githubusercontent.com/LudSoc/bmx-race-stats/main/uec-index.json',
+];
+// Index Coupe du monde UCI : mêmes sources, optionnel.
+const WC_INDEX_SOURCES = [
+  'https://pub-7af06f138c97425f8062b881846803cb.r2.dev/uci-worldcup-index.json',
+  'https://github.com/LudSoc/bmx-race-stats/releases/latest/download/uci-worldcup-index.json',
+  'https://raw.githubusercontent.com/LudSoc/bmx-race-stats/main/uci-worldcup-index.json',
+];
+// Index UCI (Mondiaux BMX Racing) : mêmes sources, optionnel.
+const UCI_INDEX_SOURCES = [
+  'https://pub-7af06f138c97425f8062b881846803cb.r2.dev/uci-index.json',
+  'https://github.com/LudSoc/bmx-race-stats/releases/latest/download/uci-index.json',
+  'https://raw.githubusercontent.com/LudSoc/bmx-race-stats/main/uci-index.json',
+];
+const STATS_BASE = '../stats/';
+
+// ── Utilitaires : voir BmxCommon (norm, escape, humanError) ──
+
+function findPilotByNormKey(key) {
+  if ((!pilotsIndex && !uecIndex) || !key) return null;
+  const seen = new Map();
+  for (const ev of allEvents()) {
+    for (const cls of (ev.classes || [])) {
+      for (const c of (cls.competitors || [])) {
+        const k = norm((c.firstName || '') + ' ' + (c.lastName || '')).trim();
+        if (k === key && !seen.has(k)) {
+          seen.set(k, { firstName: c.firstName || '', lastName: c.lastName || '', groupName: c.groupName || '', age: c.age ?? null, normKey: k });
+        }
+      }
+    }
+  }
+  return seen.get(key) ?? null;
+}
+
+function parseUrlState() {
+  const p = new URLSearchParams(location.search);
+  return { a: p.get('a') || '', b: p.get('b') || '' };
+}
+function buildUrl() {
+  const u = new URL(location.href);
+  if (pilotA?.normKey) u.searchParams.set('a', pilotA.normKey);
+  else u.searchParams.delete('a');
+  if (pilotB?.normKey) u.searchParams.set('b', pilotB.normKey);
+  else u.searchParams.delete('b');
+  return u.pathname + (u.search || '');
+}
+function pushUrlState() {
+  const newUrl = buildUrl();
+  const cur = location.pathname + location.search;
+  if (newUrl === cur) history.replaceState(null, '', newUrl);
+  else history.pushState(null, '', newUrl);
+}
+function replaceUrlState() {
+  history.replaceState(null, '', buildUrl());
+}
+
+window.addEventListener('popstate', () => {
+  const { a, b } = parseUrlState();
+  if (a) {
+    const pA = findPilotByNormKey(a);
+    if (pA && (!pilotA || pilotA.normKey !== pA.normKey)) {
+      // Reset both then re-select from URL
+      pilotA = null; pilotB = null;
+      inputA.value = ''; inputA.hidden = false; badgeA.hidden = true; badgeA.innerHTML = '';
+      inputB.value = ''; inputB.hidden = false; badgeB.hidden = true; badgeB.innerHTML = '';
+      inputB.disabled = true; invertBtn.disabled = true;
+      h2hResults.innerHTML = '';
+      document.body.classList.remove('has-results');
+      selectPilotA(pA);
+      if (b) {
+        const pB = findPilotByNormKey(b);
+        if (pB) {
+          selectPilotB(pB);
+          history.replaceState(null, '', buildUrl());
+        }
+      }
+    }
+  } else {
+    // Back to empty state
+    pilotA = null; pilotB = null;
+    inputA.value = ''; inputA.hidden = false; badgeA.hidden = true; badgeA.innerHTML = '';
+    inputB.value = ''; inputB.hidden = false; badgeB.hidden = true; badgeB.innerHTML = '';
+    inputB.disabled = true; invertBtn.disabled = true;
+    h2hResults.innerHTML = '';
+    suggestionsSection.hidden = true;
+    document.title = 'BMX-Race · Head to Head';
+    document.body.classList.remove('has-results');
+  }
+});
+
+function specialLabel(r) {
+  if (r == null || r < 100000) return null;
+  if (r >= 103000) return 'DNS';
+  if (r >= 101000) return 'DSQ';
+  return 'DNF';
+}
+
+// ── État global ──────────────────────────────────
+let pilotsIndex = null; // l'index FR expansé
+let uecIndex = null;    // l'index UEC expansé (optionnel — l'app fonctionne sans)
+let uciIndex = null;    // l'index UCI Mondiaux expansé (idem)
+let wcIndex = null;     // l'index Coupe du monde UCI expansé (idem)
+let pilotA = null;      // { firstName, lastName, groupName, normKey }
+let pilotB = null;      // idem
+
+// Tous les événements FR + UEC + UCI + WC (enrichit recherche, suggestions et confrontations).
+function allEvents() {
+  const out = [];
+  if (pilotsIndex) out.push(...(pilotsIndex.events || []));
+  if (uecIndex) out.push(...(uecIndex.events || []));
+  if (uciIndex) out.push(...(uciIndex.events || []));
+  if (wcIndex) out.push(...(wcIndex.events || []));
+  return out;
+}
+
+// ── DOM ──────────────────────────────────────────
+const statusCard        = document.getElementById('statusCard');
+const statusEl          = document.getElementById('statusEl');
+const retryBtn          = document.getElementById('retryBtn');
+const selectionCard     = document.getElementById('selectionCard');
+const inputA            = document.getElementById('inputA');
+const inputB            = document.getElementById('inputB');
+const dropdownA         = document.getElementById('dropdownA');
+const dropdownB         = document.getElementById('dropdownB');
+const badgeA            = document.getElementById('badgeA');
+const badgeB            = document.getElementById('badgeB');
+const invertBtn         = document.getElementById('invertBtn');
+const suggestionsSection = document.getElementById('suggestionsSection');
+const suggestionsSubtitle = document.getElementById('suggestionsSubtitle');
+const suggestionsList   = document.getElementById('suggestionsList');
+const h2hResults        = document.getElementById('h2hResults');
+
+// ── Expansion de l'index (format compact → complet) ─
+// ── Expansion : BmxCommon.expandIndex en mode économe (sans phases ni séries,
+// que cette app n'utilise jamais — cf. allEvents/computeConfrontations) ──
+
+// ── Chargement ───────────────────────────────────
+function setProgress(done, total) {
+  setBarProgress(done, total);
+}
+
+// ── Cache client piloté par meta.json (sha256), via BmxCommon.loadIndexCached ───────────
+const INDEX_CACHE_KEY = 'https://bmx-race.local/cache/pilots-index.json';
+const INDEX_META_URL = '../stats/pilots-index.meta.json';
+// Index UEC : même cache (clé dédiée), piloté par son propre meta.json.
+const UEC_INDEX_CACHE_KEY = 'https://bmx-race.local/cache/uec-index.json';
+const WC_INDEX_CACHE_KEY = 'https://bmx-race.local/cache/uci-worldcup-index.json';
+const UCI_INDEX_CACHE_KEY = 'https://bmx-race.local/cache/uci-index.json';
+const UEC_INDEX_META_URL = '../stats/uec-index.meta.json';
+const WC_INDEX_META_URL = '../stats/uci-worldcup-index.meta.json';
+const UCI_INDEX_META_URL = '../stats/uci-index.meta.json';
+
+const indexStatus = (text, isError) => setTextStatus(statusEl, text, isError);
+function pilotsCfg() {
+  return {
+    metaUrl: INDEX_META_URL, cacheKey: INDEX_CACHE_KEY, sources: INDEX_SOURCES,
+      tag: '[h2h]', label: 'Index', estimatedSize: 83_000_000,
+      expandOpts: { details: 'chrono', series: false },
+    onStatus: indexStatus, onProgress: setProgress,
+  };
+}
+function uecCfg() {
+  return {
+    metaUrl: UEC_INDEX_META_URL, cacheKey: UEC_INDEX_CACHE_KEY, sources: UEC_INDEX_SOURCES,
+      tag: '[h2h:uec]', label: 'Index UEC', estimatedSize: 10_000_000,
+      expandOpts: { details: 'chrono', series: false },
+    onStatus: indexStatus, onProgress: setProgress,
+  };
+}
+function uciCfg() {
+  return {
+    metaUrl: UCI_INDEX_META_URL, cacheKey: UCI_INDEX_CACHE_KEY, sources: UCI_INDEX_SOURCES,
+      tag: '[h2h:uci]', label: 'Index UCI Mondiaux', estimatedSize: 5_000_000,
+      expandOpts: { details: 'chrono', series: false },
+    onStatus: indexStatus, onProgress: setProgress,
+  };
+}
+function wcCfg() {
+  return {
+    metaUrl: WC_INDEX_META_URL, cacheKey: WC_INDEX_CACHE_KEY, sources: WC_INDEX_SOURCES,
+      tag: '[h2h:wc]', label: 'Index Coupe du monde', estimatedSize: 1_000_000,
+      expandOpts: { details: 'chrono', series: false },
+    onStatus: indexStatus, onProgress: setProgress,
+  };
+}
+
+// Fraîcheur par source dans le pied de page (une seule date si identiques).
+function showDataDates() {
+  renderDataDates([
+    { tag: 'FR', iso: pilotsIndex && pilotsIndex.generated },
+    { tag: 'UEC', iso: uecIndex && uecIndex.generated },
+    { tag: 'UCI', iso: uciIndex && uciIndex.generated },
+    { tag: 'WC', iso: wcIndex && wcIndex.generated },
+  ]);
+}
+
+async function loadIndex() {
+  retryBtn.hidden = true;
+  statusEl.className = 'status loading';
+  statusEl.textContent = 'Chargement des données…';
+  statusCard.hidden = false;
+  selectionCard.hidden = true;
+  try {
+    // Index FR : requis — l'UI devient utilisable dès qu'il est prêt.
+    pilotsIndex = await loadIndexCached(pilotsCfg());
+    await loadClubNames();
+    finishPrimaryLoad();
+    // UEC : arrière-plan — recherche et suggestions l'intègrent à son arrivée.
+    loadUecInBackground();
+    // UCI Mondiaux : idem.
+    loadUciInBackground();
+    // Coupe du monde UCI : idem.
+    loadWcInBackground();
+  } catch (e) {
+    setProgress(0, 0);
+    statusEl.className = 'status error';
+    statusEl.textContent = 'Impossible de charger les données : ' + humanError(e);
+    retryBtn.hidden = false;
+  }
+}
+
+function finishPrimaryLoad() {
+  statusCard.hidden = true;
+  selectionCard.hidden = false;
+  inputA.focus();
+  showDataDates();
+}
+
+async function loadUecInBackground() {
+  try {
+    uecIndex = await loadIndexCached({ ...uecCfg(), quiet: true });
+  } catch (e) {
+    console.warn('[h2h] uec-index.json indisponible :', e && e.message);
+    uecIndex = null;
+    return;
+  }
+  showDataDates();
+}
+async function loadUciInBackground() {
+  try {
+    uciIndex = await loadIndexCached({ ...uciCfg(), quiet: true });
+  } catch (e) {
+    console.warn('[h2h] uci-index.json indisponible :', e && e.message);
+    uciIndex = null;
+    return;
+  }
+  showDataDates();
+}
+async function loadWcInBackground() {
+  try {
+    wcIndex = await loadIndexCached({ ...wcCfg(), quiet: true });
+  } catch (e) {
+    console.warn('[h2h] uci-worldcup-index.json indisponible :', e && e.message);
+    wcIndex = null;
+    return;
+  }
+  showDataDates();
+}
+retryBtn.onclick = loadIndex;
+
+// ── 3.1 Recherche de pilotes ─────────────────────
+function searchPilots(query, excludeNormKey = null) {
+  if ((!pilotsIndex && !uecIndex) || !norm(query)) return [];
+  const tokens = norm(query).split(' ').filter(Boolean);
+  const map = new Map();
+  for (const ev of allEvents()) {
+    for (const cls of (ev.classes || [])) {
+      for (const c of (cls.competitors || [])) {
+        const key = norm((c.firstName || '') + ' ' + (c.lastName || '')).trim();
+        if (!key) continue;
+        if (excludeNormKey && key === excludeNormKey) continue;
+        if (!tokens.every(t => key.includes(t))) continue;
+        if (!map.has(key)) {
+          map.set(key, { firstName: c.firstName || '', lastName: c.lastName || '', groupName: c.groupName || '', age: c.age ?? null, normKey: key, eventCount: 0 });
+        }
+        map.get(key).eventCount++;
+      }
+    }
+  }
+  return [...map.values()]
+    .sort((a, b) => b.eventCount - a.eventCount)
+    .slice(0, 12);
+}
+
+// ── 3.2 Autocomplete ─────────────────────────────
+function setupAutocomplete(input, dropdown, onSelect, getExcludeKey) {
+  let focusedIdx = -1;
+
+  function updateDropdown(items) {
+    focusedIdx = -1;
+    if (!items.length) { dropdown.classList.remove('open'); dropdown.innerHTML = ''; return; }
+    dropdown.innerHTML = items.map((p, i) =>
+      `<div class="ac-item" data-idx="${i}" tabindex="-1">
+        <span class="ac-name">${escape(p.firstName + ' ' + p.lastName)}${p.age != null ? `<span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:6px">${p.age} ans</span>` : ''}</span>
+        ${p.groupName ? `<span class="ac-meta">${escape(clubDisplayName(p.groupName))}</span>` : ''}
+      </div>`
+    ).join('');
+    dropdown.classList.add('open');
+    dropdown._items = items;
+    dropdown.querySelectorAll('.ac-item').forEach((el, i) => {
+      el.addEventListener('mousedown', e => { e.preventDefault(); onSelect(items[i]); closeDropdown(); });
+    });
+  }
+
+  function closeDropdown() { dropdown.classList.remove('open'); dropdown.innerHTML = ''; focusedIdx = -1; }
+
+  function moveFocus(delta) {
+    const items = dropdown.querySelectorAll('.ac-item');
+    if (!items.length) return;
+    items[focusedIdx]?.classList.remove('focused');
+    focusedIdx = (focusedIdx + delta + items.length) % items.length;
+    items[focusedIdx]?.classList.add('focused');
+    items[focusedIdx]?.scrollIntoView({ block:'nearest' });
+  }
+
+  input.addEventListener('input', () => {
+    const results = searchPilots(input.value, getExcludeKey());
+    if (results.length === 1) {
+      onSelect(results[0]);
+      closeDropdown();
+    } else {
+      updateDropdown(results);
+    }
+  });
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); moveFocus(1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); moveFocus(-1); }
+    else if (e.key === 'Enter') {
+      if (!dropdown._items || !dropdown._items.length) return;
+      const focused = dropdown.querySelector('.ac-item.focused') || dropdown.querySelector('.ac-item');
+      if (focused) {
+        const idx = +focused.dataset.idx;
+        onSelect(dropdown._items[idx]);
+        closeDropdown();
+        e.preventDefault();
+      }
+    }
+    else if (e.key === 'Escape') closeDropdown();
+  });
+
+  document.addEventListener('click', e => {
+    if (!input.contains(e.target) && !dropdown.contains(e.target)) closeDropdown();
+  });
+}
+
+// ── 3.3 Badge pilote sélectionné ─────────────────
+function renderBadge(pilot) {
+  const fullName = escape(pilot.firstName + ' ' + pilot.lastName);
+  const meta = [clubDisplayName(pilot.groupName), pilot.age != null ? `${pilot.age} ans` : null].filter(Boolean).map(escape).join(' · ');
+  return `<div class="pilot-selected-badge">
+    <div class="psb-name">${fullName}</div>
+    ${meta ? `<span class="psb-meta">${meta}</span>` : ''}
+    <button type="button" class="psb-clear" aria-label="Effacer la sélection">✕</button>
+  </div>`;
+}
+
+// ── 3.4 Sélection / effacement des pilotes ───────
+function selectPilotA(pilot) {
+  pilotA = pilot;
+  inputA.value = '';
+  inputA.hidden = true;
+  badgeA.innerHTML = renderBadge(pilot);
+  badgeA.hidden = false;
+  badgeA.querySelector('.psb-clear').addEventListener('click', clearPilotA);
+  inputB.disabled = false;
+  inputB.focus();
+  invertBtn.disabled = !(pilotA && pilotB);
+  onPilotASelected();
+}
+
+function clearPilotA() {
+  pilotA = null;
+  inputA.value = '';
+  inputA.hidden = false;
+  badgeA.hidden = true;
+  badgeA.innerHTML = '';
+  inputB.disabled = true;
+  inputB.value = '';
+  invertBtn.disabled = true;
+  clearPilotB();
+  suggestionsSection.hidden = true;
+  h2hResults.innerHTML = '';
+  document.title = 'BMX-Race · Head to Head';
+  document.body.classList.remove('has-results');
+  inputA.focus();
+}
+
+function selectPilotB(pilot) {
+  pilotB = pilot;
+  inputB.value = '';
+  inputB.hidden = true;
+  badgeB.innerHTML = renderBadge(pilot);
+  badgeB.hidden = false;
+  badgeB.querySelector('.psb-clear').addEventListener('click', clearPilotB);
+  invertBtn.disabled = false;
+  computeAndRenderH2H();
+  pushUrlState();
+}
+
+function clearPilotB() {
+  pilotB = null;
+  inputB.value = '';
+  inputB.hidden = false;
+  inputB.focus();
+  badgeB.hidden = true;
+  badgeB.innerHTML = '';
+  invertBtn.disabled = !(pilotA);
+  h2hResults.innerHTML = '';
+  document.body.classList.remove('has-results');
+  replaceUrlState();
+}
+
+// ── 3.5 Connexion des autocomplètes + bouton Inverser ──
+setupAutocomplete(inputA, dropdownA, selectPilotA, () => pilotB?.normKey ?? null);
+setupAutocomplete(inputB, dropdownB, selectPilotB, () => pilotA?.normKey ?? null);
+
+invertBtn.addEventListener('click', () => {
+  if (!pilotA || !pilotB) return;
+  const tmpA = { ...pilotA };
+  const tmpB = { ...pilotB };
+  pilotA = null; pilotB = null;
+  inputA.value = ''; inputA.hidden = false; badgeA.hidden = true; badgeA.innerHTML = '';
+  inputB.value = ''; inputB.hidden = false; badgeB.hidden = true; badgeB.innerHTML = '';
+  invertBtn.disabled = true;
+  h2hResults.innerHTML = '';
+  suggestionsSection.hidden = true;
+  selectPilotA(tmpB);
+  selectPilotB(tmpA);
+});
+
+// ── Task 4: Compute top opponents et render suggestions ─────
+function computeTopOpponents(pilot, maxN = 10) {
+  if ((!pilotsIndex && !uecIndex) || !pilot) return [];
+  const pilotKey = pilot.normKey;
+  const opponents = new Map();
+
+  for (const ev of allEvents()) {
+    for (const cls of (ev.classes || [])) {
+      const pilotEntry = cls.competitors.find(c =>
+        norm((c.firstName || '') + ' ' + (c.lastName || '')).trim() === pilotKey
+      );
+      if (!pilotEntry) continue;
+      const pilotRank = typeof pilotEntry.rank === 'number' ? pilotEntry.rank : null;
+
+      for (const c of cls.competitors) {
+        const oppKey = norm((c.firstName || '') + ' ' + (c.lastName || '')).trim();
+        if (!oppKey || oppKey === pilotKey) continue;
+
+        const confrontationKey = (ev.account?.accountCode || 'src') + '|' + ev.event.eventId + '|' + cls.perpetualClassCode;
+        if (!opponents.has(oppKey)) {
+          opponents.set(oppKey, {
+            firstName: c.firstName || '',
+            lastName: c.lastName || '',
+            normKey: oppKey,
+            groupName: c.groupName || '',
+            age: c.age ?? null,
+            eventKeys: new Set(),
+            winsA: 0, winsB: 0,
+          });
+        }
+        const opp = opponents.get(oppKey);
+        if (opp.eventKeys.has(confrontationKey)) continue;
+        opp.eventKeys.add(confrontationKey);
+
+        const oppRank = typeof c.rank === 'number' ? c.rank : null;
+        if (pilotRank != null && pilotRank < 100000 && oppRank != null && oppRank < 100000) {
+          if (pilotRank < oppRank) opp.winsA++;
+          else if (oppRank < pilotRank) opp.winsB++;
+        }
+      }
+    }
+  }
+
+  return [...opponents.values()]
+    .sort((a, b) => b.eventKeys.size - a.eventKeys.size)
+    .slice(0, maxN)
+    .map(o => ({ ...o, commonEvents: o.eventKeys.size }));
+}
+
+function renderSuggestions(opponents) {
+  if (!opponents.length) {
+    suggestionsList.innerHTML = '<div class="empty-state" style="padding:16px 0"><div class="es-text">Aucun adversaire trouvé pour ce pilote.</div></div>';
+    return;
+  }
+  suggestionsList.innerHTML = opponents.map(opp => {
+    const name = escape(opp.firstName + ' ' + opp.lastName);
+    const meta = [clubDisplayName(opp.groupName), opp.age != null ? `${opp.age} ans` : null].filter(Boolean).map(escape).join(' · ');
+    const score = `${opp.winsA} – ${opp.winsB}`;
+    return `<div class="suggestion-item" role="button" tabindex="0" data-norm-key="${escape(opp.normKey)}">
+      <div style="flex:1;min-width:0">
+        <div class="si-name">${name}</div>
+        ${meta ? `<div class="si-meta">${meta}</div>` : ''}
+      </div>
+      <div class="si-score">
+        <div class="si-badge">${opp.commonEvents} événement(s)</div>
+        <div style="margin-top:3px;font-size:11px;color:var(--muted)">${score}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  suggestionsList.querySelectorAll('.suggestion-item').forEach((el, i) => {
+    const handler = () => selectPilotB(opponents[i]);
+    el.addEventListener('click', handler);
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); } });
+  });
+}
+
+// ── Stubs des fonctions à venir (Tasks 3–8) ─────
+function onPilotASelected() {
+  const opponents = computeTopOpponents(pilotA);
+  suggestionsSubtitle.textContent = `${opponents.length} adversaire(s) fréquent(s)`;
+  suggestionsSection.hidden = false;
+  renderSuggestions(opponents);
+}
+
+// Ordre sportif d'une phase pour trier les manches d'une même épreuve : manches,
+// repêchages, 1/32 → 1/8, quarts, demis, petite finale, (grande) finale, super finale.
+// « 1/8 de Finale » est un huitième (30), pas LA finale. Inconnu → 45 (avant les finales).
+// Testable.
+function phaseOrder(name) {
+  const n = (name || '').toLowerCase();
+  if (/^moto\b/.test(n) || n.includes('manche') || /\btime.trial\b/.test(n)) return 0;
+  if (/qualif|round|tour/.test(n)) return 2; // tours qualificatifs précoces
+  if (/repech|last.?chance|\blcq\b/.test(n)) return 5;
+  if (/1\/32|32(ème|eme|°)/.test(n)) return 10;
+  if (/1\/16|16(ème|eme|°)/.test(n)) return 20;
+  if (/1\/8|8(ème|eme|°)/.test(n)) return 30;
+  if (/quart|quarter|1\/4/.test(n)) return 40;
+  if (/semi|demi|1\/2/.test(n)) return 50;
+  if (!/final/.test(n)) return 45;
+  if (/super/.test(n)) return 70;
+  if (/\bb\b|petit/.test(n)) return 55;
+  return 60;
+}
+
+// Clé d'une course (manche) : raceName + phaseCode (cf. raceUrl `${raceName}%${phaseCode}`).
+// Sans les deux → course non identifiable (données UEC : noms de phases seuls, sans manches).
+// Formes expansée (raceName/phaseCode/result/phaseName) et slim (rn/pc/r/n) acceptées :
+// l'index brut garde tous les détails (competitorRankDetails est filtré en mode chrono).
+function raceKeyOf(d) {
+  if (!d) return null;
+  const rn = d.raceName ?? d.rn;
+  const pc = d.phaseCode ?? d.pc;
+  if (rn == null || rn === '' || !pc) return null;
+  return rn + '%' + pc;
+}
+// Courses partagées : même heat avec les deux pilotes au départ (DNS exclu —
+// pas sur la grille ; DNF/DSQ ont pris le départ). Testable.
+function sharedRaces(aDetails, bDetails) {
+  const resOf = d => d.result ?? d.r;
+  const phaseOf = d => d.phaseName ?? d.n;
+  const aMap = new Map();
+  for (const d of aDetails || []) {
+    const k = raceKeyOf(d);
+    const r = resOf(d);
+    if (k == null || typeof r !== 'number') continue;
+    if (!aMap.has(k)) aMap.set(k, r);
+  }
+  const out = [];
+  for (const d of bDetails || []) {
+    const k = raceKeyOf(d);
+    const r = resOf(d);
+    if (k == null || typeof r !== 'number' || !aMap.has(k)) continue;
+    const ra = aMap.get(k);
+    if (ra >= 103000 || r >= 103000) continue; // DNS
+    out.push({ key: k, phase: phaseOf(d) || '', a: ra, b: r });
+  }
+  out.sort((p, q) => phaseOrder(q.phase) - phaseOrder(p.phase)); // finale en premier (tri stable)
+  return out;
+}
+
+function computeConfrontations(pilotA, pilotB) {
+  if ((!pilotsIndex && !uecIndex) || !pilotA || !pilotB) return [];
+  const keyA = pilotA.normKey;
+  const keyB = pilotB.normKey;
+  const result = [];
+
+  for (const ev of allEvents()) {
+    for (const cls of (ev.classes || [])) {
+      const entryA = cls.competitors.find(c =>
+        norm((c.firstName || '') + ' ' + (c.lastName || '')).trim() === keyA
+      );
+      const entryB = cls.competitors.find(c =>
+        norm((c.firstName || '') + ' ' + (c.lastName || '')).trim() === keyB
+      );
+      if (!entryA || !entryB) continue;
+      if (typeof entryA.rank !== 'number' || typeof entryB.rank !== 'number') continue;
+
+      result.push({
+        event: ev.event,
+        account: ev.account,
+        cls: { className: cls.className, perpetualClassCode: cls.perpetualClassCode },
+        rankA: entryA.rank,
+        rankB: entryB.rank,
+        // Détails bruts (slim) : complets même en mode chrono (competitorRankDetails
+        // ne garde que les phases chronométrées). Sans surcoût mémoire : déjà chargés.
+        shared: sharedRaces(entryA.d || entryA.competitorRankDetails, entryB.d || entryB.competitorRankDetails),
+        chronoA: chronoBests(entryA.competitorRankDetails),
+        chronoB: chronoBests(entryB.competitorRankDetails),
+      });
+    }
+  }
+
+  return result.sort((a, b) => (b.event.eventDate || '').localeCompare(a.event.eventDate || ''));
+}
+
+// ── Duel chronos (transpondeur) ─────────────────────
+// Meilleurs temps valables par métrique, sur les phases chronométrées du pilote
+// DANS cette confrontation (même événement + même catégorie). Mêmes règles que les
+// chronos de la timeline : phases DNF/DNS/DSQ et temps ≤ 0 exclus.
+const CHRONO_METRICS = [
+  { key: 'time',        label: '⏱️ Chrono' },
+  { key: 'corner2Time', label: '⏱️ Virage 1' },
+  { key: 'hillTime',    label: '⏱️ Butte' },
+];
+const fmtChrono = v => `${Number(v).toFixed(3)} s`;
+function bestChrono(details, key) {
+  let b = null;
+  for (const d of details || []) {
+    if (isNotTimedPhase(d)) continue;
+    const v = num(d[key]);
+    if (v != null && (b == null || v < b)) b = v;
+  }
+  return b;
+}
+function chronoBests(details) {
+  const out = {};
+  for (const m of CHRONO_METRICS) out[m.key] = bestChrono(details, m.key);
+  return out;
+}
+// Agrégat par métrique : duels où les DEUX pilotes sont chronométrés, victoires
+// (meilleur temps), écart médian (absolu). Ne retient que les métriques avec ≥ 1 duel.
+function computeChronoStats(confrontations) {
+  return CHRONO_METRICS.map(m => {
+    const deltas = [];
+    let winsA = 0, winsB = 0, ties = 0;
+    for (const c of confrontations) {
+      const a = c.chronoA ? c.chronoA[m.key] : null;
+      const b = c.chronoB ? c.chronoB[m.key] : null;
+      if (a == null || b == null) continue;
+      if (a < b) winsA++;
+      else if (b < a) winsB++;
+      else ties++;
+      deltas.push(Math.abs(a - b));
+    }
+    deltas.sort((x, y) => x - y);
+    return {
+      key: m.key, label: m.label, duels: deltas.length, winsA, winsB, ties,
+      medDelta: deltas.length ? deltas[Math.floor(deltas.length / 2)] : null,
+    };
+  }).filter(s => s.duels > 0);
+}
+
+function computeH2HStats(confrontations) {
+  let winsA = 0, winsB = 0, ties = 0, validCount = 0;
+  const categories = new Set();
+  let firstDate = '', lastDate = '';
+
+  for (const c of confrontations) {
+    const dateStr = c.event.eventDate || '';
+    if (dateStr) {
+      if (!firstDate || dateStr < firstDate) firstDate = dateStr;
+      if (!lastDate || dateStr > lastDate) lastDate = dateStr;
+    }
+    categories.add(c.cls.className || c.cls.perpetualClassCode || '?');
+
+    const specA = specialLabel(c.rankA);
+    const specB = specialLabel(c.rankB);
+    if (specA || specB) continue;
+    validCount++;
+    if (c.rankA < c.rankB) winsA++;
+    else if (c.rankB < c.rankA) winsB++;
+    else ties++;
+  }
+
+  return { winsA, winsB, ties, validCount, total: confrontations.length, categories: [...categories], firstDate, lastDate };
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const [y, m, d] = iso.slice(0, 10).split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function renderH2HHeader(stats, viewScore) {
+  // viewScore = null (vue classement : victoires) ou { winsA, winsB, caption }
+  // (vue chrono : duels remportés sur la métrique) — le total suit le tableau choisi.
+  const winsA = viewScore ? viewScore.winsA : stats.winsA;
+  const winsB = viewScore ? viewScore.winsB : stats.winsB;
+  const caption = viewScore ? viewScore.caption : 'victoire(s)';
+  const aLeads = winsA > winsB;
+  const bLeads = winsB > winsA;
+  const nameA = escape(pilotA.firstName + ' ' + pilotA.lastName);
+  const nameB = escape(pilotB.firstName + ' ' + pilotB.lastName);
+  const metaA = [clubDisplayName(pilotA.groupName), pilotA.age != null ? `${pilotA.age} ans` : null].filter(Boolean).map(escape).join(' · ');
+  const metaB = [clubDisplayName(pilotB.groupName), pilotB.age != null ? `${pilotB.age} ans` : null].filter(Boolean).map(escape).join(' · ');
+  const clubA = metaA ? `<div class="hp-club">${metaA}</div>` : '';
+  const clubB = metaB ? `<div class="hp-club">${metaB}</div>` : '';
+  const period = stats.firstDate
+    ? `${fmtDate(stats.firstDate)} → ${fmtDate(stats.lastDate)}`
+    : '—';
+
+  const linkA = `${STATS_BASE}?name=${encodeURIComponent(pilotA.firstName + ' ' + pilotA.lastName)}`;
+  const linkB = `${STATS_BASE}?name=${encodeURIComponent(pilotB.firstName + ' ' + pilotB.lastName)}`;
+
+  return `<div class="h2h-header">
+    <div class="h2h-pilot">
+      <div class="hp-name"><a class="bmx-link" href="${linkA}" target="_blank">${nameA}</a></div>
+      ${clubA}
+      <div class="hp-wins${aLeads?' leader':''}">${winsA}</div>
+      <div style="font-size:12px;color:var(--muted)">${escape(caption)}</div>
+    </div>
+    <div class="h2h-vs">
+      <div class="vs-label">VS</div>
+      <div class="vs-sub">${stats.total} confrontation(s)<br>${period}</div>
+    </div>
+    <div class="h2h-pilot right">
+      <div class="hp-name"><a class="bmx-link" href="${linkB}" target="_blank">${nameB}</a></div>
+      ${clubB}
+      <div class="hp-wins${bLeads?' leader':''}">${winsB}</div>
+      <div style="font-size:12px;color:var(--muted)">${escape(caption)}</div>
+    </div>
+  </div>`;
+}
+
+function renderH2HStatsCards(stats) {
+  const tiesHtml = stats.ties > 0
+    ? `<div class="stat teal"><div class="k">Égalités</div><div class="v">${stats.ties}</div></div>` : '';
+
+  return `<div class="stats" style="margin:16px 18px">
+    <div class="stat sky"><div class="k">Confrontations</div><div class="v">${stats.total}</div><div class="sub">${stats.validCount} avec classements valides</div></div>
+    <div class="stat good"><div class="k">Victoires A</div><div class="v">${stats.winsA}</div></div>
+    <div class="stat rose"><div class="k">Victoires B</div><div class="v">${stats.winsB}</div></div>
+    ${tiesHtml}
+  </div>`;
+}
+
+function eventNameCell(c) {
+  // Coupe du monde UCI : pas de page Sqorz → lien vers la manche sur uci.org (ou rien).
+  if (c.account?.accountCode === 'uciworldcup') {
+    return c.event?.url
+      ? `<a class="bmx-link" href="${escape(c.event.url)}" target="_blank" rel="noopener">${escape(c.event.eventName || c.event.eventId)}</a>`
+      : escape(c.event.eventName || c.event.eventId);
+  }
+  const eventHref = c.account?.accountCode
+    ? `https://our.sqorz.com/org/${encodeURIComponent(c.account.accountCode)}/event/${encodeURIComponent(c.event.eventId)}${c.cls.perpetualClassCode ? '/class/' + encodeURIComponent(c.cls.perpetualClassCode) : ''}`
+    : null;
+  return eventHref
+    ? `<a class="bmx-link" href="${eventHref}" target="_blank" rel="noopener">${escape(c.event.eventName || c.event.eventId)}</a>`
+    : escape(c.event.eventName || c.event.eventId);
+}
+
+function renderH2HTable(confrontations) {
+  if (!confrontations.length) return '';
+  const nameA = escape(pilotA.firstName + ' ' + pilotA.lastName);
+  const nameB = escape(pilotB.firstName + ' ' + pilotB.lastName);
+
+  const rows = confrontations.map(c => {
+    const specA = specialLabel(c.rankA);
+    const specB = specialLabel(c.rankB);
+    const isDnx = specA || specB;
+
+    const rankACellContent = specA
+      ? `<span class="special-result" style="font-size:.85em;font-weight:700">${specA}</span>`
+      : (c.rankA === 1 ? '🥇' : c.rankA === 2 ? '🥈' : c.rankA === 3 ? '🥉' : `${c.rankA}e`);
+    const rankBCellContent = specB
+      ? `<span class="special-result" style="font-size:.85em;font-weight:700">${specB}</span>`
+      : (c.rankB === 1 ? '🥇' : c.rankB === 2 ? '🥈' : c.rankB === 3 ? '🥉' : `${c.rankB}e`);
+
+    const aWins = !isDnx && c.rankA < c.rankB;
+    const bWins = !isDnx && c.rankB < c.rankA;
+    const winIcon = isDnx ? '' : aWins ? '<span aria-hidden="true">← 🏆</span>' : bWins ? '<span aria-hidden="true">🏆 →</span>' : '<span aria-hidden="true">=</span>';
+
+    const eventName = eventNameCell(c);
+
+    return `<tr class="${isDnx ? 'dnx-row' : ''}" tabindex="0">
+      <td class="ev-date">${fmtDate(c.event.eventDate)}</td>
+      <td class="ev-name">${eventName}</td>
+      <td class="ev-cat">${escape(c.cls.className || c.cls.perpetualClassCode || '')}</td>
+      <td class="rank-a${aWins?' winner':''}">${rankACellContent}</td>
+      <td class="rank-b${bWins?' winner':''}">${rankBCellContent}</td>
+      <td class="win-icon">${winIcon}</td>
+    </tr>${renderSharedRaces(c.shared)}`;
+  }).join('');
+
+  return `<div style="overflow-x:auto;padding:0 18px 18px">
+    <table class="h2h-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Événement</th>
+          <th>Catégorie</th>
+          <th>${nameA}</th>
+          <th>${nameB}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+// Tableau des duels chronométrés pour UNE métrique (lignes où les deux pilotes
+// sont chronométrés). Titre avec le total (victoires A à B, comme les
+// classements finaux) + nombre de duels. Vide ('') si aucun duel.
+function renderChronoTable(confrontations, metric) {
+  const duels = confrontations.filter(c => {
+    const a = c.chronoA ? c.chronoA[metric.key] : null;
+    const b = c.chronoB ? c.chronoB[metric.key] : null;
+    return a != null && b != null;
+  });
+  if (!duels.length) return '';
+  let winsA = 0, winsB = 0;
+  for (const c of duels) {
+    const a = c.chronoA[metric.key], b = c.chronoB[metric.key];
+    if (a < b) winsA++;
+    else if (b < a) winsB++;
+  }
+  const nameA = escape(pilotA.firstName + ' ' + pilotA.lastName);
+  const nameB = escape(pilotB.firstName + ' ' + pilotB.lastName);
+
+  const rows = duels.map(c => {
+    const a = c.chronoA[metric.key], b = c.chronoB[metric.key];
+    const aFaster = a < b, bFaster = b < a;
+    return `<tr tabindex="0">
+      <td class="ev-date">${fmtDate(c.event.eventDate)}</td>
+      <td class="ev-name">${eventNameCell(c)}</td>
+      <td class="ev-cat">${escape(c.cls.className || c.cls.perpetualClassCode || '')}</td>
+      <td class="rank-a${aFaster?' winner':''}">${fmtChrono(a)}</td>
+      <td class="rank-b${bFaster?' winner':''}">${fmtChrono(b)}</td>
+      <td class="chrono-gap">${fmtChrono(Math.abs(a - b))}</td>
+    </tr>${renderSharedRaces(c.shared)}`;
+  }).join('');
+
+  return `<div class="section-title" style="padding:0 18px;margin-bottom:0">
+    ${escape(metric.label)}
+    <span class="meta">${winsA} à ${winsB} · ${duels.length} duel${duels.length > 1 ? 's' : ''}</span>
+  </div>
+  <div style="overflow-x:auto;padding:0 18px 18px">
+    <table class="h2h-table chrono-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Événement</th>
+          <th>Catégorie</th>
+          <th>${nameA}</th>
+          <th>${nameB}</th>
+          <th>Écart</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+function renderCatFilter(categories, activeCat) {
+  if (categories.length <= 1) return '';
+  const pills = [''].concat(categories).map(cat => {
+    const label = cat === '' ? 'Toutes' : escape(cat);
+    const isActive = cat === activeCat;
+    return `<button type="button" class="cat-pill${isActive?' active':''}" data-cat="${escape(cat)}" aria-pressed="${isActive}">${label}</button>`;
+  }).join('');
+  return `<div class="cat-filter-row" id="catFilterRow" role="group" aria-label="Filtrer par catégorie">${pills}</div>`;
+}
+
+// Détail des manches communes d'une confrontation (testé) : sous-ligne par épreuve,
+// vainqueur de la manche en gras (rangs finaux seuls) ; '' si aucune.
+function renderSharedRaces(shared) {
+  if (!shared || !shared.length) return '';
+  const items = shared.map(s => {
+    const la = specialLabel(s.a), lb = specialLabel(s.b);
+    const fa = la || (s.a === 1 ? '1er' : s.a + 'e');
+    const fb = lb || (s.b === 1 ? '1er' : s.b + 'e');
+    const win = !la && !lb && s.a !== s.b;
+    const a = win && s.a < s.b ? `<b>${fa}</b>` : fa;
+    const b = win && s.b < s.a ? `<b>${fb}</b>` : fb;
+    return `<span class="shared-race"><span class="sr-phase">${escape(s.phase || 'Manche')}</span> ${a} – ${b}</span>`;
+  }).join('<span class="sr-sep" aria-hidden="true"> · </span>');
+  return `<tr class="shared-races-row"><td colspan="6"><span aria-hidden="true">🏁</span> ${items}</td></tr>`;
+}
+
+// Filtre combiné catégorie + année + même course (testé) — utilisé par renderH2H.
+function filterConfrontations(confrontations, cat, year, sameRaceOnly) {
+  return confrontations.filter(c => {
+    if (cat && (c.cls.className || c.cls.perpetualClassCode) !== cat) return false;
+    if (year && !(c.event.eventDate || '').startsWith(year + '-')) return false;
+    if (sameRaceOnly && !(c.shared && c.shared.length > 0)) return false;
+    return true;
+  });
+}
+function confrontationYears(confrontations) {
+  const set = new Set();
+  for (const c of confrontations) {
+    const y = (c.event.eventDate || '').slice(0, 4);
+    if (/^\d{4}$/.test(y)) set.add(y);
+  }
+  return [...set].sort((a, b) => b.localeCompare(a));
+}
+// Sélecteur d'année (masqué si une seule année — rien à filtrer).
+function renderYearFilter(years, activeYear) {
+  if (years.length <= 1) return '';
+  const opts = [`<option value="">Toutes années</option>`]
+    .concat(years.map(y => `<option value="${y}"${y === activeYear ? ' selected' : ''}>${y}</option>`))
+    .join('');
+  return `<div class="year-filter-row"><label for="yearFilterSel">Année :</label><select id="yearFilterSel">${opts}</select></div>`;
+}
+// Case « même course » (masquée si aucune confrontation ne partage de manche —
+// ex. que des Time Trial ou de l'UEC, sans détail de manches).
+function renderSameRaceFilter(n, active) {
+  if (!n) return '';
+  return `<label class="samerace-row" title="Ne garde que les épreuves où les deux pilotes ont pris le même départ (même manche). Time Trial et confrontations européennes exclus (runs en solo / sans détail de manches)."><input type="checkbox" id="sameRaceChk"${active ? ' checked' : ''}> Même course uniquement <span class="samerace-count">(${n})</span></label>`;
+}
+
+let allConfrontations = [];
+let activeCat = '';
+let activeYear = ''; // filtre année ('') = toutes) — reset à chaque nouvelle comparaison
+let activeSameRace = false; // filtre même course — reset idem
+let activeChronoView = 'rank'; // tableau affiché : 'rank', 'races' ou une clé CHRONO_METRICS
+
+function computeAndRenderH2H() {
+  allConfrontations = computeConfrontations(pilotA, pilotB);
+  activeCat = '';
+  activeYear = '';
+  activeSameRace = false;
+  activeChronoView = 'rank';
+
+  if (!allConfrontations.length) {
+    const keyA = pilotA.normKey, keyB = pilotB.normKey;
+    let hasCommonEvent = false;
+    for (const ev of allEvents()) {
+      let hasA = false, hasB = false;
+      for (const cls of ev.classes) {
+        for (const c of cls.competitors) {
+          const k = norm((c.firstName||'') + ' ' + (c.lastName||'')).trim();
+          if (k === keyA) hasA = true;
+          if (k === keyB) hasB = true;
+        }
+      }
+      if (hasA && hasB) { hasCommonEvent = true; break; }
+    }
+    if (hasCommonEvent) {
+      h2hResults.innerHTML = `<div class="card"><div class="empty-state">
+        <div class="es-icon">📋</div>
+        <div class="es-title">Pas de confrontation dans la même catégorie</div>
+        <div class="es-text">Ces pilotes ont participé aux mêmes événements mais jamais dans la même catégorie. Essayez de chercher un autre adversaire.</div>
+      </div></div>`;
+    } else {
+      h2hResults.innerHTML = `<div class="card"><div class="empty-state">
+        <div class="es-icon">🏁</div>
+        <div class="es-title">Aucune confrontation directe</div>
+        <div class="es-text">Ces deux pilotes ne se sont peut-être pas affrontés dans la même catégorie. Essayez de chercher un autre adversaire pour ce pilote.</div>
+      </div></div>`;
+    }
+    return;
+  }
+
+  renderH2H();
+  document.title = `${pilotA.firstName} ${pilotA.lastName} vs ${pilotB.firstName} ${pilotB.lastName} — Head to Head`;
+  setTimeout(() => {
+    const topbarH = document.querySelector('.topbar')?.offsetHeight || 0;
+    const y = h2hResults.getBoundingClientRect().top + window.scrollY - topbarH - 12;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  }, 50);
+}
+
+// Sélecteur du tableau affiché : classement final + une pastille par métrique
+// chrono ayant des duels (les métriques sans duel n'apparaissent pas).
+// Absent quand aucun duel chronométré (rien d'autre à afficher que les rangs).
+function renderViewSelector(chronoStats, activeView, rankCount, racesCount = 0) {
+  const views = [{ key: 'rank', label: '🏆 Classement final', n: rankCount }]
+    .concat(racesCount > 0 ? [{ key: 'races', label: '🏁 Manches communes', n: racesCount }] : [])
+    .concat(chronoStats.map(s => ({ key: s.key, label: s.label, n: s.duels })));
+  if (views.length <= 1) return '';
+  const pills = views.map(v => {
+    const isActive = v.key === activeView;
+    return `<button type="button" class="cat-pill${isActive?' active':''}" data-chrono-view="${v.key}" aria-pressed="${isActive}">${escape(v.label)} (${v.n})</button>`;
+  }).join('');
+  return `<div class="cat-filter-row" id="chronoViewRow" role="group" aria-label="Choisir le tableau affiché">${pills}</div>`;
+}
+
+// Manches communes à plat (testé) : une ligne par manche partagée (et non par épreuve),
+// triées par date décroissante. Base de la vue « Manches communes ».
+function flattenSharedRaces(confrontations) {
+  const out = [];
+  for (const c of confrontations || []) {
+    for (const s of c.shared || []) {
+      out.push({ event: c.event, account: c.account, cls: c.cls, phase: s.phase, key: s.key, a: s.a, b: s.b });
+    }
+  }
+  return out.sort((x, y) =>
+    (y.event.eventDate || '').localeCompare(x.event.eventDate || '') || phaseOrder(y.phase) - phaseOrder(x.phase));
+}
+
+// Tableau des manches communes (testé) : date, événement, manche, places A/B,
+// vainqueur. Vide ('') si aucune.
+function renderRaceTable(races) {
+  if (!races.length) return '';
+  const nameA = escape(pilotA.firstName + ' ' + pilotA.lastName);
+  const nameB = escape(pilotB.firstName + ' ' + pilotB.lastName);
+  const cell = v => {
+    const spec = specialLabel(v);
+    if (spec) return `<span class="special-result" style="font-size:.85em;font-weight:700">${spec}</span>`;
+    return v === 1 ? '🥇' : v === 2 ? '🥈' : v === 3 ? '🥉' : `${v}e`;
+  };
+  const rows = races.map(r => {
+    const specA = specialLabel(r.a);
+    const specB = specialLabel(r.b);
+    const isDnx = specA || specB;
+    const aWins = !isDnx && r.a < r.b;
+    const bWins = !isDnx && r.b < r.a;
+    const winIcon = isDnx ? '' : aWins ? '<span aria-hidden="true">← 🏆</span>' : bWins ? '<span aria-hidden="true">🏆 →</span>' : '<span aria-hidden="true">=</span>';
+    return `<tr tabindex="0">
+      <td class="ev-date">${fmtDate(r.event.eventDate)}</td>
+      <td class="ev-name">${eventNameCell(r)}</td>
+      <td class="ev-cat">${escape(r.phase || 'Manche')}</td>
+      <td class="rank-a${aWins ? ' winner' : ''}">${cell(r.a)}</td>
+      <td class="rank-b${bWins ? ' winner' : ''}">${cell(r.b)}</td>
+      <td class="win-icon">${winIcon}</td>
+    </tr>`;
+  }).join('');
+
+  return `<div style="overflow-x:auto;padding:0 18px 18px">
+    <table class="h2h-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Événement</th>
+          <th>Manche</th>
+          <th>${nameA}</th>
+          <th>${nameB}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+function renderH2H() {
+  document.body.classList.add('has-results');
+  const filtered = filterConfrontations(allConfrontations, activeCat, activeYear, activeSameRace);
+  const races = flattenSharedRaces(filtered);
+
+  const chronoStats = computeChronoStats(filtered);
+  // Une seule vue à la fois ; repli sur les rangs si la vue n'a plus de lignes filtrées.
+  let view = activeChronoView;
+  if (view !== 'rank' && view !== 'races') {
+    view = chronoStats.some(s => s.key === view) ? view : 'rank';
+  }
+  if (view === 'races' && !races.length) view = 'rank';
+  activeChronoView = view;
+  // En vue Manches les cartes/en-tête portent sur les manches (pseudo-confrontations rang A/B).
+  const stats = view === 'races'
+    ? computeH2HStats(races.map(r => ({ event: r.event, cls: r.cls, rankA: r.a, rankB: r.b })))
+    : computeH2HStats(filtered);
+  const allStats = computeH2HStats(allConfrontations);
+  const yearFilter = renderYearFilter(confrontationYears(allConfrontations), activeYear);
+  const catFilter = renderCatFilter(allStats.categories, activeCat);
+  // En vue Manches tout est déjà en même course : la case est masquée.
+  const sameRaceFilter = view === 'races' ? '' : renderSameRaceFilter(allConfrontations.filter(c => c.shared && c.shared.length > 0).length, activeSameRace);
+  // Le total de l'en-tête suit le tableau choisi (rangs, manches ou métrique chrono).
+  const chronoView = (view !== 'rank' && view !== 'races') ? chronoStats.find(s => s.key === view) : null;
+  const viewScore = chronoView
+    ? { winsA: chronoView.winsA, winsB: chronoView.winsB, caption: `${chronoView.label} · ${chronoView.duels} duel${chronoView.duels > 1 ? 's' : ''}` }
+    : view === 'races'
+      ? { winsA: stats.winsA, winsB: stats.winsB, caption: 'manche(s)' }
+      : null;
+  const header = renderH2HHeader(stats, viewScore);
+  const statsCards = renderH2HStatsCards(stats);
+  const table = renderH2HTable(filtered);
+  const viewSelector = renderViewSelector(chronoStats, view, filtered.length, races.length);
+  const detailBlock = view === 'rank'
+    ? `<div class="section-title" style="padding:0 18px;margin-bottom:0">
+      🏆 Classement final
+      <span class="meta">${filtered.length} résultat(s)</span>
+    </div>
+    ${table}`
+    : view === 'races'
+      ? `<div class="section-title" style="padding:0 18px;margin-bottom:0">
+      🏁 Manches communes
+      <span class="meta">${races.length} manche(s)</span>
+    </div>
+    ${renderRaceTable(races)}`
+      : renderChronoTable(filtered, CHRONO_METRICS.find(m => m.key === view));
+
+  h2hResults.innerHTML = `<div class="card" style="padding:0;overflow:hidden">
+    ${header}
+    <div class="share-row">
+      <button type="button" class="h2h-share-btn" id="h2hShareBtn" aria-label="Copier le lien de cette comparaison">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Partager
+      </button>
+    </div>
+    ${yearFilter}
+    ${catFilter}
+    ${sameRaceFilter}
+    ${statsCards}
+    ${viewSelector}
+    ${detailBlock}
+  </div>`;
+
+  document.getElementById('yearFilterSel')?.addEventListener('change', e => {
+    activeYear = e.target.value;
+    renderH2H();
+  });
+
+  document.getElementById('catFilterRow')?.querySelectorAll('.cat-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeCat = btn.dataset.cat;
+      renderH2H();
+    });
+  });
+
+  document.getElementById('sameRaceChk')?.addEventListener('change', e => {
+    activeSameRace = e.target.checked;
+    renderH2H();
+  });
+
+  document.getElementById('chronoViewRow')?.querySelectorAll('[data-chrono-view]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeChronoView = btn.dataset.chronoView;
+      renderH2H();
+    });
+  });
+
+  const shareBtn = document.getElementById('h2hShareBtn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', () => {
+      const url = location.protocol === 'file:'
+        ? location.href
+        : location.origin + location.pathname + location.search;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(() => {
+          shareBtn.textContent = '✓ Lien copié !';
+          shareBtn.classList.add('copied');
+          setTimeout(() => {
+            shareBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Partager';
+            shareBtn.classList.remove('copied');
+          }, 2000);
+        }).catch(() => {
+          prompt('Copie ce lien :', url);
+        });
+      } else {
+        prompt('Copie ce lien :', url);
+      }
+    });
+  }
+}
+
+(async () => {
+  await loadIndex();
+  const { a, b } = parseUrlState();
+  if (!a) return;
+  const pA = findPilotByNormKey(a);
+  if (!pA) return;
+  selectPilotA(pA);
+  if (!b) return;
+  const pB = findPilotByNormKey(b);
+  if (!pB) return;
+  selectPilotB(pB);
+  history.replaceState(null, '', buildUrl());
+})();
+})();
+
+(() => {
+  const base = '../';
+  document.getElementById('hubBackLink').href = base;
+})();
+</script>
+
+<script>
+(() => {
+  const btn = document.getElementById('themeBtn');
+  function getTheme() { return localStorage.getItem('theme') || 'auto'; }
+  function applyTheme(pref) {
+    const icons = { auto:'🌓', light:'☀️', dark:'🌙' };
+    btn.textContent = icons[pref] || icons.auto;
+    btn.title = `Thème : ${pref}`;
+    const isDark = pref === 'dark' || (pref !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('dark', isDark);
+    if (pref === 'auto') localStorage.removeItem('theme');
+    else document.documentElement.dataset.themePref = pref;
+  }
+  btn.addEventListener('click', () => {
+    const order = ['auto','light','dark'];
+    const next = order[(order.indexOf(getTheme()) + 1) % 3];
+    localStorage.setItem('theme', next);
+    if (next === 'auto') localStorage.removeItem('theme');
+    applyTheme(next);
+  });
+  applyTheme(getTheme());
+})();
+</script>
+<footer>
+  <span>Données issues de <a href="https://our.sqorz.com/orgs" target="_blank" rel="noopener noreferrer">Sqorz</a> (France, Mondiaux), <a href="https://www.jstiming.nl" target="_blank" rel="noopener noreferrer">JSTiming</a> (Europe UEC) et <a href="https://www.uci.org" target="_blank" rel="noopener noreferrer">UCI</a> (Coupe du monde)</span>
+  <span class="footer-sep">·</span>
+  <span>© <span id="footerYear"></span></span>
+  <span class="footer-sep">·</span>
+  <span>Projet communautaire non officiel, non affilié à Sqorz</span>
+  <span id="dataDateWrap" hidden><span class="footer-sep">·</span><span>Données du <span id="dataDate"></span></span></span>
+</footer>
+<script>
+  document.getElementById('footerYear').textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>

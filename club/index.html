@@ -1,0 +1,1855 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later
+     Copyright (c) 2026 ludovic.socie -->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%234a7ab5'/><text x='16' y='23' font-family='system-ui' font-size='20' font-weight='800' fill='white' text-anchor='middle'>S</text></svg>">
+<title>BMX-Race · Stats Club</title>
+<meta name="description" content="Analysez les performances d'un club BMX Race : classements, évolutions et comparatifs par année.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ludsoc.github.io/bmx-race-tools/club/">
+<meta property="og:title" content="BMX-Race · Stats Club">
+<meta property="og:description" content="Analysez les performances d'un club BMX Race : classements, évolutions et comparatifs par année.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BMX-Race · Stats Club">
+<meta name="twitter:description" content="Analysez les performances d'un club BMX Race : classements, évolutions et comparatifs par année.">
+<script>
+  (() => {
+    const saved = localStorage.getItem('theme');
+    const isDark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('dark', isDark);
+    if (saved) document.documentElement.dataset.themePref = saved;
+  })();
+</script>
+<link rel="stylesheet" href="../theme.css">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0; padding:0}
+:focus{outline:none}
+.btn:focus-visible{outline:2px solid var(--accent-hi); outline-offset:3px}
+.control:focus-visible{outline:none}
+.topbar :focus-visible{outline-color:#fff}
+body{
+  font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--ink); background:var(--bg); -webkit-font-smoothing:antialiased;
+}
+
+/* Topbar */
+.topbar{
+  position:relative; overflow:hidden; color:#fff; padding:48px 24px 128px;
+  background:linear-gradient(135deg, #2e4158 0%, #3f566f 35%, #6a8caf 70%, #8aa6c2 100%);
+  transition:padding .25s ease, height .25s ease;
+}
+.topbar::after{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(circle at 80% 0%, rgba(255,255,255,.22), transparent 55%),
+             radial-gradient(circle at 10% 100%, rgba(30,50,80,.35), transparent 45%);
+}
+.topbar-inner{max-width:1180px; margin:0 auto; position:relative; z-index:1}
+.brand-row{display:flex; align-items:center; justify-content:space-between; gap:12px}
+.brand{display:flex; align-items:center; gap:12px; font-weight:600; letter-spacing:.2px; color:#fff}
+.brand .logo{
+  width:40px; height:40px; border-radius:12px;
+  background:rgba(255,255,255,.22); color:#fff;
+  display:grid; place-items:center; font-weight:800; font-size:14px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.45);
+  backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+}
+.theme-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:36px; height:36px; padding:0;
+  background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.22);
+  color:#fff; border-radius:10px; cursor:pointer; font-size:18px; line-height:1;
+  transition:background .15s, border-color .15s, transform .15s;
+}
+.theme-btn:hover{background:rgba(255,255,255,.2); border-color:rgba(255,255,255,.4)}
+.theme-btn:active{transform:scale(.95)}
+.donate-btn{display:inline-flex;align-items:center;gap:5px;padding:0 12px;height:36px;background:linear-gradient(135deg,rgba(255,210,150,.9),rgba(251,146,60,.75));border:1px solid rgba(251,146,60,.6);color:#7c3405;box-shadow:0 2px 8px rgba(251,146,60,.35),inset 0 1px 0 rgba(255,255,255,.3);border-radius:10px;font-size:.8rem;font-weight:600;text-decoration:none;transition:background .15s,border-color .15s,transform .15s;white-space:nowrap}
+.donate-btn:hover{background:linear-gradient(135deg,rgba(255,210,150,1),rgba(251,146,60,.95));border-color:rgba(251,146,60,.9);box-shadow:0 3px 10px rgba(251,146,60,.45),inset 0 1px 0 rgba(255,255,255,.3);}
+.donate-btn:active{transform:scale(.95)}
+.donate-icon{font-size:1.15rem;display:inline-flex;align-items:center}
+@media(max-width:520px){.donate-btn .donate-label{display:none}}
+  .hub-back{display:inline-flex;align-items:center;gap:6px;margin-top:14px;color:#fff;font-size:13px;font-weight:600;text-decoration:none;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);padding:6px 12px;border-radius:99px}
+  .hub-back:hover{background:rgba(255,255,255,.28)}
+  #retryBtn:not([hidden]){display:block;margin:8px auto 0;padding:6px 18px;background:var(--accent,#4e80ee);color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer}
+  #retryBtn:hover{opacity:.85}
+  .progress{height:6px;background:var(--card-soft);border:1px solid var(--line);border-radius:99px;overflow:hidden;margin-top:10px}
+  .progress>div{height:100%;width:0;transition:width .2s;background:linear-gradient(90deg,var(--teal),var(--sky),var(--lavender))}
+.topbar h1{margin:24px 0 8px; font-size:34px; font-weight:800; letter-spacing:-1px; color:#fff; text-shadow:0 2px 14px rgba(20,35,60,.45)}
+.topbar p{margin:0; font-size:15px; max-width:min(600px,100%); color:#dce8f2; text-shadow:0 1px 6px rgba(20,35,60,.35); line-height:1.5}
+
+/* Club header sticky */
+body.has-results .club-header{
+  position:sticky; top:52px; z-index:10;
+  border-radius:0; margin-bottom:0;
+  box-shadow:0 4px 16px rgba(60,90,120,.12);
+}
+body.has-results:not(.scrolled) .club-header{position:static; border-radius:var(--radius); margin-bottom:18px; box-shadow:var(--shadow-xl)}
+
+/* Topbar compact (seulement quand scrollé) */
+body.has-results.scrolled .topbar{
+  position:sticky; top:0; z-index:20;
+  padding:0 24px; height:52px; overflow:hidden;
+  box-shadow:0 2px 16px rgba(0,0,0,.22);
+}
+body.has-results.scrolled .topbar-inner{height:52px; display:flex; align-items:center}
+body.has-results.scrolled .topbar h1,
+body.has-results.scrolled .topbar p{display:none}
+body.has-results.scrolled .topbar .brand-row{width:100%; margin:0}
+
+/* Layout */
+main{max-width:1180px; margin:-80px auto 40px; padding:0 24px 32px; position:relative; z-index:2}
+body.has-results.scrolled main{margin-top:24px}
+
+/* Base components */
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  padding:18px; box-shadow:var(--shadow); margin-bottom:18px;
+}
+.filters{padding:20px}
+label{font-size:11px; font-weight:600; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; display:block}
+.control{
+  font:inherit; padding:10px 12px; border:1px solid var(--line);
+  border-radius:9px; background:var(--card); color:var(--ink);
+  transition:border-color .15s, box-shadow .15s, background .15s;
+}
+.control:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%, transparent)}
+.control:disabled{background:var(--card-soft); color:var(--muted); cursor:not-allowed}
+input.control, select.control{width:100%}
+
+/* Status */
+.status{font-size:13px; color:var(--muted); margin-top:14px; min-height:18px}
+.status.error{color:var(--bad)}
+.status.loading{font-size:15px; color:var(--accent); font-weight:600; display:flex; align-items:center; gap:8px}
+.status.loading::before{
+  content:''; display:inline-block; width:16px; height:16px;
+  border:2px solid color-mix(in srgb,var(--accent) 30%,transparent);
+  border-top-color:var(--accent); border-radius:50%;
+  animation:spin .7s linear infinite; flex-shrink:0;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Autocomplete */
+.autocomplete-wrap{position:relative}
+.suggestions{
+  position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:50;
+  background:var(--card); border:1px solid var(--line); border-radius:10px;
+  box-shadow:var(--shadow-xl); max-height:300px; overflow-y:auto;
+  display:none;
+}
+.suggestions.open{display:block}
+.suggestion-item{
+  padding:10px 14px; cursor:pointer; font-size:13px; color:var(--ink);
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  transition:background .1s;
+}
+.suggestion-item:hover,.suggestion-item.highlighted{background:var(--accent-soft); color:var(--accent-hi)}
+.suggestion-item .sug-count{font-size:11px; color:var(--muted); white-space:nowrap}
+.suggestion-empty{padding:10px 14px; color:var(--muted); font-size:13px}
+.suggestion-more{padding:8px 14px; color:var(--muted); font-size:11.5px; text-align:center; border-top:1px dashed var(--line)}
+
+/* Club header */
+.club-header{
+  padding:24px 28px; margin-bottom:18px;
+  background:linear-gradient(135deg, var(--card) 0%, color-mix(in srgb, var(--accent) 6%, var(--card)) 100%);
+  border:1px solid color-mix(in srgb, var(--accent) 25%, var(--line));
+  border-radius:var(--radius); box-shadow:var(--shadow-xl);
+}
+.club-name{font-size:24px; font-weight:800; color:var(--ink); margin-bottom:16px; letter-spacing:-.5px}
+.fav-btn{font-size:15px; line-height:1; vertical-align:middle; cursor:pointer; background:none; border:1px solid var(--line); border-radius:99px; padding:2px 9px; color:var(--muted); margin-left:8px}
+.fav-btn:hover{ border-color:var(--accent); color:var(--accent); }
+.fav-btn.on{ color:var(--accent); border-color:var(--accent); }
+.club-kpis{display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:12px}
+.club-kpi{
+  background:var(--card); border:1px solid var(--line); border-radius:12px;
+  padding:14px 16px; box-shadow:var(--shadow); position:relative; overflow:hidden;
+}
+.club-kpi::before{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:4px;
+  background:var(--kpi-color, var(--accent)); opacity:.85;
+}
+.club-kpi .k{font-size:11px; color:var(--muted); text-transform:uppercase; font-weight:600; letter-spacing:.5px; position:relative}
+.club-kpi .v{font-size:26px; font-weight:700; margin-top:2px; line-height:1.1; color:var(--ink); position:relative}
+.club-kpi .kpi-sub{font-size:11px; color:var(--muted); font-weight:500; margin-top:2px; position:relative}
+.club-kpi.sky{--kpi-color:var(--sky)}
+.club-kpi.gold{--kpi-color:var(--gold)}
+.club-kpi.silver{--kpi-color:var(--silver)}
+.club-kpi.mint{--kpi-color:var(--mint)}
+.club-kpi.teal{--kpi-color:var(--teal)}
+.club-kpi.lime{--kpi-color:var(--lime)}
+.club-kpi.lavender{--kpi-color:var(--lavender)}
+
+/* Filters bar */
+.club-filters{display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end; padding:16px 18px}
+.club-filters .field{display:flex; flex-direction:column}
+.club-filters .field-cat{flex:1 1 180px; max-width:280px}
+
+/* Year pills */
+.year-pills{display:flex; gap:5px; flex-wrap:wrap}
+.yp-btn{
+  font:inherit; font-size:12px; font-weight:600; cursor:pointer;
+  padding:5px 12px; min-height:36px; border-radius:99px;
+  background:var(--card-soft); border:1px solid var(--line-strong); color:var(--ink-2);
+  transition:border-color .15s, background .15s, color .15s;
+}
+.yp-btn:hover{border-color:var(--accent); color:var(--accent-hi)}
+.yp-btn.active{background:var(--accent); border-color:var(--accent); color:#fff}
+
+
+
+/* Table */
+.table-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
+.table-card{padding:0; overflow:hidden}
+.ranking-table{width:100%; border-collapse:collapse; font-size:12.5px; min-width:520px}
+.ranking-table th{
+  cursor:pointer; user-select:none; background:var(--card-soft);
+  padding:8px 8px; text-align:right; white-space:nowrap;
+  border-bottom:2px solid var(--line-strong); position:sticky; top:0; z-index:1;
+}
+.ranking-table th.no-sort{cursor:default}
+.ranking-table th.sorted{color:var(--accent)}
+.ranking-table th:first-child,.ranking-table td:first-child{text-align:center; min-width:36px; padding-left:10px}
+.ranking-table th:nth-child(2),.ranking-table td:nth-child(2){text-align:left; min-width:130px; padding-left:8px}
+.ranking-table th:nth-child(3),.ranking-table td:nth-child(3){text-align:left; min-width:80px}
+.ranking-table td{padding:7px 8px; border-bottom:1px solid var(--line); text-align:right}
+.ranking-table th:last-child,.ranking-table td:last-child{padding-right:12px}
+.ranking-table tbody tr:nth-child(even) td{background:color-mix(in srgb, var(--card-soft) 70%, transparent)}
+.ranking-table tbody tr.pilot-row:hover td{background:var(--accent-soft) !important}
+
+/* Pilot link */
+.pilot-link{
+  color:inherit; text-decoration:none; font-weight:600;
+  border-bottom:1px solid transparent; transition:border-color .15s, color .15s;
+}
+.pilot-link:hover{color:var(--accent-hi); border-bottom-color:color-mix(in srgb,var(--accent) 40%, transparent)}
+.pilot-link::after{content:"↗"; font-size:.7em; margin-left:3px; color:var(--muted); opacity:.6}
+.pilot-link:hover::after{opacity:1; color:var(--accent-hi)}
+
+/* Rank pills */
+.rpill{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:28px; height:28px; border-radius:50%; font-weight:700; font-size:13px;
+  background:var(--card-soft); border:2px solid var(--line); color:var(--ink);
+  font-variant-numeric:tabular-nums;
+}
+.rpill.r1{background:linear-gradient(135deg,#fff2c8,#e8c574); border-color:var(--gold); color:#7a5a18}
+.rpill.r2{background:linear-gradient(135deg,#f4f6fa,#cdd2dc); border-color:var(--silver); color:#4a5260}
+.rpill.r3{background:linear-gradient(135deg,#f7dcc4,#d4a07c); border-color:var(--bronze); color:#7a4a2a}
+.wins-badge{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:26px; height:26px; border-radius:50%; font-weight:700; font-size:12px;
+  background:linear-gradient(135deg,#fff2c8,#e8c574); border:2px solid var(--gold); color:#7a5a18;
+  font-variant-numeric:tabular-nums;
+}
+
+/* Section title */
+.section-title{
+  font-size:12px; font-weight:700; color:var(--muted);
+  text-transform:uppercase; letter-spacing:.7px; margin:0 0 14px;
+}
+
+/* Categories grid */
+.cat-section-toggle{
+  display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none;
+  padding:0; background:none; border:none; width:100%; text-align:left;
+  color:var(--ink); font-size:13px; font-weight:600; font-family:inherit;
+}
+.cat-section-toggle:hover{color:var(--accent)}
+.cat-toggle-arrow{font-size:11px; color:var(--muted); transition:transform .2s; display:inline-block}
+.cat-section-toggle.open .cat-toggle-arrow{transform:rotate(90deg)}
+.cat-toggle-label{flex:1}
+.cat-toggle-count{font-size:11px; color:var(--muted); font-weight:500}
+.cat-active-badge{font-size:11px; font-weight:600; padding:2px 8px; border-radius:99px; background:var(--accent-soft); color:var(--accent-hi); border:1px solid color-mix(in srgb,var(--accent) 30%,transparent); cursor:pointer}
+.cat-active-badge:hover{background:color-mix(in srgb,var(--accent) 20%,transparent)}
+.cat-collapsible{display:none; margin-top:12px}
+.cat-collapsible.open{display:block}
+.cat-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:10px}
+.cat-card{
+  background:var(--card-soft); border:1px solid var(--line); border-radius:10px;
+  padding:12px 14px; cursor:pointer;
+  transition:border-color .15s, background .15s;
+}
+.cat-card:hover{border-color:var(--accent); background:color-mix(in srgb,var(--accent) 6%, var(--card-soft))}
+.cat-card.active{
+  border-color:var(--accent); background:var(--accent-soft);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 20%, transparent);
+}
+.cat-card.active .cat-card-name{color:var(--accent-hi)}
+.cat-card-name{font-weight:600; font-size:13px; color:var(--ink); margin-bottom:10px; display:flex; align-items:center; gap:6px; flex-wrap:wrap}
+.cat-level-badge{display:inline-flex; align-items:center; gap:4px; font-size:9px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; padding:0 6px; border-radius:99px; border:1px solid currentColor; line-height:1.6; margin-bottom:8px}
+.cat-level-badge::before{content:""; width:6px; height:6px; border-radius:50%; background:currentColor}
+.cat-level-national{color:#4e80ee; background:color-mix(in srgb,#4e80ee 10%,transparent)}
+.cat-level-regional{color:#2bb3a3; background:color-mix(in srgb,#2bb3a3 12%,transparent)}
+.cat-level-uec{color:#9a6ff0; background:color-mix(in srgb,#9a6ff0 12%,transparent)}
+.cat-level-uci{color:#e06b8a; background:color-mix(in srgb,#e06b8a 12%,transparent)}
+.cat-card-stats{display:flex; gap:12px; flex-wrap:wrap}
+.cat-card-stat{display:flex; flex-direction:column; align-items:center; gap:2px}
+.cat-card-stat .v{font-size:18px; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums; line-height:1}
+.cat-card-stat .k{font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; font-weight:600}
+
+.empty-state{padding:40px; text-align:center; color:var(--muted); font-size:13px}
+.chart-empty{padding:24px; text-align:center; color:var(--muted); font-size:13px; font-style:italic}
+
+/* Footer */
+footer{
+  text-align:center; padding:28px 24px 36px;
+  font-size:12.5px; color:var(--muted);
+  border-top:1px solid var(--line);
+  display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap;
+}
+footer a{color:var(--accent); text-decoration:none}
+footer a:hover{text-decoration:underline}
+.footer-sep{color:var(--line-strong)}
+
+/* Back to top */
+#backToTop{
+  position:fixed; bottom:24px; right:24px; z-index:100;
+  width:44px; height:44px; border-radius:50%; border:none;
+  background:var(--accent); color:#fff;
+  display:grid; place-items:center; cursor:pointer; font-size:20px; line-height:1;
+  box-shadow:0 4px 16px rgba(0,0,0,.22);
+  opacity:0; pointer-events:none;
+  transition:opacity .2s, transform .2s, background .15s;
+  transform:translateY(8px);
+}
+#backToTop.visible{opacity:1; pointer-events:auto; transform:translateY(0)}
+#backToTop:hover{background:var(--accent-hi)}
+
+/* Responsive */
+@media(max-width:640px){
+  .topbar{padding:24px 16px 88px}
+  .topbar h1{font-size:22px; letter-spacing:-.5px; margin-top:16px}
+  .topbar p{font-size:13px}
+  main{padding:0 12px 20px; margin-top:-56px}
+  body.has-results.scrolled .topbar{height:48px; padding:0 16px}
+  body.has-results.scrolled .topbar-inner{height:48px}
+  body.has-results.scrolled main{margin-top:16px}
+  body.has-results.scrolled .club-header{top:48px}
+  .card{padding:12px; border-radius:12px; margin-bottom:12px}
+  .club-header{padding:12px 14px}
+  .club-name{font-size:18px; margin-bottom:10px}
+  .club-kpis{grid-template-columns:repeat(2,1fr); gap:6px}
+  .club-kpi{padding:8px 6px}
+  .club-kpi .v{font-size:16px}
+  .club-kpi .k{font-size:9px}
+  .club-kpi .kpi-sub{font-size:9px; margin-top:1px}
+  .club-filters{gap:10px}
+  .club-filters .field-cat{max-width:none}
+  .ranking-table{font-size:12px}
+  .ranking-table th,.ranking-table td{padding:6px 5px}
+  .ranking-table th{top:unset}
+  .ranking-table th:first-child,.ranking-table td:first-child{min-width:28px}
+  .ranking-table th:nth-child(2),.ranking-table td:nth-child(2){min-width:100px}
+  .ranking-table th:nth-child(3),.ranking-table td:nth-child(3){min-width:60px}
+  #backToTop{bottom:16px; right:14px; width:40px; height:40px; font-size:18px}
+}
+@media(max-width:400px){
+  .cat-grid{grid-template-columns:1fr}
+  .year-pills{gap:3px}
+  .yp-btn{padding:4px 8px; font-size:11px}
+}
+
+/* Tab bar */
+#tabBar{display:flex; gap:4px; margin-bottom:18px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:4px; box-shadow:var(--shadow)}
+.tab-btn{
+  flex:1; font:inherit; font-size:13px; font-weight:600; cursor:pointer;
+  padding:9px 16px; border-radius:calc(var(--radius) - 4px); border:none;
+  background:transparent; color:var(--muted);
+  transition:background .15s, color .15s;
+}
+.tab-btn:hover{background:var(--card-soft); color:var(--ink)}
+.tab-btn.active{background:var(--accent); color:#fff; box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 40%,transparent)}
+
+/* Ranking section */
+.ranking-club-row td{cursor:pointer}
+.ranking-club-row:hover td{background:var(--accent-soft)}
+.ranking-club-row td:nth-child(2){color:var(--accent-hi)}
+.ranking-club-row.hl td{background:color-mix(in srgb,var(--accent) 14%,var(--card)) !important}
+.ranking-club-row.hl td:nth-child(2){font-weight:800}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand-row">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </span>
+        BMX-Race Club
+      </div>
+      
+      <div style="display:flex; gap:8px; align-items:center">
+      <a href="https://ko-fi.com/sqorz_tools" target="_blank" rel="noopener noreferrer" class="donate-btn" title="Soutenir le projet sur Ko-fi"><span class="donate-icon">☕</span><span class="donate-label">Soutenir</span></a>
+      <button type="button" id="themeBtn" class="theme-btn" aria-label="Changer le thème" title="Changer le thème (auto / clair / sombre)"></button>
+      </div>
+    </div>
+    <a class="hub-back" id="hubBackLink" href="#" aria-label="Retour au BMX-Race Hub">← BMX-Race Hub</a>
+    <h1>BMX-Race · Stats Club</h1>
+    <p>Pilotes, victoires et podiums d'un club BMX en un coup d'œil.</p>
+  </div>
+</div>
+
+<main>
+  <div id="tabBar" hidden role="tablist">
+    <button class="tab-btn active" data-tab="club" role="tab" aria-selected="true">Fiche club</button>
+    <button class="tab-btn" data-tab="ranking" role="tab" aria-selected="false">Classement général</button>
+  </div>
+  <div class="card filters" id="searchCard">
+    <div class="autocomplete-wrap">
+      <label for="clubInp">Club</label>
+      <input id="clubInp" class="control" type="text" placeholder="Nom du club…" autocomplete="off" disabled aria-autocomplete="list" aria-controls="suggestions">
+      <div class="suggestions" id="suggestions" role="listbox"></div>
+    </div>
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+    <div class="progress" id="progressWrap" hidden><div id="progressBar"></div></div>
+    <button id="retryBtn" hidden>Réessayer</button>
+  </div>
+
+  <div id="results" aria-live="polite"></div>
+  <div id="rankingSection" hidden></div>
+</main>
+
+<footer>
+  <span>Données issues de <a href="https://our.sqorz.com/orgs" target="_blank" rel="noopener noreferrer">Sqorz</a> (France, Mondiaux), <a href="https://www.jstiming.nl" target="_blank" rel="noopener noreferrer">JSTiming</a> (Europe UEC) et <a href="https://www.uci.org" target="_blank" rel="noopener noreferrer">UCI</a> (Coupe du monde)</span>
+  <span class="footer-sep">·</span>
+  <span>© <span id="footerYear"></span></span>
+  <span class="footer-sep">·</span>
+  <span>Projet communautaire non officiel, non affilié à Sqorz</span>
+  <span id="dataDateWrap" hidden><span class="footer-sep">·</span><span>Données du <span id="dataDate"></span></span></span>
+</footer>
+<script>document.getElementById('footerYear').textContent = new Date().getFullYear();</script>
+
+<button id="backToTop" aria-label="Retour en haut" title="Retour en haut">↑</button>
+
+<script src="../common.js"></script>
+<script>
+(() => {
+  if (!window.BmxCommon) throw new Error('[club] common.js introuvable — recharge la page.');
+  // Socle partagé (common.js) : utils, expansion d'index, chargeur à cache, dates.
+  const { norm, escape, humanError, isFinalPhase, isTimeTrialPhase, loadIndexCached, renderDataDates, setBarProgress, isFav, toggleFav, pushRecent } = window.BmxCommon;
+  const INDEX_SOURCES = [
+    'https://pub-7af06f138c97425f8062b881846803cb.r2.dev/pilots-index.json',
+    'https://github.com/LudSoc/bmx-race-stats/releases/latest/download/pilots-index.json',
+    'https://raw.githubusercontent.com/LudSoc/bmx-race-stats/main/pilots-index.json',
+  ];
+  // Index UEC (JSTiming — Coupe/Championnats d'Europe) : mêmes sources, optionnel.
+  const UEC_INDEX_SOURCES = [
+    'https://pub-7af06f138c97425f8062b881846803cb.r2.dev/uec-index.json',
+    'https://github.com/LudSoc/bmx-race-stats/releases/latest/download/uec-index.json',
+    'https://raw.githubusercontent.com/LudSoc/bmx-race-stats/main/uec-index.json',
+  ];
+  // Index UCI (Mondiaux BMX Racing) : mêmes sources, optionnel.
+  const UCI_INDEX_SOURCES = [
+    'https://pub-7af06f138c97425f8062b881846803cb.r2.dev/uci-index.json',
+    'https://github.com/LudSoc/bmx-race-stats/releases/latest/download/uci-index.json',
+    'https://raw.githubusercontent.com/LudSoc/bmx-race-stats/main/uci-index.json',
+  ];
+  // Index Coupe du monde UCI : mêmes sources, optionnel.
+  const WC_INDEX_SOURCES = [
+    'https://pub-7af06f138c97425f8062b881846803cb.r2.dev/uci-worldcup-index.json',
+    'https://github.com/LudSoc/bmx-race-stats/releases/latest/download/uci-worldcup-index.json',
+    'https://raw.githubusercontent.com/LudSoc/bmx-race-stats/main/uci-worldcup-index.json',
+  ];
+  const STATS_BASE = '../stats/';
+
+  // --- Labels catégories (identique à category_stats) ---
+  const CLASS_GROUPS = [
+    { key:'g:U7G',  label:'U7 Garçon',       codes:new Set(['U7GR','7GR','U7']) },
+    { key:'g:U7F',  label:'U7 Fille',         codes:new Set(['U7FR','7FR','U7.C']) },
+    { key:'g:U9G',  label:'U9 Garçon',        codes:new Set(['U9GR','9GR','8GR','U9G','U9GNR','U9']) },
+    { key:'g:U9F',  label:'U9 Fille',         codes:new Set(['U9FR','9FR','8FR','U9F','U9.C']) },
+    { key:'g:U11G', label:'U11 Garçon',       codes:new Set(['U11GR','11GR','10GR','U11G','U11GNR','U11']) },
+    { key:'g:U11F', label:'U11 Fille',        codes:new Set(['U11FR','11FR','10FR','U11F','U11.C']) },
+    { key:'g:U13G', label:'U13 Garçon',       codes:new Set(['U13GR','U13G','U13GNR','U13','G12','G13','12GR','13GR']) },
+    { key:'g:U13F', label:'U13 Fille',        codes:new Set(['U13FR','U13F','U13FNR','U13.C','F12','F13','12FR','13FR','F13N']) },
+    { key:'g:U15G', label:'U15 Garçon',       codes:new Set(['U15GR','U15G','U15GNR','U15','G14','G14N','G14C','G15','G15N','G15C','14GR']) },
+    { key:'g:U15F', label:'U15 Fille',        codes:new Set(['U15FR','U15F','U15FNR','U15.C','F14','F14N','F15','F15N','F15C','14FR']) },
+    { key:'g:U17G', label:'U17 Garçon',       codes:new Set(['U17GR','U17G','U17GNR']) },
+    { key:'g:U17F', label:'U17 Fille',        codes:new Set(['U17FR','U17F']) },
+    { key:'g:JH',   label:'Junior Homme',     codes:new Set(['JH','JHR']) },
+    { key:'g:JF',   label:'Junior Fille',     codes:new Set(['JF','JFR']) },
+  ];
+  const CODE_TO_GROUP = new Map();
+  for (const g of CLASS_GROUPS) for (const c of g.codes) CODE_TO_GROUP.set(c, g);
+  const CLASS_NAMES = {
+    F8:'Fille 8', F9:'Fille 9', F10:'Fille 10', F11:'Fille 11',
+    G8:'Garçon 8', G9:'Garçon 9', G10:'Garçon 10', G11:'Garçon 11',
+    F16:'Fille 16', F16N:'Fille 16 Nationale', F16C:'Fille 16 Championnat',
+    U17GR:'U17 Garçon', U17FR:'U17 Fille', U17:'U17', U17G:'U17 Garçon', U17F:'U17 Fille',
+    U17GNR:'U17 Garçon Novice', G16:'Garçon 16', G16N:'Garçon 16 National', G16C:'Garçon 16 Championnat',
+    U17GCHL:'U17 Garçon Challenge', U17FCHL:'U17 Fille Challenge',
+    U17GRCHP:'U17 Garçon Championnat', U17FRCHP:'U17 Fille Championnat',
+    JH:'Junior Homme', JF:'Junior Fille', JHR:'Junior Homme Régional', JFR:'Junior Fille Régionale',
+    U19H:'U19 Homme', U19F:'U19 Fille', U19HR:'U19 Homme Régional', U19FR:'U19 Fille Régionale',
+    U23H:'U23 Homme', U23F:'U23 Femme', U23HR:'U23 Homme Régional', U23FR:'U23 Femme Régionale',
+    EH:'Élite Homme', EF:'Élite Femme', EHR:'Élite Régionale Homme', EFR:'Élite Régionale Femme',
+    H1724:'Homme 17/24', H1724N:'Homme 17/24 National', H1724R:'Homme 17/24 Régional',
+    H1729:'Homme 17/29', H1729R:'Homme 17/29 Régional', H17:'Homme 17+', 'H17+':'Homme 17+',
+    H2529:'Homme 25/29', H2529N:'Homme 25/29 National', H2529R:'Homme 25/29 Régional',
+    H3034:'Homme 30/34', H3039:'Homme 30/39',
+    'H30+':'Homme 30+', 'H30+N':'Homme 30+ National', 'H30+R':'Homme 30+ Régional',
+    'H35+':'Homme 35+', 'H40+':'Homme 40+',
+    F1724:'Femme 17/24', F1724N:'Femme 17/24 Nationale', F1724R:'Femme 17/24 Régionale',
+    'F17+':'Femme 17+', 'F17+N':'Femme 17+ Nationale', 'F17+R':'Femme 17+ Régionale',
+    'F15+R':'Femme 15+ Régionale', 'F25+':'Femme 25+', 'F25+N':'Femme 25+ Nationale', 'F25+R':'Femme 25+ Régionale',
+    'C30+':'30 ans et + Hommes', C1729:'17/29 ans Hommes', C1724:'17/24 ans', 'C15+F':'15 ans et + Femmes', 'MA30+':'Masters 30+',
+    SGR:'Supercross Garçon', SFR:'Supercross Fille', SG:'Supercross Garçon', SF:'Supercross Fille',
+    TT15:'Time Trial U15+',
+    CRH1724:'Cruiser Homme 17/24', CRH1724N:'Cruiser Homme 17/24 National', CRH1724R:'Cruiser Homme 17/24 Régional',
+    CRH1729:'Cruiser Homme 17/29', CRH2529:'Cruiser Homme 25/29', CRH2529N:'Cruiser Homme 25/29 National', CRH2529R:'Cruiser Homme 25/29 Régional',
+    CRH3034:'Cruiser Homme 30/34', CRH3039:'Cruiser Homme 30/39', CRH3039N:'Cruiser Homme 30/39 National', CRH3039R:'Cruiser Homme 30/39 Régional',
+    CRH3539:'Cruiser Homme 35/39', CRH3539R:'Cruiser Homme 35/39 Régional',
+    CRH4044:'Cruiser Homme 40/44', CRH4044N:'Cruiser Homme 40/44 National', CRH4044R:'Cruiser Homme 40/44 Régional',
+    CRH4049:'Cruiser Homme 40/49', CRH4549:'Cruiser Homme 45/49',
+    'CRH40+':'Cruiser Homme 40+', 'CRH40+R':'Cruiser Homme 40+ Régional',
+    'CRH45+':'Cruiser Homme 45+', 'CRH45+N':'Cruiser Homme 45+ National', 'CRH45+R':'Cruiser Homme 45+ Régional',
+    'CRH50+':'Cruiser Homme 50+',
+    'CR30+R':'Cruiser 30+ Régional', 'CR30+R.C':'Cruiser 30+ Régional Fille',
+    CR1329R:'Cruiser 13/29 Régional', 'CR1329R.C':'Cruiser 13/29 Régional Fille',
+    CR1724:'Cruiser 17/24', CR1724N:'Cruiser 17/24 National', CR2529:'Cruiser 25/29', CR2529N:'Cruiser 25/29 National',
+    CR3034:'Cruiser 30/34', CR3039:'Cruiser 30/39', CR3039N:'Cruiser 30/39 National',
+    CR3539:'Cruiser 35/39', CR4044:'Cruiser 40/44', CR4044N:'Cruiser 40/44 National', 'CR45+':'Cruiser 45+',
+    CRF1729:'Cruiser Femme 17/29', CRF1729N:'Cruiser Femme 17/29 Nationale', CRF1729R:'Cruiser Femme 17/29 Régionale',
+    CRF1924:'Cruiser Femme 19/24', CRF2529:'Cruiser Femme 25/29',
+    'CRF17+':'Cruiser Femme 17+', 'CRF17+R':'Cruiser Femme 17+ Régionale',
+    'CRF30+':'Cruiser Femme 30+', 'CRF30+N':'Cruiser Femme 30+ Nationale', 'CRF30+R':'Cruiser Femme 30+ Régionale',
+    CRF3039:'Cruiser Femme 30/39', 'CRF40+':'Cruiser Femme 40+',
+    CRU15G:'Cruiser U15 Garçon', CRU15GN:'Cruiser U15 Garçon National', CRU15GR:'Cruiser U15 Garçon Régional',
+    CRU15F:'Cruiser U15 Fille', CRU15FN:'Cruiser U15 Fille Nationale', CRU15FR:'Cruiser U15 Fille Régionale',
+    CRU17G:'Cruiser U17 Garçon', CRU17GN:'Cruiser U17 Garçon National', CRU17GR:'Cruiser U17 Garçon Régional',
+    CRU17F:'Cruiser U17 Fille', CRU17FN:'Cruiser U17 Fille Nationale', CRU17FR:'Cruiser U17 Fille Régionale',
+    CRU19HR:'Cruiser U19 Homme Régional', CRU19F:'Cruiser U19 Fille',
+  };
+  function classLabel(code) {
+    if (!code) return '';
+    const grp = CODE_TO_GROUP.get(code);
+    if (grp) return grp.label;
+    return CLASS_NAMES[code] || code;
+  }
+
+  // --- Référentiel catégories (niveaux) — optionnel, chargé en arrière-plan ---
+  const REF_LEVEL_LABELS = { national: 'National', regional: 'Régional', departemental: 'Départemental', uec: 'UEC', uci: 'UCI' };
+  let catRef = null;
+
+  // Niveau d'un code JSTiming/Sqorz : FR d'abord, puis UEC, Mondiaux, Coupe du monde.
+  function refLevelFor(code) {
+    if (!catRef || !code) return '';
+    const sections = ['categories', 'categoriesUec', 'categoriesUci', 'categoriesWorldCup'];
+    for (const src of sections) {
+      const entry = catRef[src] && catRef[src][code];
+      if (entry && entry.level) return entry.level;
+    }
+    return '';
+  }
+
+  async function loadCatRef() {
+    try {
+      const r = await fetch('../stats/categories-ref.json', { cache: 'no-cache' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      catRef = await r.json();
+    } catch (e) {
+      catRef = null;
+      console.warn('[club] categories-ref.json indisponible (optionnel) :', e && e.message);
+    }
+    renderResults();
+  }
+
+  // --- Utilitaires : voir BmxCommon (norm, escape, humanError) ---
+  // normClub : normalisation douce préservant la casse/ponctuation des noms de clubs.
+
+  const normClub = s => (s || '').trim()
+    .toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+  // --- Logique de phases : isFinalPhase via BmxCommon ---
+
+  // --- computeStats (identique à category_stats) ---
+  function computeStats(matches) {
+    const s = {
+      entries: matches.length,
+      wins: 0, podiums: 0, bestRank: null,
+      rankSum: 0, rankCount: 0,
+    };
+    for (const m of matches) {
+      const c = m.competitor;
+      if (typeof c.rank === 'number') {
+        if (c.rank === 1) s.wins++;
+        if (c.rank <= 3) s.podiums++;
+        if (s.bestRank == null || c.rank < s.bestRank) s.bestRank = c.rank;
+        s.rankSum += c.rank;
+        s.rankCount++;
+      }
+    }
+    s.avgRank = s.rankCount ? s.rankSum / s.rankCount : null;
+    return s;
+  }
+
+  // --- expandIndex : voir BmxCommon (sur-ensemble : phases, chronos, séries) ---
+
+  // --- Noms complets des clubs (clubs.json : CODE -> {name, city}, annuaire FFC) ---
+  let clubFullNames = new Map();
+  async function loadClubNames() {
+    try {
+      const r = await fetch('../clubs.json', { cache: 'no-cache' });
+      if (!r.ok) return;
+      const j = await r.json();
+      const m = (j && j.mapping) || j || {};
+      for (const [k, v] of Object.entries(m)) {
+        if (k === '_meta' || !v || !v.name) continue;
+        clubFullNames.set(normClub(k), { name: v.name, city: v.city || null });
+      }
+    } catch { /* repli : codes seuls */ }
+  }
+  // « BMX BESANCON (BESANC) » — repli sur le code seul si inconnu.
+  function clubDisplayName(raw) {
+    const name = (raw || '').trim();
+    const full = clubFullNames.get(normClub(name));
+    return full ? `${full.name} (${name})` : name;
+  }
+  function clubCity(raw) {
+    return clubFullNames.get(normClub(raw || ''))?.city || null;
+  }
+
+  // --- Construire la map des clubs ---
+  function buildClubsMap(idx) {
+    const map = new Map();
+    for (const ev of (idx.events || [])) {
+      const year = (ev.event.eventDate || '').slice(0, 4);
+      for (const cls of (ev.classes || [])) {
+        for (const c of (cls.competitors || [])) {
+          const gn = c.groupName || '';
+          if (!gn) continue;
+          const key = normClub(gn);
+          if (!map.has(key)) map.set(key, { nameFreq: new Map(), years: new Set(), pilotKeys: new Set() });
+          const club = map.get(key);
+          club.nameFreq.set(gn, (club.nameFreq.get(gn) || 0) + 1);
+          if (year) club.years.add(year);
+          const pk = norm((c.firstName || '') + ' ' + (c.lastName || ''));
+          if (pk) club.pilotKeys.add(pk);
+        }
+      }
+    }
+    const result = new Map();
+    for (const [key, raw] of map) {
+      const rawName = [...raw.nameFreq.entries()].sort((a, b) => b[1] - a[1])[0][0];
+      result.set(key, {
+        displayName: clubDisplayName(rawName),
+        city: clubCity(rawName),
+        pilotCount: raw.pilotKeys.size,
+        sortedYears: [...raw.years].sort().reverse(),
+      });
+    }
+    return result;
+  }
+
+  // --- État global ---
+  let pilotsIndex = null;
+  let uecIndex = null;   // index UEC (optionnel) — compté dans les stats des pilotes du club
+  let uciIndex = null;   // index UCI Mondiaux (optionnel) — idem
+  let wcIndex = null;    // index Coupe du monde UCI (optionnel) — idem
+  let clubsMap    = null;
+  let selectedClubKey = null;
+  let yearFilter     = new Set(); // vide = toutes les années
+  let catFilter      = '';
+  let catSectionOpen = false;
+  let sortCol        = 'wins';
+  let sortDir        = 'desc';
+  let rankingYear      = String(new Date().getFullYear());
+  let rankingSortCol   = 'wins';
+  let rankingSortDir   = 'desc';
+  let rankingSearch    = '';
+  let rankingSearchName = '';
+
+  // --- DOM ---
+  const statusEl  = document.getElementById('status');
+  const clubInp   = document.getElementById('clubInp');
+  const retryBtn  = document.getElementById('retryBtn');
+  const suggestEl = document.getElementById('suggestions');
+  const resultsEl = document.getElementById('results');
+
+  function setStatus(msg, isError = false) {
+    statusEl.className = 'status' + (isError ? ' error' : '');
+    statusEl.textContent = msg || '';
+  }
+  function setLoading(msg) {
+    statusEl.className = 'status loading';
+    statusEl.textContent = msg;
+  }
+
+  // --- Chargement de l'index ---
+  function setProgress(done, total) {
+    setBarProgress(done, total);
+  }
+
+  // --- Chargement via BmxCommon.loadIndexCached (cache Cache API piloté par meta.json) ---
+  const INDEX_CACHE_KEY = 'https://bmx-race.local/cache/pilots-index.json';
+  const INDEX_META_URL = '../stats/pilots-index.meta.json';
+  const UEC_INDEX_CACHE_KEY = 'https://bmx-race.local/cache/uec-index.json';
+  const UEC_INDEX_META_URL = '../stats/uec-index.meta.json';
+  const UCI_INDEX_CACHE_KEY = 'https://bmx-race.local/cache/uci-index.json';
+  const UCI_INDEX_META_URL = '../stats/uci-index.meta.json';
+  const WC_INDEX_CACHE_KEY = 'https://bmx-race.local/cache/uci-worldcup-index.json';
+  const WC_INDEX_META_URL = '../stats/uci-worldcup-index.meta.json';
+
+  function pilotsCfg() {
+    return {
+      metaUrl: INDEX_META_URL, cacheKey: INDEX_CACHE_KEY, sources: INDEX_SOURCES,
+      tag: '[club]', label: 'Index', estimatedSize: 83_000_000,
+      expandOpts: { series: false }, // les séries ne sont jamais utilisées ici
+      onStatus: (text, isError) => (isError ? setStatus(text, true) : setLoading(text)),
+      onProgress: (done, total) => setProgress(done, total),
+    };
+  }
+  function uecCfg() {
+    return {
+      metaUrl: UEC_INDEX_META_URL, cacheKey: UEC_INDEX_CACHE_KEY, sources: UEC_INDEX_SOURCES,
+      tag: '[club:uec]', label: 'Index UEC', estimatedSize: 10_000_000,
+      expandOpts: { details: 'chrono', series: false },
+      onStatus: indexStatus, onProgress: setProgress,
+    };
+  }
+  function uciCfg() {
+    return {
+      metaUrl: UCI_INDEX_META_URL, cacheKey: UCI_INDEX_CACHE_KEY, sources: UCI_INDEX_SOURCES,
+      tag: '[club:uci]', label: 'Index UCI', estimatedSize: 5_000_000,
+      expandOpts: { details: 'chrono', series: false },
+      onStatus: indexStatus, onProgress: setProgress,
+    };
+  }
+  function wcCfg() {
+    return {
+      metaUrl: WC_INDEX_META_URL, cacheKey: WC_INDEX_CACHE_KEY, sources: WC_INDEX_SOURCES,
+      tag: '[club:wc]', label: 'Index Coupe du monde', estimatedSize: 1_000_000,
+      expandOpts: { details: 'chrono', series: false },
+      onStatus: indexStatus, onProgress: setProgress,
+    };
+  }
+  function indexStatus(text, isError) {
+    if (isError) console.warn('[club] ' + text);
+  }
+
+  // Fraîcheur dans le pied de page (via BmxCommon.renderDataDates).
+  function showDataDates() {
+    renderDataDates([
+      { tag: 'FR', iso: pilotsIndex && pilotsIndex.generated },
+      { tag: 'UEC', iso: uecIndex && uecIndex.generated },
+      { tag: 'UCI', iso: uciIndex && uciIndex.generated },
+      { tag: 'WC', iso: wcIndex && wcIndex.generated },
+    ]);
+  }
+
+  async function loadIndex() {
+    retryBtn.hidden = true;
+    setLoading('Chargement des données…');
+    clubInp.disabled = true;
+    try {
+      pilotsIndex = await loadIndexCached(pilotsCfg());
+      await loadClubNames();
+      clubsMap = buildClubsMap(pilotsIndex);
+      clubInp.disabled = false;
+      clubInp.focus();
+      setStatus(`${clubsMap.size} clubs disponibles — tapez pour chercher.`);
+      showDataDates();
+      document.getElementById('tabBar').hidden = false;
+      loadUecInBackground();
+      loadUciInBackground();
+      loadWcInBackground();
+    } catch (e) {
+      setProgress(0, 0);
+      setStatus('Impossible de charger les données : ' + humanError(e), true);
+      retryBtn.hidden = false;
+    }
+  }
+  retryBtn.onclick = loadIndex;
+
+  // Index UEC/UCI/WC : arrière-plan — les stats des pilotes du club les intègrent à leur arrivée.
+  async function loadUecInBackground() {
+    try { uecIndex = await loadIndexCached({ ...uecCfg(), quiet: true }); }
+    catch (e) { console.warn('[club] uec-index indisponible :', e && e.message); uecIndex = null; }
+    showDataDates();
+    if (selectedClubKey) renderResults();
+  }
+  async function loadUciInBackground() {
+    try { uciIndex = await loadIndexCached({ ...uciCfg(), quiet: true }); }
+    catch (e) { console.warn('[club] uci-index indisponible :', e && e.message); uciIndex = null; }
+    showDataDates();
+    if (selectedClubKey) renderResults();
+  }
+  async function loadWcInBackground() {
+    try { wcIndex = await loadIndexCached({ ...wcCfg(), quiet: true }); }
+    catch (e) { console.warn('[club] uci-worldcup-index indisponible :', e && e.message); wcIndex = null; }
+    showDataDates();
+    if (selectedClubKey) renderResults();
+  }
+
+  document.getElementById('tabBar').querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+
+  // --- Autocomplétion ---
+  let suggHighlight = -1;
+
+  function renderSuggestions(query) {
+    if (!clubsMap || !query.trim()) {
+      suggestEl.className = 'suggestions';
+      return;
+    }
+    const q = normClub(query);
+    const matches = [];
+    for (const [key, club] of clubsMap) {
+      if (normClub(club.displayName).includes(q) || key.includes(q)) {
+        matches.push({ key, ...club });
+      }
+    }
+    matches.sort((a, b) => {
+      const aN = normClub(a.displayName);
+      const bN = normClub(b.displayName);
+      const diff = (aN.startsWith(q) ? 0 : 1) - (bN.startsWith(q) ? 0 : 1);
+      return diff !== 0 ? diff : a.displayName.localeCompare(b.displayName, 'fr');
+    });
+
+    if (matches.length === 0) {
+      suggestEl.innerHTML = `<div class="suggestion-empty">Aucun club trouvé pour « ${escape(query)} »</div>`;
+    } else {
+      const top  = matches.slice(0, 10);
+      const more = matches.length - top.length;
+      suggestEl.innerHTML = top.map((m, i) =>
+        `<div class="suggestion-item" role="option" data-key="${escape(m.key)}" data-idx="${i}">
+          <span>${escape(m.displayName)}</span>
+          <span class="sug-count">${m.pilotCount} pilote${m.pilotCount !== 1 ? 's' : ''}</span>
+        </div>`
+      ).join('') + (more > 0 ? `<div class="suggestion-more">+${more} résultat${more > 1 ? 's' : ''}…</div>` : '');
+
+      suggestEl.querySelectorAll('.suggestion-item').forEach(el => {
+        el.addEventListener('mousedown', e => {
+          e.preventDefault();
+          selectClub(el.dataset.key);
+        });
+      });
+    }
+    suggHighlight = -1;
+    suggestEl.className = 'suggestions open';
+  }
+
+  function hideSuggestions() {
+    suggestEl.className = 'suggestions';
+    suggHighlight = -1;
+  }
+
+  function highlightSuggestion(idx) {
+    const items = suggestEl.querySelectorAll('.suggestion-item');
+    items.forEach((el, i) => el.classList.toggle('highlighted', i === idx));
+    suggHighlight = idx;
+  }
+
+  clubInp.addEventListener('input', () => renderSuggestions(clubInp.value));
+  clubInp.addEventListener('focus', () => { if (clubInp.value) renderSuggestions(clubInp.value); });
+  clubInp.addEventListener('blur', () => setTimeout(hideSuggestions, 150));
+  clubInp.addEventListener('keydown', e => {
+    const items = suggestEl.querySelectorAll('.suggestion-item');
+    if (!items.length || suggestEl.className !== 'suggestions open') return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      highlightSuggestion(Math.min(suggHighlight + 1, items.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      highlightSuggestion(Math.max(suggHighlight - 1, 0));
+    } else if (e.key === 'Enter') {
+      if (suggHighlight >= 0 && items[suggHighlight]) {
+        e.preventDefault();
+        selectClub(items[suggHighlight].dataset.key);
+      }
+    } else if (e.key === 'Escape') {
+      hideSuggestions();
+    }
+  });
+
+  // --- Sélection d'un club ---
+  function selectClub(key) {
+    if (!clubsMap || !clubsMap.has(key)) {
+      resultsEl.innerHTML = `<div class="card"><div class="empty-state">Club introuvable (« ${escape(key)} »).</div></div>`;
+      return;
+    }
+    selectedClubKey = key;
+    const club = clubsMap.get(key);
+    if (!club) return;
+    if (typeof pushRecent === 'function') pushRecent('clubs', key, club.displayName);
+    clubInp.value = club.displayName;
+    hideSuggestions();
+    yearFilter     = new Set();
+    catFilter      = '';
+    catSectionOpen = false;
+    sortCol        = 'wins';
+    sortDir    = 'desc';
+    renderResults();
+    pushUrlState(key);  // ← ajout
+  }
+
+  // --- Favoris partagés (état inter-outils, cf. BmxCommon.toggleFav) ---
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('[data-fav-club]');
+    if (!btn || btn.disabled || typeof toggleFav !== 'function') return;
+    const nowFav = toggleFav('clubs', btn.dataset.favClub, btn.dataset.favName);
+    btn.textContent = nowFav ? '★' : '☆';
+    btn.classList.toggle('on', nowFav);
+    btn.title = nowFav ? 'Suivi ✓ — cliquer pour ne plus suivre' : 'Suivre ce club';
+  });
+
+  // --- Exposition des variables pour debug console (seulement avec ?debug=1) ---
+  if (new URLSearchParams(location.search).has('debug')) {
+    window._getState = () => ({ yearFilter: [...yearFilter], catFilter, selectedClubKey });
+  }
+
+  // --- URL state ---
+  function parseUrlState() {
+    const p = new URLSearchParams(location.search);
+    return { club: p.get('club') || '', q: p.get('q') || '' };
+  }
+  function buildUrl(key) {
+    const u = new URL(location.href);
+    if (key) { u.searchParams.set('club', key); u.searchParams.delete('q'); }
+    else u.searchParams.delete('club');
+    return u.pathname + (u.search || '');
+  }
+  function pushUrlState(key) {
+    const newUrl = buildUrl(key);
+    const cur = location.pathname + location.search;
+    if (newUrl === cur) history.replaceState(null, '', newUrl);
+    else history.pushState(null, '', newUrl);
+  }
+
+  window.addEventListener('popstate', () => {
+    const { club } = parseUrlState();
+    const key = club && normClub(club);
+    if (key && clubsMap && clubsMap.has(key)) {
+      selectClub(key);
+      history.replaceState(null, '', buildUrl(key));
+    } else {
+      // Reset to empty state
+      selectedClubKey = null;
+      clubInp.value = '';
+      yearFilter = new Set();
+      catFilter = '';
+      catSectionOpen = false;
+      sortCol = 'wins';
+      sortDir = 'desc';
+      renderResults();
+    }
+  });
+
+  // --- Debug : inspecte un pilote par nom normalisé (seulement avec ?debug=1) ---
+  if (new URLSearchParams(location.search).has('debug')) {
+  window._debugPilot = function(firstName, lastName) {
+    if (!pilotsIndex || !selectedClubKey) { console.log('index not loaded or no club selected'); return; }
+    const target = norm(firstName + ' ' + lastName);
+    const allRows = [], clubRows = [];
+    for (const ev of (pilotsIndex.events || [])) {
+      const year = (ev.event.eventDate || '').slice(0, 4);
+      for (const cls of (ev.classes || [])) {
+        for (const c of (cls.competitors || [])) {
+          if (norm((c.firstName||'') + ' ' + (c.lastName||'')) !== target) continue;
+          const row = { eventId: ev.event.eventId, eventDate: ev.event.eventDate, year, code: cls.perpetualClassCode, rank: c.rank, gn: c.groupName, gnKey: normClub(c.groupName||'') };
+          allRows.push(row);
+          if (normClub(c.groupName||'') === selectedClubKey) clubRows.push(row);
+        }
+      }
+    }
+    console.log('=== TOUTES les apparitions (tous clubs) ===');
+    console.table(allRows);
+    console.log('Total brut (tous clubs):', allRows.length);
+    const allKeys = new Set(allRows.map(r => `${r.eventId}|${r.year}`));
+    console.log('Unique eventId|year (tous clubs):', allKeys.size);
+    console.log('');
+    console.log('=== Apparitions pour le club sélectionné (key=' + selectedClubKey + ') ===');
+    console.table(clubRows);
+    console.log('Total brut (club sélectionné):', clubRows.length);
+    const clubKeys = new Set(clubRows.map(r => `${r.eventId}|${r.year}`));
+    console.log('Unique eventId|year (club sélectionné):', clubKeys.size);
+    console.log('');
+    console.log('Clubs distincts trouvés pour ce pilote:');
+    const gnSet = new Map();
+    for (const r of allRows) gnSet.set(r.gnKey, r.gn);
+    console.table([...gnSet.entries()].map(([k,v]) => ({key:k, displayName:v})));
+
+    console.log('=== Répartition par année (club sélectionné) ===');
+    const yearCounts = {};
+    for (const r of clubRows) yearCounts[r.year || '(vide)'] = (yearCounts[r.year || '(vide)'] || 0) + 1;
+    console.table(yearCounts);
+
+    console.log('=== Simulation buildPilotsData avec filtres actuels ===');
+    console.log('yearFilter:', [...yearFilter], '| catFilter:', catFilter || '(aucun)');
+    const seenMap = new Map();
+    let skippedYear = 0, skippedCat = 0, skippedClub = 0;
+    for (const ev of (pilotsIndex.events || [])) {
+      const year2 = (ev.event.eventDate || '').slice(0, 4);
+      if (yearFilter.size > 0 && !yearFilter.has(year2)) continue;
+      for (const cls of (ev.classes || [])) {
+        const code2 = cls.perpetualClassCode;
+        if (catFilter) {
+          const ok = catFilter.startsWith('g:') ? CODE_TO_GROUP.get(code2)?.key === catFilter : code2 === catFilter;
+          if (!ok) { skippedCat++; continue; }
+        }
+        for (const c of (cls.competitors || [])) {
+          if (norm((c.firstName||'')+' '+(c.lastName||'')) !== target) continue;
+          if (normClub(c.groupName||'') !== selectedClubKey) { skippedClub++; continue; }
+          const evKey = `${ev.event.eventId}|${year2}|${code2||''}`;
+          const rank2 = typeof c.rank === 'number' ? c.rank : Infinity;
+          const ex = seenMap.get(evKey);
+          const exRank = ex ? (typeof ex.rank === 'number' ? ex.rank : Infinity) : Infinity;
+          if (!ex || rank2 < exRank) seenMap.set(evKey, { eventId: ev.event.eventId, year: year2, code: code2, rank: c.rank, kept: true });
+        }
+      }
+    }
+    console.log('Entrées comptées (seenMap.size):', seenMap.size);
+    console.log('Clés ignorées (cat):', skippedCat, '| Ignorées (club):', skippedClub);
+    console.table([...seenMap.values()]);
+  };
+  }
+
+  // --- Construction des données pilotes filtrées ---
+  function buildPilotsData(ignoreCatFilter = false, ignoreYearFilter = false) {
+    if (!selectedClubKey || !pilotsIndex) return [];
+    const yearsActive = !ignoreYearFilter && yearFilter.size > 0;
+    const pilotMap = new Map();
+
+    // Passe 0 : l'identité du club est définie par ses pilotes vus en FR (groupName = club).
+    // Les index UEC/UCI/WC n'ont pas de groupement club (code pays) : on y matche par nom.
+    const clubPilotKeys = new Set();
+    for (const ev of (pilotsIndex.events || [])) {
+      if (yearsActive && !yearFilter.has((ev.event.eventDate || '').slice(0, 4))) continue;
+      for (const cls of (ev.classes || [])) {
+        if (!ignoreCatFilter && catFilter) {
+          const code = cls.perpetualClassCode;
+          const ok = catFilter.startsWith('g:') ? CODE_TO_GROUP.get(code)?.key === catFilter : code === catFilter;
+          if (!ok) continue;
+        }
+        for (const c of (cls.competitors || [])) {
+          const gn = c.groupName || '';
+          if (!gn || normClub(gn) !== selectedClubKey) continue;
+          const key = norm((c.firstName || '') + ' ' + (c.lastName || ''));
+          if (key) clubPilotKeys.add(key);
+        }
+      }
+    }
+
+    const allSrcs = [
+      [pilotsIndex, 'club'],       // FR : on garde aussi le groupName en filtre de garantie
+      [uecIndex, 'name'],          // UEC : match par nom uniquement
+      [uciIndex, 'name'],          // UCI Mondiaux : idem
+      [wcIndex, 'name'],           // Coupe du monde : idem
+    ];
+    for (const [idx, mode] of allSrcs) {
+      if (!idx) continue;
+      for (const ev of (idx.events || [])) {
+        const year = (ev.event.eventDate || '').slice(0, 4);
+        if (yearsActive && !yearFilter.has(year)) continue;
+
+        for (const cls of (ev.classes || [])) {
+          if (!ignoreCatFilter && catFilter) {
+            const code = cls.perpetualClassCode;
+            const catMatches = catFilter.startsWith('g:')
+              ? CODE_TO_GROUP.get(code)?.key === catFilter
+              : code === catFilter;
+            if (!catMatches) continue;
+          }
+
+          for (const c of (cls.competitors || [])) {
+            // FR : groupe club exigé. International : le nom doit appartenir au club.
+            if (mode === 'club') {
+              const gn = c.groupName || '';
+              if (!gn || normClub(gn) !== selectedClubKey) continue;
+            } else {
+              const pilotKey = norm((c.firstName || '') + ' ' + (c.lastName || ''));
+              if (!pilotKey || !clubPilotKeys.has(pilotKey)) continue;
+            }
+
+            const pilotKey = norm((c.firstName || '') + ' ' + (c.lastName || ''));
+            if (!pilotKey) continue;
+
+            if (!pilotMap.has(pilotKey)) {
+              pilotMap.set(pilotKey, {
+                firstName:   c.firstName || '',
+                lastName:    c.lastName  || '',
+                seenEvents:  new Map(),
+                classCounts: new Map(),
+              });
+            }
+            const pilot = pilotMap.get(pilotKey);
+
+            // Catégorie dominante
+            const code = cls.perpetualClassCode || cls.className || '';
+            if (code) pilot.classCounts.set(code, (pilot.classCounts.get(code) || 0) + 1);
+
+            // Clé composite : source + eventId + année + code catégorie (évite les
+            // collisions d'eventId entre Sqorz FR et JSTiming UEC/UCI).
+            const evKey      = `${mode}|${ev.event.eventId}|${year}|${cls.perpetualClassCode || cls.className || ''}`;
+            const existing   = pilot.seenEvents.get(evKey);
+            const rank        = typeof c.rank === 'number' ? c.rank : Infinity;
+            const existRank   = existing ? (typeof existing.competitor.rank === 'number' ? existing.competitor.rank : Infinity) : Infinity;
+            if (!existing || rank < existRank) {
+              pilot.seenEvents.set(evKey, {
+                account: ev.account,
+                event:   ev.event,
+                cls:     { className: cls.className, perpetualClassCode: cls.perpetualClassCode },
+                competitor: c,
+                totalParticipants: cls.total || (cls.competitors || []).length,
+              });
+            }
+          }
+        }
+      }
+    }
+
+    return [...pilotMap.values()].map(p => {
+      const matches      = [...p.seenEvents.values()];
+      const stats        = computeStats(matches);
+      const dominantCode = [...p.classCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || '';
+      const years        = [...new Set(matches.map(m => (m.event.eventDate || '').slice(0, 4)).filter(Boolean))].sort().reverse();
+      return {
+        key:          norm(p.firstName + ' ' + p.lastName),
+        firstName:    p.firstName,
+        lastName:     p.lastName,
+        name:         (p.firstName + ' ' + p.lastName).trim(),
+        dominantCode,
+        years,
+        stats,
+        matches,
+      };
+    });
+  }
+
+  // --- Stats annuelles pour le graphe de progression ---
+  function buildYearlyStats() {
+    const allPilots = buildPilotsData(false, true);
+    const yearMap = new Map();
+    for (const pilot of allPilots) {
+      for (const m of pilot.matches) {
+        const year = (m.event.eventDate || '').slice(0, 4);
+        if (!year) continue;
+        if (!yearMap.has(year)) yearMap.set(year, { wins: 0, entries: 0, pilotKeys: new Set() });
+        const yd = yearMap.get(year);
+        yd.entries++;
+        if (typeof m.competitor.rank === 'number' && m.competitor.rank === 1) yd.wins++;
+        yd.pilotKeys.add(pilot.key);
+      }
+    }
+    return [...yearMap.entries()]
+      .map(([year, d]) => ({
+        year,
+        wins: d.wins,
+        entries: d.entries,
+        winRate: d.entries > 0 ? 100 * d.wins / d.entries : 0,
+        pilotCount: d.pilotKeys.size,
+      }))
+      .sort((a, b) => a.year.localeCompare(b.year));
+  }
+
+  // --- Taux de finale ---
+  function countFinaleEntries(pilots) {
+    let count = 0;
+    for (const pilot of pilots) {
+      for (const m of pilot.matches) {
+        // Hors contre-la-montre (runs en solo : une « Super Final » n'est pas une finale).
+        if ((m.competitor.competitorRankDetails || []).some(d => isFinalPhase(d) && !isTimeTrialPhase(d))) count++;
+      }
+    }
+    return count;
+  }
+
+  // --- Données catégories (extrait pour réutilisation dans les KPIs) ---
+  function buildCatsData(pilots) {
+    const catMap = new Map();
+    for (const pilot of pilots) {
+      for (const m of pilot.matches) {
+        const code   = m.cls.perpetualClassCode || m.cls.className || '?';
+        const grp    = CODE_TO_GROUP.get(code);
+        const catKey = grp ? grp.key : code;
+        const label  = grp ? grp.label : (CLASS_NAMES[code] || code);
+        if (!catMap.has(catKey)) catMap.set(catKey, { label, wins: 0, podiums: 0, total: 0, pilotKeys: new Set(), levels: new Map() });
+        const bucket = catMap.get(catKey);
+        const lvl    = refLevelFor(code);
+        if (lvl) bucket.levels.set(lvl, (bucket.levels.get(lvl) || 0) + 1);
+        if (typeof m.competitor.rank === 'number') {
+          if (m.competitor.rank === 1) bucket.wins++;
+          if (m.competitor.rank <= 3) bucket.podiums++;
+        }
+        bucket.total++;
+        bucket.pilotKeys.add(norm((m.competitor.firstName || '') + ' ' + (m.competitor.lastName || '')));
+      }
+    }
+    return [...catMap.entries()]
+      .map(([catKey, b]) => ({
+        code:       catKey,
+        label:      b.label,
+        level:      b.levels.size ? [...b.levels.entries()].sort((x, y) => y[1] - x[1])[0][0] : '',
+        pilotCount: b.pilotKeys.size,
+        wins:       b.wins,
+        podiums:    b.podiums,
+        rate:       b.total ? Math.round(100 * b.podiums / b.total) : 0,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label, 'fr'));
+  }
+
+  // --- Graphe progression annuelle ---
+  function buildProgressionHtml(yearlyStats) {
+    if (yearlyStats.length < 2) return '<div class="card"><div class="chart-empty">Pas assez de données (au moins 2 saisons requises).</div></div>';
+    const W = 600, H = 190;
+    const pL = 42, pR = 38, pT = 14, pB = 30;
+    const cW = W - pL - pR, cH = H - pT - pB;
+    const n = yearlyStats.length;
+
+    const maxWR = Math.max(...yearlyStats.map(d => d.winRate));
+    const wrCeil = maxWR <= 10 ? 10 : maxWR <= 20 ? 20 : maxWR <= 25 ? 25 : maxWR <= 50 ? 50 : 100;
+    const maxP = Math.max(...yearlyStats.map(d => d.pilotCount), 1);
+
+    const xPos = i => pL + (n > 1 ? (i / (n - 1)) : 0.5) * cW;
+    const yW   = v => pT + cH * (1 - v / wrCeil);
+    const yP   = v => pT + cH * (1 - v / maxP);
+    const baseY = (pT + cH).toFixed(1);
+
+    const gridHtml = [0.25, 0.5, 0.75, 1].map(t => {
+      const y   = (pT + cH * (1 - t)).toFixed(1);
+      const wrV = Math.round(wrCeil * t);
+      const pV  = Math.round(maxP * t);
+      return `<line x1="${pL}" y1="${y}" x2="${pL + cW}" y2="${y}" stroke="var(--line)" stroke-width="1"/>` +
+        `<text x="${pL - 4}" y="${(parseFloat(y) + 4).toFixed(1)}" text-anchor="end" font-size="10" style="fill:var(--accent);opacity:.8">${wrV}%</text>` +
+        `<text x="${pL + cW + 4}" y="${(parseFloat(y) + 4).toFixed(1)}" text-anchor="start" font-size="10" style="fill:var(--mint);opacity:.9">${pV}</text>`;
+    }).join('');
+
+    const wrPts  = yearlyStats.map((d, i) => `${i === 0 ? 'M' : 'L'}${xPos(i).toFixed(1)},${yW(d.winRate).toFixed(1)}`).join(' ');
+    const pPts   = yearlyStats.map((d, i) => `${i === 0 ? 'M' : 'L'}${xPos(i).toFixed(1)},${yP(d.pilotCount).toFixed(1)}`).join(' ');
+    const wrArea = `${wrPts} L${xPos(n - 1).toFixed(1)},${baseY} L${xPos(0).toFixed(1)},${baseY}Z`;
+    const pArea  = `${pPts} L${xPos(n - 1).toFixed(1)},${baseY} L${xPos(0).toFixed(1)},${baseY}Z`;
+
+    const xLabels = yearlyStats.map((d, i) =>
+      `<text x="${xPos(i).toFixed(1)}" y="${H - 5}" text-anchor="middle" font-size="11" style="fill:var(--muted)">${d.year}</text>`
+    ).join('');
+
+    const wrDots = yearlyStats.map((d, i) =>
+      `<circle cx="${xPos(i).toFixed(1)}" cy="${yW(d.winRate).toFixed(1)}" r="4" style="fill:var(--accent);stroke:var(--card);stroke-width:2"><title>${d.year} · % victoires : ${d.winRate.toFixed(1)}%</title></circle>`
+    ).join('');
+    const pDots = yearlyStats.map((d, i) =>
+      `<circle cx="${xPos(i).toFixed(1)}" cy="${yP(d.pilotCount).toFixed(1)}" r="4" style="fill:var(--mint);stroke:var(--card);stroke-width:2"><title>${d.year} · Pilotes actifs : ${d.pilotCount}</title></circle>`
+    ).join('');
+
+    return `<div class="card">
+      <p class="section-title" style="margin-bottom:10px">Progression annuelle</p>
+      <div style="display:flex;gap:16px;margin-bottom:8px;flex-wrap:wrap">
+        <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)">
+          <span style="width:18px;height:2.5px;background:var(--accent);display:inline-block;border-radius:2px"></span>% victoires
+        </span>
+        <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)">
+          <span style="width:18px;height:2.5px;background:var(--mint);display:inline-block;border-radius:2px"></span>Pilotes actifs
+        </span>
+      </div>
+      <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" aria-hidden="true">
+        <line x1="${pL}" y1="${baseY}" x2="${pL + cW}" y2="${baseY}" stroke="var(--line-strong)" stroke-width="1"/>
+        ${gridHtml}
+        <path d="${wrArea}" style="fill:var(--accent);opacity:.08"/>
+        <path d="${pArea}" style="fill:var(--mint);opacity:.12"/>
+        <path d="${wrPts}" style="fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round"/>
+        <path d="${pPts}" style="fill:none;stroke:var(--mint);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round"/>
+        ${wrDots}
+        ${pDots}
+        ${xLabels}
+      </svg>
+    </div>`;
+  }
+
+  function getCoveredEventIds(pilots) {
+    const ids = new Set();
+    for (const p of pilots) for (const m of p.matches) ids.add(m.event.eventId);
+    return ids.size;
+  }
+
+  // --- Rendu global des résultats ---
+  function renderResults() {
+    if (!clubsMap) return; // pas encore chargé (course loadCatRef vs loadIndex)
+    const pilots    = buildPilotsData();
+    const pilotsAll = buildPilotsData(true); // sans filtre catégorie, pour l'encadré catégories
+    const club      = clubsMap.get(selectedClubKey);
+
+    if (pilots.length === 0) {
+      document.body.classList.remove('has-results');
+      const yearMsg = yearFilter.size > 0 ? ` en ${[...yearFilter].sort().join(', ')}` : '';
+      resultsEl.innerHTML = `<div class="card"><div class="empty-state">Aucun résultat pour « ${escape(club?.displayName || '')} »${yearMsg}.</div></div>`;
+      return;
+    }
+
+    document.body.classList.add('has-results');
+
+    // Stats club agrégées
+    const totalWins   = pilots.reduce((s, p) => s + p.stats.wins, 0);
+    const totalPodiums= pilots.reduce((s, p) => s + p.stats.podiums, 0);
+    const totalParts  = pilots.reduce((s, p) => s + p.stats.entries, 0);
+    const winRate     = totalParts > 0 ? Math.round(100 * totalWins / totalParts) : 0;
+    const podiumRate  = totalParts > 0 ? Math.round(100 * totalPodiums / totalParts) : 0;
+    const eventCount  = getCoveredEventIds(pilots);
+    const finaleEntries = countFinaleEntries(pilots);
+    const finaleRate    = totalParts > 0 ? Math.round(100 * finaleEntries / totalParts) : 0;
+    const catsData      = buildCatsData(pilotsAll);
+    const bestCat       = [...catsData].sort((a, b) => b.wins - a.wins || b.podiums - a.podiums)[0] || null;
+    const yearlyStats   = buildYearlyStats();
+
+    // Années disponibles (depuis la map, pas filtrées)
+    const allYears    = club?.sortedYears || [];
+
+    // --- En-tête club ---
+    // Garde : le CDN common.js peut être en retard d'un déploiement (socle partagé).
+    const favNow = typeof isFav === 'function' && isFav('clubs', selectedClubKey);
+    const headerHtml = `
+      <div class="club-header">
+        <div class="club-name">${escape(club?.displayName || '')}<button class="fav-btn${favNow ? ' on' : ''}" data-fav-club="${escape(selectedClubKey || '')}" data-fav-name="${escape(club?.displayName || '')}" title="${favNow ? 'Suivi ✓ — cliquer pour ne plus suivre' : 'Suivre ce club'}">${favNow ? '★' : '☆'}</button></div>
+        ${club?.city ? `<div style="font-size:12.5px;color:var(--muted);margin-top:2px">${escape(club.city)}</div>` : ''}
+        <div class="club-kpis">
+          <div class="club-kpi sky"><div class="k">Pilotes actifs</div><div class="v">${pilots.length}</div></div>
+          <div class="club-kpi gold"><div class="k">Victoires</div><div class="v">${totalWins}</div><div class="kpi-sub">/ ${totalParts} · ${winRate}%</div></div>
+          <div class="club-kpi silver"><div class="k">Podiums</div><div class="v">${totalPodiums}</div><div class="kpi-sub">/ ${totalParts} · ${podiumRate}%</div></div>
+          <div class="club-kpi mint"><div class="k">Vainqueurs</div><div class="v">${pilots.filter(p => p.stats.wins > 0).length}</div><div class="kpi-sub">pilotes différents</div></div>
+          <div class="club-kpi teal"><div class="k">Événements</div><div class="v">${eventCount}</div></div>
+          <div class="club-kpi lime"><div class="k">Taux de finale</div><div class="v">${finaleRate}%</div><div class="kpi-sub">${finaleEntries} / ${totalParts}</div></div>
+          <div class="club-kpi lavender"><div class="k">Top catégorie</div><div class="v" style="font-size:16px;line-height:1.3">${bestCat ? escape(bestCat.label) : '—'}</div><div class="kpi-sub">${bestCat ? bestCat.wins + ' victoire' + (bestCat.wins !== 1 ? 's' : '') : ''}</div></div>
+        </div>
+      </div>`;
+
+    // --- Barre de filtres ---
+    const yearPillsHtml = allYears.map(y =>
+      `<button class="yp-btn${yearFilter.has(y) ? ' active' : ''}" data-year="${escape(y)}">${escape(y)}</button>`
+    ).join('');
+
+    const filtersHtml = `
+      <div class="card club-filters" id="clubFiltersCard">
+        <div class="field">
+          <label>Année</label>
+          <div class="year-pills">
+            <button class="yp-btn${yearFilter.size === 0 ? ' active' : ''}" data-year="all">Toutes</button>
+            ${yearPillsHtml}
+          </div>
+        </div>
+      </div>`;
+
+    // --- Tableau des pilotes ---
+    const tableHtml = buildTableHtml(pilots, totalWins, totalPodiums);
+
+    // --- Section catégories (données non filtrées par catégorie) ---
+    const catsHtml = buildCategoriesHtml(pilotsAll);
+
+    const progressionHtml = buildProgressionHtml(yearlyStats);
+    resultsEl.innerHTML = headerHtml + filtersHtml + progressionHtml + catsHtml
+      + `<div class="card table-card"><div class="table-scroll">${tableHtml}</div></div>`;
+
+    // Événements sur les filtres
+    resultsEl.querySelectorAll('.yp-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const y = btn.dataset.year;
+        if (y === 'all') {
+          yearFilter.clear();
+        } else if (yearFilter.has(y)) {
+          yearFilter.delete(y);
+        } else {
+          yearFilter.add(y);
+        }
+        renderResults();
+      });
+    });
+
+    // Toggle section catégories
+    const catToggleBtn = document.getElementById('catToggleBtn');
+    const catCollapsible = document.getElementById('catCollapsible');
+    if (catToggleBtn && catCollapsible) {
+      catToggleBtn.addEventListener('click', () => {
+        catSectionOpen = !catSectionOpen;
+        catToggleBtn.classList.toggle('open', catSectionOpen);
+        catCollapsible.classList.toggle('open', catSectionOpen);
+      });
+    }
+
+    // Badge "effacer filtre catégorie"
+    const catClearBtn = document.getElementById('catClearBtn');
+    if (catClearBtn) {
+      catClearBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        catFilter = '';
+        catSectionOpen = false;
+        renderResults();
+      });
+    }
+
+    // Clic sur une carte catégorie → filtre + repli section
+    resultsEl.querySelectorAll('.cat-card[data-code]').forEach(card => {
+      card.addEventListener('click', () => {
+        catFilter = catFilter === card.dataset.code ? '' : card.dataset.code;
+        catSectionOpen = false;
+        renderResults();
+      });
+    });
+
+    // Tri via en-têtes
+    resultsEl.querySelectorAll('.ranking-table th[data-col]').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (col === sortCol) {
+          sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+          sortCol = col;
+          sortDir = ['name', 'cat', 'avgRank'].includes(col) ? 'asc' : 'desc';
+        }
+        renderResults();
+      });
+    });
+  }
+
+  // --- Tri des pilotes ---
+  function sortedPilots(pilots) {
+    return [...pilots].sort((a, b) => {
+      let av, bv;
+      switch (sortCol) {
+        case 'name':    av = a.name.toLowerCase(); bv = b.name.toLowerCase(); break;
+        case 'cat':     av = a.dominantCode; bv = b.dominantCode; break;
+        case 'entries': av = a.stats.entries; bv = b.stats.entries; break;
+        case 'wins':    av = a.stats.wins;    bv = b.stats.wins;    break;
+        case 'podiums': av = a.stats.podiums; bv = b.stats.podiums; break;
+        case 'podRate': av = a.stats.entries ? a.stats.podiums / a.stats.entries : 0;
+                        bv = b.stats.entries ? b.stats.podiums / b.stats.entries : 0; break;
+        case 'avgRank': av = a.stats.avgRank  ?? 9999; bv = b.stats.avgRank  ?? 9999; break;
+        default: return 0;
+      }
+      const cmp = typeof av === 'string' ? av.localeCompare(bv, 'fr') : av - bv;
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+  }
+
+  // --- Tableau HTML ---
+  function buildTableHtml(pilots, totalWins, totalPodiums) {
+    // En vue « Toutes » (toutes années), la catégorie dominante n'a pas de sens
+    // (un pilote change de catégorie d'une année à l'autre) : colonne masquée.
+    const showCat = yearFilter.size > 0;
+    if (!showCat && sortCol === 'cat') { sortCol = 'wins'; sortDir = 'desc'; }
+    const cols = [
+      { key: null,       label: '#',           nosort: true },
+      { key: 'name',     label: 'Nom' },
+      ...(showCat ? [{ key: 'cat', label: 'Catégorie', title: 'Catégorie dominante' }] : []),
+      { key: null,       label: 'Années',      nosort: true },
+      { key: 'entries',  label: 'Particip.',   title: 'Participations' },
+      { key: 'wins',     label: 'Victoires' },
+      { key: null,       label: '% victoires club', nosort: true, title: 'Part des victoires totales du club' },
+      { key: 'podiums',  label: 'Podiums' },
+      { key: null,       label: '% podiums club',   nosort: true, title: 'Part des podiums totaux du club' },
+    ];
+
+    const thHtml = cols.map(col => {
+      if (col.nosort) return `<th class="no-sort">${escape(col.label)}</th>`;
+      const isSorted = col.key === sortCol;
+      const arrow    = isSorted ? ` <span aria-hidden="true">${sortDir === 'asc' ? '▲' : '▼'}</span>` : '';
+      return `<th class="${isSorted ? 'sorted' : ''}" data-col="${col.key}" title="${escape(col.title || col.label)}">${escape(col.label)}${arrow}</th>`;
+    }).join('');
+
+    const sorted   = sortedPilots(pilots);
+    const rowsHtml = sorted.map((pilot, i) => {
+      const s      = pilot.stats;
+      const rank   = i + 1;
+      const rankCell = rank === 1 ? `<span class="rpill r1">1</span>`
+                     : rank === 2 ? `<span class="rpill r2">2</span>`
+                     : rank === 3 ? `<span class="rpill r3">3</span>`
+                     : rank;
+      const pilotUrl = `${STATS_BASE}?name=${encodeURIComponent(pilot.firstName + ' ' + pilot.lastName)}`;
+      const nameCell = `<a class="pilot-link" href="${escape(pilotUrl)}" target="_blank" rel="noopener noreferrer">${escape(pilot.name)}</a>`;
+      const winsCell = s.wins > 0 ? `<span class="wins-badge">${s.wins}</span>` : '0';
+      return `<tr class="pilot-row" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' ')this.click()">
+        <td>${rankCell}</td>
+        <td>${nameCell}</td>
+        ${showCat ? `<td style="text-align:left;font-size:11.5px;color:var(--muted)">${escape(classLabel(pilot.dominantCode))}${(() => { const lvl = refLevelFor(pilot.dominantCode); return lvl ? ` <span class="cat-level-badge cat-level-${lvl}">${escape(REF_LEVEL_LABELS[lvl] || lvl)}</span>` : ''; })()}</td>` : ''}
+        <td style="text-align:left;white-space:nowrap">${pilot.years.map(y => `<span style="display:inline-block;font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:99px;background:var(--card-soft);border:1px solid var(--line-strong);color:var(--ink-2);margin-right:2px">${escape(y)}</span>`).join('')}</td>
+        <td>${s.entries}</td>
+        <td>${winsCell}</td>
+        <td style="font-size:11px;color:var(--muted)">${totalWins > 0 ? Math.round(100 * s.wins / totalWins) + '%' : '—'}</td>
+        <td>${s.podiums}</td>
+        <td style="font-size:11px;color:var(--muted)">${totalPodiums > 0 ? Math.round(100 * s.podiums / totalPodiums) + '%' : '—'}</td>
+      </tr>`;
+    }).join('');
+
+    return `<table class="ranking-table">
+      <thead><tr>${thHtml}</tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>`;
+  }
+
+  // --- Section catégories ---
+  function buildCategoriesHtml(pilots) {
+    const cats = buildCatsData(pilots);
+    if (cats.length === 0) return '';
+
+    const cardsHtml = cats.map(c => `
+      <div class="cat-card${catFilter === c.code ? ' active' : ''}" data-code="${escape(c.code)}" title="${catFilter === c.code ? 'Cliquer pour effacer le filtre' : 'Cliquer pour filtrer sur cette catégorie'}" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+        <div class="cat-card-name">${escape(c.label)}${c.level ? `<span class="cat-level-badge cat-level-${c.level}">${escape(REF_LEVEL_LABELS[c.level] || c.level)}</span>` : ''}</div>
+        <div class="cat-card-stats">
+          <div class="cat-card-stat"><span class="v">${c.pilotCount}</span><span class="k">Pilotes</span></div>
+          <div class="cat-card-stat"><span class="v">${c.wins}</span><span class="k">Victoires</span></div>
+          <div class="cat-card-stat"><span class="v">${c.podiums}</span><span class="k">Podiums</span></div>
+          <div class="cat-card-stat"><span class="v">${c.rate}%</span><span class="k">% Pod.</span></div>
+        </div>
+      </div>`).join('');
+
+    const openClass = catSectionOpen ? ' open' : '';
+    const activeCat = cats.find(c => c.code === catFilter);
+    const activeLabel = activeCat ? activeCat.label : '';
+    const filterBadge = activeLabel
+      ? ` <span class="cat-active-badge" id="catClearBtn" title="Afficher toutes les catégories">${escape(activeLabel)} ×</span>`
+      : `<span class="cat-toggle-count">${cats.length} catégorie${cats.length > 1 ? 's' : ''}</span>`;
+    return `<div class="card" style="padding:14px 16px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="cat-section-toggle${openClass}" id="catToggleBtn" style="flex:1">
+          <span class="cat-toggle-arrow">▶</span>
+          <span class="cat-toggle-label">Catégories du club</span>
+          ${filterBadge}
+        </button>
+      </div>
+      <div class="cat-collapsible${openClass}" id="catCollapsible">
+        <div class="cat-grid">${cardsHtml}</div>
+      </div>
+    </div>`;
+  }
+
+  // --- Bouton thème ---
+  (() => {
+    const btn = document.getElementById('themeBtn');
+    function getTheme() { return localStorage.getItem('theme') || 'auto'; }
+    function applyTheme(pref) {
+      const icons = { auto:'🌓', light:'☀️', dark:'🌙' };
+      btn.textContent = icons[pref] || icons.auto;
+      btn.title = `Thème : ${pref}`;
+      const isDark = pref === 'dark' || (pref !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.classList.toggle('dark', isDark);
+      if (pref === 'auto') localStorage.removeItem('theme');
+      else document.documentElement.dataset.themePref = pref;
+    }
+    btn.addEventListener('click', () => {
+      const order = ['auto','light','dark'];
+      const next = order[(order.indexOf(getTheme()) + 1) % 3];
+      if (next === 'auto') localStorage.removeItem('theme');
+      else localStorage.setItem('theme', next);
+      applyTheme(next);
+    });
+    applyTheme(getTheme());
+  })();
+
+  // --- Retour en haut ---
+  const backBtn = document.getElementById('backToTop');
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    backBtn.classList.toggle('visible', y > 300);
+    // Hystérésis : évite l'oscillation lors du changement de layout
+    if (y > 120) document.body.classList.add('scrolled');
+    else if (y < 30) document.body.classList.remove('scrolled');
+  }, { passive: true });
+  backBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // --- Classement général : stats par club ---
+  function buildAllClubsStats(year) {
+    const clubData = new Map();
+    const getClub = key => {
+      if (!clubData.has(key)) clubData.set(key, { wins: 0, podiums: 0, entries: 0, pilotKeys: new Set(), rankSum: 0, rankCount: 0 });
+      return clubData.get(key);
+    };
+    const accrue = (key, dclub, c) => {
+      dclub.entries++;
+      const pk = norm((c.firstName || '') + ' ' + (c.lastName || ''));
+      if (pk) dclub.pilotKeys.add(pk);
+      if (typeof c.rank === 'number') {
+        if (c.rank === 1) dclub.wins++;
+        if (c.rank <= 3) dclub.podiums++;
+        dclub.rankSum += c.rank;
+        dclub.rankCount++;
+      }
+    };
+
+    // Passes FR : les clubs sont identifiés par leur groupName.
+    for (const ev of (pilotsIndex.events || [])) {
+      const evYear = (ev.event.eventDate || '').slice(0, 4);
+      if (year && evYear !== year) continue;
+      for (const cls of (ev.classes || [])) {
+        for (const c of (cls.competitors || [])) {
+          const gn = c.groupName || '';
+          const key = normClub(gn);
+          if (!gn || !key) continue;
+          accrue(key, getClub(key), c);
+        }
+      }
+    }
+
+    // Passes UEC/UCI/WC : les pilotes du club y sont retrouvés par nom (pas de
+    // groupement club) et leurs résultats sont attribués à leur club.
+    const pilotClub = new Map();
+    for (const ev of (pilotsIndex.events || [])) {
+      for (const cls of (ev.classes || [])) {
+        for (const c of (cls.competitors || [])) {
+          const k = norm((c.firstName || '') + ' ' + (c.lastName || ''));
+          if (k && !pilotClub.has(k)) pilotClub.set(k, normClub(c.groupName || ''));
+        }
+      }
+    }
+    for (const idx of [uecIndex, uciIndex, wcIndex]) {
+      if (!idx) continue;
+      for (const ev of (idx.events || [])) {
+        const evYear = (ev.event.eventDate || '').slice(0, 4);
+        if (year && evYear !== year) continue;
+        for (const cls of (ev.classes || [])) {
+          for (const c of (cls.competitors || [])) {
+            const pk = norm((c.firstName || '') + ' ' + (c.lastName || ''));
+            const key = pilotClub.get(pk);
+            if (!key) continue;
+            accrue(key, getClub(key), c);
+          }
+        }
+      }
+    }
+
+    return [...clubData.entries()].map(([key, d]) => ({
+      key,
+      displayName: clubsMap.get(key)?.displayName || key,
+      pilotCount:  d.pilotKeys.size,
+      wins:        d.wins,
+      podiums:     d.podiums,
+      entries:     d.entries,
+      winRate:     d.entries > 0 ? d.wins / d.entries : 0,
+      podiumRate:  d.entries > 0 ? d.podiums / d.entries : 0,
+      avgRank:     d.rankCount > 0 ? d.rankSum / d.rankCount : null,
+    }));
+  }
+
+  function sortedClubs(clubs) {
+    return [...clubs].sort((a, b) => {
+      let av, bv;
+      switch (rankingSortCol) {
+        case 'name':     av = a.displayName.toLowerCase(); bv = b.displayName.toLowerCase(); break;
+        case 'pilots':   av = a.pilotCount;  bv = b.pilotCount;  break;
+        case 'entries':  av = a.entries;     bv = b.entries;     break;
+        case 'wins':     av = a.wins;        bv = b.wins;        break;
+        case 'winRate':  av = a.winRate;     bv = b.winRate;     break;
+        case 'podiums':  av = a.podiums;     bv = b.podiums;     break;
+        case 'podRate':  av = a.podiumRate;  bv = b.podiumRate;  break;
+        case 'avgRank':  av = a.avgRank ?? 9999; bv = b.avgRank ?? 9999; break;
+        default: return 0;
+      }
+      const cmp = typeof av === 'string' ? av.localeCompare(bv, 'fr') : av - bv;
+      return rankingSortDir === 'asc' ? cmp : -cmp;
+    });
+  }
+
+  function renderRanking() {
+    const clubs  = buildAllClubsStats(rankingYear);
+    const sorted = sortedClubs(clubs);
+    const rankingSection = document.getElementById('rankingSection');
+
+    const allYears = [...new Set(
+      (pilotsIndex.events || []).map(ev => (ev.event.eventDate || '').slice(0, 4)).filter(Boolean)
+    )].sort().reverse();
+
+    const yearPillsHtml = allYears.map(y =>
+      `<button class="yp-btn${rankingYear === y ? ' active' : ''}" data-ry="${escape(y)}">${escape(y)}</button>`
+    ).join('');
+
+    const clearBtnHtml = rankingSearch
+      ? `<button class="yp-btn" id="rankingSearchClear" title="Effacer la recherche" style="flex-shrink:0">×</button>`
+      : '';
+
+    const yearBarHtml = `<div class="card club-filters" style="flex-wrap:wrap;gap:16px;align-items:flex-end">
+      <div class="field">
+        <label>Année</label>
+        <div class="year-pills">
+          <button class="yp-btn${!rankingYear ? ' active' : ''}" data-ry="">Toutes</button>
+          ${yearPillsHtml}
+        </div>
+      </div>
+      <div class="field" style="flex:1 1 200px;min-width:180px">
+        <label>Rechercher un club</label>
+        <div style="display:flex;gap:6px;align-items:center">
+          <div class="autocomplete-wrap" style="flex:1">
+            <input class="control" id="rankingSearchInp" type="text" placeholder="Nom du club…" autocomplete="off" value="${escape(rankingSearchName)}">
+            <div class="suggestions" id="rankingSuggestions" role="listbox"></div>
+          </div>
+          ${clearBtnHtml}
+        </div>
+      </div>
+    </div>`;
+
+    const rCols = [
+      { key: null,       label: '#',         nosort: true },
+      { key: 'name',     label: 'Club' },
+      { key: 'pilots',   label: 'Pilotes',   title: 'Pilotes actifs' },
+      { key: 'entries',  label: 'Particip.', title: 'Participations' },
+      { key: 'wins',     label: 'Victoires' },
+      { key: 'winRate',  label: '% V',       title: '% de victoires' },
+      { key: 'podiums',  label: 'Podiums' },
+      { key: 'podRate',  label: '% P',       title: '% de podiums' },
+      { key: 'avgRank',  label: 'Moy.',      title: 'Classement moyen' },
+    ];
+
+    const thHtml = rCols.map(col => {
+      if (col.nosort) return `<th class="no-sort">${escape(col.label)}</th>`;
+      const isSorted = col.key === rankingSortCol;
+      const arrow = isSorted ? ` <span aria-hidden="true">${rankingSortDir === 'asc' ? '▲' : '▼'}</span>` : '';
+      return `<th class="${isSorted ? 'sorted' : ''}" data-rcol="${col.key}" title="${escape(col.title || col.label)}">${escape(col.label)}${arrow}</th>`;
+    }).join('');
+
+    let tableContent;
+    if (sorted.length === 0) {
+      const yearLabel = rankingYear || 'toutes les années';
+      tableContent = `<div class="empty-state" style="padding:32px;text-align:center;color:var(--muted)">Aucune donnée pour ${escape(yearLabel)}.</div>`;
+    } else {
+      const rowsHtml = sorted.map((club, i) => {
+        const rank = i + 1;
+        const rankCell = rank === 1 ? `<span class="rpill r1">1</span>`
+                       : rank === 2 ? `<span class="rpill r2">2</span>`
+                       : rank === 3 ? `<span class="rpill r3">3</span>`
+                       : rank;
+        const winsCell = club.wins > 0 ? `<span class="wins-badge">${club.wins}</span>` : '0';
+        const avg = club.avgRank != null ? club.avgRank.toFixed(1) : '—';
+        const hlClass = club.key === rankingSearch ? ' hl' : '';
+        return `<tr class="pilot-row ranking-club-row${hlClass}" data-key="${escape(club.key)}" title="Voir la fiche de ${escape(club.displayName)}" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' ')this.click()">
+          <td>${rankCell}</td>
+          <td style="text-align:left">${escape(club.displayName)}</td>
+          <td>${club.pilotCount}</td>
+          <td>${club.entries}</td>
+          <td>${winsCell}</td>
+          <td style="font-size:11px;color:var(--muted)">${Math.round(club.winRate * 100)}%</td>
+          <td>${club.podiums}</td>
+          <td style="font-size:11px;color:var(--muted)">${Math.round(club.podiumRate * 100)}%</td>
+          <td>${avg}</td>
+        </tr>`;
+      }).join('');
+      tableContent = `<div class="table-scroll"><table class="ranking-table">
+        <thead><tr>${thHtml}</tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table></div>`;
+    }
+
+    rankingSection.innerHTML = yearBarHtml + `<div class="card table-card">${tableContent}</div>`;
+
+    // Année
+    rankingSection.querySelectorAll('[data-ry]').forEach(btn => {
+      btn.addEventListener('click', () => { rankingYear = btn.dataset.ry; renderRanking(); });
+    });
+
+    // Tri
+    rankingSection.querySelectorAll('th[data-rcol]').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.rcol;
+        if (col === rankingSortCol) {
+          rankingSortDir = rankingSortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+          rankingSortCol = col;
+          rankingSortDir = col === 'name' || col === 'avgRank' ? 'asc' : 'desc';
+        }
+        renderRanking();
+      });
+    });
+
+    // Clic ligne → fiche club
+    rankingSection.querySelectorAll('.ranking-club-row').forEach(row => {
+      row.addEventListener('click', () => {
+        switchTab('club');
+        selectClub(row.dataset.key);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    // Recherche autocomplete
+    const searchInp  = rankingSection.querySelector('#rankingSearchInp');
+    const suggestEl2 = rankingSection.querySelector('#rankingSuggestions');
+
+    function showRankingSuggestions(query) {
+      if (!query.trim()) { suggestEl2.className = 'suggestions'; return; }
+      const q = normClub(query);
+      const matches = sorted.filter(c => normClub(c.displayName).includes(q)).slice(0, 10);
+      if (matches.length === 0) {
+        suggestEl2.innerHTML = `<div class="suggestion-empty">Aucun club trouvé pour « ${escape(query)} »</div>`;
+      } else {
+        suggestEl2.innerHTML = matches.map(c => {
+          const rank = sorted.findIndex(sc => sc.key === c.key) + 1;
+          return `<div class="suggestion-item" role="option" data-key="${escape(c.key)}" data-name="${escape(c.displayName)}">
+            <span>${escape(c.displayName)}</span>
+            <span class="sug-count">#${rank}</span>
+          </div>`;
+        }).join('');
+        suggestEl2.querySelectorAll('.suggestion-item').forEach(el => {
+          el.addEventListener('mousedown', e => {
+            e.preventDefault();
+            rankingSearch     = el.dataset.key;
+            rankingSearchName = el.dataset.name;
+            renderRanking();
+            setTimeout(() => {
+              const hlRow = rankingSection.querySelector('.ranking-club-row.hl');
+              if (hlRow) hlRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 50);
+          });
+        });
+      }
+      suggestEl2.className = 'suggestions open';
+    }
+
+    searchInp.addEventListener('input',  () => showRankingSuggestions(searchInp.value));
+    searchInp.addEventListener('focus',  () => { if (searchInp.value) showRankingSuggestions(searchInp.value); });
+    searchInp.addEventListener('blur',   () => setTimeout(() => { suggestEl2.className = 'suggestions'; }, 150));
+
+    const clearBtn = rankingSection.querySelector('#rankingSearchClear');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        rankingSearch = '';
+        rankingSearchName = '';
+        renderRanking();
+      });
+    }
+
+    // Scroll vers la ligne mise en avant
+    if (rankingSearch) {
+      setTimeout(() => {
+        const hlRow = rankingSection.querySelector('.ranking-club-row.hl');
+        if (hlRow) hlRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 50);
+    }
+  }
+
+  function switchTab(tab) {
+    document.getElementById('tabBar').querySelectorAll('.tab-btn').forEach(btn => {
+      const isActive = btn.dataset.tab === tab;
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+    document.getElementById('searchCard').hidden   = tab !== 'club';
+    document.getElementById('results').hidden      = tab !== 'club';
+    document.getElementById('rankingSection').hidden = tab !== 'ranking';
+    if (tab === 'ranking') renderRanking();
+  }
+
+  // --- Init ---
+  loadCatRef();
+  loadIndex().then(() => {
+    const { club, q } = parseUrlState();
+    const key = club && normClub(club);
+    if (key && clubsMap.has(key)) {
+      selectClub(key);
+      history.replaceState(null, '', buildUrl(key));
+    } else if (q) {
+      // Pré-remplissage depuis la recherche universelle du hub (?q=).
+      clubInp.value = q;
+      renderSuggestions(q);
+      clubInp.focus();
+    }
+  });
+})();
+
+  (() => {
+    const base = '../';
+    document.getElementById('hubBackLink').href = base;
+  })();
+</script>
+
+
+</body>
+</html>

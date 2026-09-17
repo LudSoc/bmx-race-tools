@@ -1,0 +1,849 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later
+     Copyright (c) 2026 ludovic.socie -->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%234a7ab5'/><text x='16' y='23' font-family='system-ui' font-size='20' font-weight='800' fill='white' text-anchor='middle'>S</text></svg>">
+<script>
+  (() => {
+    const saved = localStorage.getItem('theme');
+    const isDark = saved === 'dark' ||
+      (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('dark', isDark);
+    if (saved) document.documentElement.dataset.themePref = saved;
+  })();
+</script>
+<title>BMX-Race · Hub</title>
+<meta name="description" content="Accès centralisé aux outils de statistiques BMX Race : stats club, head-to-head, catégorie et recherche pilote.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ludsoc.github.io/bmx-race-tools/">
+<meta property="og:title" content="BMX-Race · Hub">
+<meta property="og:description" content="Accès centralisé aux outils de statistiques BMX Race : stats club, head-to-head, catégorie et recherche pilote.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BMX-Race · Hub">
+<meta name="twitter:description" content="Accès centralisé aux outils de statistiques BMX Race : stats club, head-to-head, catégorie et recherche pilote.">
+<link rel="stylesheet" href="./theme.css">
+<link rel="manifest" href="./manifest.json">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  :focus{outline:none}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+  .btn:focus-visible{outline:2px solid var(--accent-hi);outline-offset:3px}
+  .topbar :focus-visible{outline-color:#fff}
+  body{
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* Topbar */
+  .topbar{
+    position:relative;overflow:hidden;
+    color:#fff;padding:48px 24px 120px;
+    background:linear-gradient(135deg,#2e4158 0%,#3f566f 35%,#6a8caf 70%,#8aa6c2 100%);
+  }
+  .topbar::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(circle at 80% 0%,rgba(255,255,255,.22),transparent 55%),
+               radial-gradient(circle at 10% 100%,rgba(30,50,80,.35),transparent 45%);
+  }
+  .topbar-inner{max-width:980px;margin:0 auto;position:relative;z-index:1}
+  .brand-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:600;letter-spacing:.2px;color:#fff}
+  .brand .logo{
+    width:40px;height:40px;border-radius:12px;
+    background:rgba(255,255,255,.22);color:#fff;
+    display:grid;place-items:center;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.45);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  }
+  .theme-btn{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:36px;height:36px;padding:0;
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+    color:#fff;border-radius:10px;cursor:pointer;font-size:18px;line-height:1;
+    transition:background .15s,border-color .15s,transform .15s;
+  }
+  .theme-btn:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.4)}
+  .theme-btn:active{transform:scale(.95)}
+  .donate-btn{display:inline-flex;align-items:center;gap:5px;padding:0 12px;height:36px;background:linear-gradient(135deg,rgba(255,210,150,.9),rgba(251,146,60,.75));border:1px solid rgba(251,146,60,.6);color:#7c3405;box-shadow:0 2px 8px rgba(251,146,60,.35),inset 0 1px 0 rgba(255,255,255,.3);border-radius:10px;font-size:.8rem;font-weight:600;text-decoration:none;transition:background .15s,border-color .15s,transform .15s;white-space:nowrap}
+  .donate-btn:hover{background:linear-gradient(135deg,rgba(255,210,150,1),rgba(251,146,60,.95));border-color:rgba(251,146,60,.9);box-shadow:0 3px 10px rgba(251,146,60,.45),inset 0 1px 0 rgba(255,255,255,.3);}
+  .donate-btn:active{transform:scale(.95)}
+  .donate-icon{font-size:1.15rem;display:inline-flex;align-items:center}
+  @media(max-width:520px){.donate-btn .donate-label{display:none}}
+  .topbar h1{margin:24px 0 8px;font-size:34px;font-weight:800;letter-spacing:-1px;color:#fff;text-shadow:0 2px 14px rgba(20,35,60,.45)}
+  .topbar p{margin:0;font-size:15px;max-width:min(600px,100%);color:#dce8f2;text-shadow:0 1px 6px rgba(20,35,60,.35);line-height:1.5}
+
+  /* Main */
+  main{max-width:980px;margin:-72px auto 40px;padding:0 24px 32px;position:relative;z-index:2}
+
+  /* Status bar */
+  .status-bar{font-size:12px;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+  .status-dot{width:7px;height:7px;border-radius:50%;background:var(--good);flex-shrink:0}
+
+  /* Project list */
+  .project-list{display:flex;flex-direction:column;gap:12px}
+  .project-card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 20px;box-shadow:var(--shadow);display:flex;align-items:center;gap:18px;
+  }
+  .project-icon{
+    width:48px;height:48px;border-radius:12px;flex-shrink:0;
+    display:grid;place-items:center;color:#fff;
+    font-weight:800;font-size:15px;
+  }
+  .project-info{flex:1;min-width:0}
+  .project-name{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:4px}
+  .project-desc{font-size:13px;color:var(--ink-2);line-height:1.45}
+  .project-meta{font-size:11px;color:var(--muted);margin-top:5px;display:flex;align-items:center;gap:4px}
+  .project-btn{
+    flex-shrink:0;padding:9px 18px;border-radius:9px;
+    background:var(--accent);color:var(--accent-ink);
+    font:inherit;font-weight:600;font-size:13px;
+    text-decoration:none;border:none;cursor:pointer;
+    transition:background .15s;
+  }
+  .project-btn:hover{background:var(--accent-hi)}
+
+  /* Skeleton shimmer */
+  .skel{
+    background:linear-gradient(90deg,var(--line) 25%,var(--card-soft) 50%,var(--line) 75%);
+    background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:4px;
+  }
+  @keyframes shimmer{to{background-position:-200% 0}}
+  .skel-icon{width:48px;height:48px;border-radius:12px;flex-shrink:0}
+  .skel-line{height:10px;margin-bottom:6px}
+  .skel-line.short{width:40%}
+  .skel-line.medium{width:65%}
+  .skel-line.long{width:90%}
+  .skel-btn{width:80px;height:36px;border-radius:9px;flex-shrink:0}
+
+  /* Error */
+  .error-card{
+    background:var(--card);border:1px solid var(--line-strong);border-radius:var(--radius);
+    padding:24px;box-shadow:var(--shadow);text-align:center;
+  }
+  .error-card p{color:var(--muted);font-size:14px;margin:0 0 10px}
+  .error-card a{color:var(--accent)}
+
+  /* Layout 2 colonnes + panneau latéral « Données » */
+  .main-layout{display:grid;grid-template-columns:1fr 240px;gap:20px;align-items:start}
+  .side{position:sticky;top:16px;background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;font-size:11.5px}
+  .side-head{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;
+    padding:0;border:none;background:none;font:inherit;color:var(--ink);cursor:default;
+    text-align:left}
+  .side-title{font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;
+    font-size:10px;display:flex;align-items:center;gap:6px;margin:0}
+  .side-chev{display:none;transition:transform .15s}
+  .side-dot{width:7px;height:7px;border-radius:50%;background:var(--good);flex-shrink:0}
+  .side-dot.warn{background:var(--warn)}
+  .side-dot.stale{background:var(--bad)}
+  .side-body{display:block}
+  .srcs{display:flex;flex-direction:column;gap:3px;margin-top:9px}
+  .src{display:flex;align-items:center;gap:7px;justify-content:space-between;padding:2px 0}
+  .src .l{display:flex;align-items:center;gap:6px;color:var(--ink-2);min-width:0;white-space:nowrap}
+  .src .l b{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis}
+  .src .age{color:var(--muted);font-size:10.5px;flex-shrink:0}
+  .src .dot{width:6px;height:6px;border-radius:50%;background:var(--warn);flex-shrink:0}
+  .src.ok .dot{background:var(--good)}
+  .src.stale .dot{background:var(--bad)}
+  .side-sep{height:1px;background:var(--line);margin:10px 0}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .stat{background:var(--card-soft);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+  .stat .v{font-size:18px;font-weight:800;letter-spacing:-.4px;line-height:1.05}
+  .stat .k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+  .side-note{font-size:10px;color:var(--muted);margin-top:10px;line-height:1.5}
+  @media(max-width:760px){
+    .main-layout{grid-template-columns:1fr}
+    .side{position:static}
+  }
+  @media(max-width:520px){
+    .side-head{cursor:pointer}
+    .side-chev{display:inline-block}
+    .side-body{display:none}
+    .side.open .side-body{display:block}
+    .side.open .side-chev{transform:rotate(180deg)}
+  }
+
+  /* Footer */
+  .hub-footer{font-size:11px;color:var(--muted);text-align:center;margin-top:24px}
+  .hub-footer a{color:var(--accent);text-decoration:none}
+  .hub-footer a:hover{text-decoration:underline}
+
+  /* Retry button */
+  .btn-retry { margin-top:8px; padding:6px 14px; border-radius:8px; cursor:pointer; background:var(--accent); color:#fff; border:none; font-size:13px; }
+  .btn-retry:hover { background:var(--accent-hi); }
+
+  /* Recherche universelle */
+  .search-wrap{position:relative;margin-bottom:18px}
+  #hubSearch{
+    width:100%;box-sizing:border-box;padding:12px 16px;border-radius:12px;
+    background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
+    font:inherit;font-size:14px;color:var(--ink);
+  }
+  #hubSearch:focus{outline:none;border-color:var(--accent)}
+  .search-results{
+    position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:10;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    box-shadow:var(--shadow);overflow:hidden;
+  }
+  .search-results a{
+    display:block;padding:10px 16px;font-size:13.5px;color:var(--ink);
+    text-decoration:none;border-bottom:1px solid var(--line);
+  }
+  .search-results a:last-child{border-bottom:none}
+  .search-results a:hover,.search-results a.active{background:var(--card-soft)}
+
+  /* Mes suivis */
+  .suivis{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px 20px;margin-bottom:18px;
+  }
+  .suivis h2{font-size:13px;font-weight:700;color:var(--muted);margin:0 0 10px;text-transform:uppercase;letter-spacing:.6px}
+  .suivis h3{font-size:12px;font-weight:700;color:var(--ink-2);margin:12px 0 6px}
+  .suivis h3:first-of-type{margin-top:0}
+  .suivi-row{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13.5px}
+  .suivi-row a{color:var(--ink);text-decoration:none;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .suivi-row a:hover{color:var(--accent)}
+  .unfav-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;padding:2px 6px;border-radius:6px}
+  .unfav-btn:hover{color:var(--accent);background:var(--card-soft)}
+
+  /* Responsive mobile */
+  @media(max-width:520px){
+    .topbar{padding:32px 16px 96px}
+    .topbar h1{font-size:26px}
+    main{padding:0 16px 24px}
+    .project-card{flex-wrap:wrap;gap:12px}
+    .project-icon{flex-shrink:0}
+    .project-info{min-width:0;flex-basis:calc(100% - 60px)}
+    .project-btn{width:100%;text-align:center;margin-top:4px}
+    .status-bar{flex-wrap:wrap;gap:4px}
+    .status-bar span[style]{margin-left:0 !important;flex-basis:100%}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand-row">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="8" height="8" rx="1.5"/>
+            <rect x="13" y="3" width="8" height="8" rx="1.5"/>
+            <rect x="3" y="13" width="8" height="8" rx="1.5"/>
+            <rect x="13" y="13" width="8" height="8" rx="1.5"/>
+          </svg>
+        </span>
+        BMX-Race Hub
+      </div>
+
+      <div style="display:flex; gap:8px; align-items:center">
+      <a href="https://ko-fi.com/sqorz_tools" target="_blank" rel="noopener noreferrer" class="donate-btn" title="Soutenir le projet sur Ko-fi"><span class="donate-icon">☕</span><span class="donate-label">Soutenir</span></a>
+      <button type="button" id="themeBtn" class="theme-btn" aria-label="Changer le thème (auto / clair / sombre)"></button>
+      </div>
+    </div>
+    <h1>BMX-Race Hub</h1>
+    <p>Tous mes outils BMX-Race — statistiques, historiques pilotes, analyses par catégorie.</p>
+  </div>
+</div>
+
+<main id="main"></main>
+
+<script>
+  function renderSkeleton(count = 3) {
+    const host = document.getElementById('projects');
+    if (!host) return;
+    const cards = Array.from({ length: count }, () => `
+      <div class="project-card">
+        <div class="skel skel-icon"></div>
+        <div class="project-info">
+          <div class="skel skel-line medium"></div>
+          <div class="skel skel-line long"></div>
+          <div class="skel skel-line short" style="margin-top:6px"></div>
+        </div>
+        <div class="skel skel-btn"></div>
+      </div>
+    `).join('');
+    host.innerHTML = `
+      <div class="status-bar">
+        <div class="status-dot" style="background:var(--warn)" aria-hidden="true"></div>
+        Chargement…
+      </div>
+      <div class="project-list">${cards}</div>
+    `;
+  }
+
+  const GH_USER = 'ludsoc';
+  const HUB_REPO = 'bmx-race-hub';
+  const DISPLAY_NAMES = {
+    'bmx-race-club':      'BMX-Race · Stats Club',
+    'bmx-race-head2head': 'BMX-Race · Head to Head',
+    'bmx-race-category':  'BMX-Race · Stats Catégorie',
+    'bmx-race-stats':     'BMX-Race · Stats Pilote',
+    'bmx-race-rankings':  'BMX-Race · Indice de performance',
+  };
+  const ICON_GRADIENTS = [
+    'linear-gradient(135deg,#2e4158,#6a8caf)',
+    'linear-gradient(135deg,#3f566f,#8aa6c2)',
+    'linear-gradient(135deg,#2e4158,#7aa6c2)',
+    'linear-gradient(135deg,#506f8f,#9bb5cf)',
+  ];
+
+  // --- État partagé inter-outils (convention bmx.*, cf. common.js) ---
+  // Le hub ne dépend pas de common.js : lecteurs minimaux (lecture + retrait),
+  // avec migration one-shot des clés historiques « sqorz.favs.* » / « sqorz.recent ».
+  function migrateKey(newKey, legacyKey) {
+    try {
+      if (localStorage.getItem(newKey) == null) {
+        const old = localStorage.getItem(legacyKey);
+        if (old != null) localStorage.setItem(newKey, old);
+        localStorage.removeItem(legacyKey);
+      }
+    } catch (e) {}
+  }
+  function readFavs(type) {
+    try {
+      migrateKey('bmx.favs.' + type, 'sqorz.favs.' + type);
+      const v = JSON.parse(localStorage.getItem('bmx.favs.' + type));
+      return Array.isArray(v) ? v.filter(e => e && e.key) : [];
+    } catch { return []; }
+  }
+  function removeFav(type, key) {
+    try {
+      const list = readFavs(type).filter(e => e.key !== key);
+      localStorage.setItem('bmx.favs.' + type, JSON.stringify(list));
+    } catch {}
+    renderSuivis();
+  }
+  function readRecent(n = 8) {
+    try {
+      migrateKey('bmx.recent', 'sqorz.recent');
+      const v = JSON.parse(localStorage.getItem('bmx.recent'));
+      return (Array.isArray(v) ? v : []).slice(0, n);
+    } catch { return []; }
+  }
+
+  // --- Liens profonds (chemins relatifs dans le monorepo bmx-race-tools) ---
+  const PAGES_LOCAL = { 'bmx-race-stats': 'stats', 'bmx-race-club': 'club', 'bmx-race-head2head': 'h2h', 'bmx-race-category': 'category', 'bmx-race-rankings': 'ranking' };
+  function pagesBase(repo) {
+    return `${PAGES_LOCAL[repo]}/`;
+  }
+  const pilotUrl = name => pagesBase('bmx-race-stats') + '?name=' + encodeURIComponent(name);
+  // Clé normalisée (minuscules, ponctuation conservée) : miroir de normClub (club_stats).
+  const clubKey = s => (s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const clubUrl = key => pagesBase('bmx-race-club') + '?club=' + encodeURIComponent(clubKey(key));
+  const clubSearchUrl = q => pagesBase('bmx-race-club') + '?q=' + encodeURIComponent(q);
+  // Miroir de BmxCommon.norm pour construire les clés h2h (?a=, ?b=).
+  const hubNorm = s => (s || '').toString().toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9 ]+/g, ' ').trim().replace(/\s+/g, ' ');
+  const duelUrl = (a, b) => pagesBase('bmx-race-head2head')
+    + '?a=' + encodeURIComponent(hubNorm(a)) + '&b=' + encodeURIComponent(hubNorm(b));
+  function parseDuelQuery(q) {
+    const m = String(q || '').split(/\s+(?:vs\.?|contre)\s+/i);
+    if (m.length !== 2) return null;
+    const a = m[0].trim(), b = m[1].trim();
+    return (a && b) ? { a, b } : null;
+  }
+
+  // --- Mini-index de recherche (top pilotes + clubs, hub-search.json) ---
+  // Chargé en différé après le 1er affichage ; échec silencieux → repli favoris + liens génériques.
+  let searchIdx = null;
+  function lev2(a, b) {
+    const n = a.length, m = b.length;
+    if (Math.abs(n - m) > 2) return 3;
+    let prev = Array.from({ length: m + 1 }, (_, j) => j);
+    for (let i = 1; i <= n; i++) {
+      const cur = [i];
+      let rowMin = i;
+      for (let j = 1; j <= m; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+        if (cur[j] < rowMin) rowMin = cur[j];
+      }
+      if (rowMin > 2) return 3;
+      prev = cur;
+    }
+    return prev[m];
+  }
+  // Requête → [{ kind: 'pilot'|'club', key, name, club, score }] trié desc, max 8.
+  // key pilote = nom exact (pour ?name=), key club = code (pour ?club=).
+  // Deux passes : d'abord les matchs forts sur tout l'index, le fuzzy (coûteux
+  // sur 17k noms) seulement si moins de 5 matchs forts — frappe toujours fluide.
+  function searchHubIndex(query, idx) {
+    const q = hubNorm(query);
+    if (!q || !idx) return [];
+    const out = [];
+    const strong = [];
+    for (const p of (idx.pilots || [])) {
+      const name = hubNorm(p.n);
+      if (!name) continue;
+      const words = name.split(' ');
+      let s = 0;
+      if (name === q) s = 100;
+      else if (words.some(w => w === q)) s = 85;
+      else if (name.startsWith(q)) s = 75;
+      else if (q.length >= 3 && words.some(w => w.startsWith(q))) s = 65;
+      else if (name.includes(q)) s = 50;
+      if (s > 0) strong.push({ p, s });
+    }
+    const pool = strong.length >= 5 ? strong : strong.concat(fuzzyPilotPass(q, idx));
+    for (const { p, s } of pool) {
+      out.push({ kind: 'pilot', key: p.n, name: p.n, club: p.c || '', score: s + Math.min(9, (p.e || 0) / 20) });
+    }
+    for (const [code, c] of Object.entries(idx.clubs || {})) {
+      const cn = hubNorm(code), fn = hubNorm(c.name || '');
+      let s = 0;
+      if (cn === q) s = 100;
+      else if (fn.split(' ').some(w => w === q)) s = 85;
+      else if (cn.startsWith(q) || fn.startsWith(q)) s = 75;
+      else if (fn.includes(q) || cn.includes(q)) s = 50;
+      if (s > 0) out.push({ kind: 'club', key: code, name: (c.name || code) + ' (' + code + ')', club: '', score: s });
+    }
+    return out.sort((a, b) => b.score - a.score).slice(0, 8);
+  }
+
+  // Passe fuzzy (Levenshtein ≤ 2) : nom complet ou faute sur un mot.
+  function fuzzyPilotPass(q, idx) {
+    if (q.length < 4) return [];
+    const out = [];
+    for (const p of (idx.pilots || [])) {
+      const name = hubNorm(p.n);
+      if (!name) continue;
+      const words = name.split(' ');
+      if (lev2(name, q) <= 2 || words.some(w => w.length >= 4 && lev2(w, q) <= 1)) {
+        out.push({ p, s: 32 });
+      }
+    }
+    return out;
+  }
+
+  // --- Recherche universelle : route, ne devine pas ---
+  function routeSearch(q) {
+    const query = (q || '').trim();
+    if (!query) return [];
+    const duel = parseDuelQuery(query);
+    if (duel) return [{ kind: 'duel', label: `⚔️ ${duel.a} vs ${duel.b}`, url: duelUrl(duel.a, duel.b) }];
+    const out = [];
+    const nq = hubNorm(query);
+    const seenPilot = new Set(), seenClub = new Set();
+    for (const f of readFavs('pilots')) {
+      if (hubNorm(f.name).includes(nq)) {
+        out.push({ kind: 'pilot', label: `🏃 ${f.name}`, url: pilotUrl(f.name) });
+        seenPilot.add(hubNorm(f.name));
+      }
+      if (out.length >= 6) break;
+    }
+    for (const f of readFavs('clubs')) {
+      if (hubNorm(f.name).includes(nq) || hubNorm(f.key).includes(nq)) {
+        out.push({ kind: 'club', label: `📍 ${f.name}`, url: clubUrl(f.key) });
+        seenClub.add(hubNorm(f.key));
+      }
+      if (out.length >= 8) break;
+    }
+    // Index précis : complète (pilotes actifs + tous les clubs), sans doublons.
+    if (searchIdx && out.length < 10) {
+      for (const hit of searchHubIndex(query, searchIdx)) {
+        if (hit.kind === 'pilot' && seenPilot.has(hubNorm(hit.key))) continue;
+        if (hit.kind === 'club' && seenClub.has(hubNorm(hit.key))) continue;
+        out.push(hit.kind === 'pilot'
+          ? { kind: 'pilot', label: `🏃 ${hit.name}${hit.club ? ' · ' + hit.club : ''}`, url: pilotUrl(hit.key) }
+          : { kind: 'club', label: `📍 ${hit.name}`, url: clubUrl(hit.key) });
+        if (out.length >= 10) break;
+      }
+    }
+    out.push({ kind: 'pilot-search', label: `🔍 Pilote « ${query} »`, url: pilotUrl(query) });
+    out.push({ kind: 'club-search', label: `🔍 Club « ${query} »`, url: clubSearchUrl(query) });
+    return out;
+  }
+
+  // Liste locale de secours : l'API GitHub anonyme est limitée à 60 req/h/IP
+  // (403 fréquents derrière une IP partagée). branch = branche par défaut du dépôt.
+  const STATIC_PROJECTS = [
+    { name: 'bmx-race-stats', branch: 'main', description: 'Recherchez un pilote BMX Race et consultez son historique complet : résultats, podiums, progressions et comparaisons.' },
+    { name: 'bmx-race-club', branch: 'main', description: "Analysez les performances d'un club BMX Race : classements, évolutions et comparatifs par année." },
+    { name: 'bmx-race-head2head', branch: 'main', description: 'Comparez les performances de deux pilotes BMX Race face à face : victoires, podiums et évolution dans le temps.' },
+    { name: 'bmx-race-category', branch: 'master', description: "Classements et statistiques BMX Race par catégorie d'âge : évolutions, podiums et comparatifs entre organisations." },
+    { name: 'bmx-race-rankings', branch: 'main', description: "Classement national des pilotes BMX Race par indice de performance : qui domine le plus sa concurrence, par catégorie et par club." },
+  ];
+  const REPOS_CACHE_KEY = 'bmxRaceHubRepos';
+  const REPOS_CACHE_TTL = 24 * 3600 * 1000; // 1 jour
+
+  function readReposCache() {
+    try {
+      const raw = localStorage.getItem(REPOS_CACHE_KEY);
+      if (!raw) return null;
+      const { at, repos } = JSON.parse(raw);
+      if (!at || !Array.isArray(repos) || Date.now() - at > REPOS_CACHE_TTL) return null;
+      return repos;
+    } catch { return null; }
+  }
+  function writeReposCache(repos) {
+    try { localStorage.setItem(REPOS_CACHE_KEY, JSON.stringify({ at: Date.now(), repos })); } catch {}
+  }
+
+  async function fetchRepos() {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    try {
+      const res = await fetch(
+        `https://api.github.com/users/${GH_USER}/repos?per_page=100&sort=updated`,
+        { signal: ctrl.signal }
+      );
+      if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+      let repos;
+      try { repos = await res.json(); }
+      catch(e) { throw new Error('Réponse invalide de l\'API GitHub'); }
+      return repos
+        .filter(r => r.has_pages && r.name !== HUB_REPO);
+    } finally { clearTimeout(timer); }
+  }
+
+  function sanitizeSvg(svgText) {
+    return svgText
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/\s+on\w+="[^"]*"/gi, '')
+      .replace(/\s+on\w+='[^']*'/gi, '');
+  }
+
+  async function fetchIcon(repoName, defaultBranch = 'main') {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 5000);
+    try {
+      const res = await fetch(
+        `https://raw.githubusercontent.com/${GH_USER}/${repoName}/${defaultBranch}/index.html`,
+        { signal: ctrl.signal }
+      );
+      clearTimeout(timer);
+      if (!res.ok) return null;
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const logo = doc.querySelector('.logo');
+      const svg = logo?.querySelector('svg');
+      return svg ? sanitizeSvg(svg.outerHTML) : null;
+    } catch(e) {
+      clearTimeout(timer);
+      return null;
+    }
+  }
+
+  function initials(name) {
+    return name.split(/[-_]/)
+      .map(w => w[0]?.toUpperCase() ?? '')
+      .join('')
+      .slice(0, 2) || name.slice(0, 2).toUpperCase();
+  }
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function formatDate(iso) {
+    return new Intl.DateTimeFormat('fr-FR', {
+      day: 'numeric', month: 'short', year: 'numeric'
+    }).format(new Date(iso));
+  }
+
+  function renderCard(repo, icon, gradient) {
+    const iconHtml = icon
+      ? icon
+      : `<span style="font-size:15px;font-weight:800">${initials(repo.name)}</span>`;
+    const desc = esc(repo.description || 'Aucune description disponible');
+    const displayName = esc(DISPLAY_NAMES[repo.name] || repo.name);
+    const url = `https://${GH_USER}.github.io/${repo.name}/`;
+    const meta = repo.updated_at
+      ? `<div class="project-meta">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.75a.75.75 0 0 0-1.5 0v3.5a.75.75 0 0 0 .22.53l2.25 2.25a.75.75 0 1 0 1.06-1.06L8.5 7.94V4.75z"/>
+            </svg>
+            Mis à jour le ${formatDate(repo.updated_at)}
+          </div>`
+      : '';
+    return `
+      <article class="project-card">
+        <div class="project-icon" style="background:${gradient}" aria-hidden="true">
+          ${iconHtml}
+        </div>
+        <div class="project-info">
+          <div class="project-name">${displayName}</div>
+          <div class="project-desc">${desc}</div>
+          ${meta}
+        </div>
+        <a class="project-btn" href="${url}" target="_blank" rel="noopener" aria-label="Ouvrir ${displayName} (nouvelle fenêtre)">Ouvrir →</a>
+      </article>
+    `;
+  }
+
+  async function loadProjects() {
+    const expectedCount = Object.keys(DISPLAY_NAMES).length || 3;
+    renderSkeleton(expectedCount);
+    // API → cache local (24 h) → liste statique : le hub s'affiche toujours.
+    let repos = null, source = 'api';
+    try {
+      repos = await fetchRepos();
+      writeReposCache(repos);
+    } catch (err) {
+      repos = readReposCache();
+      source = repos ? 'cache' : 'static';
+      if (!repos) repos = STATIC_PROJECTS.map(p => ({
+        name: p.name, description: p.description,
+        updated_at: null, default_branch: p.branch, has_pages: true,
+      }));
+    }
+    const sourceLabel = { api: 'via GitHub API', cache: 'via cache local', static: 'liste locale' }[source];
+    const retryBtn = source === 'api'
+      ? ''
+      : ` <button onclick="loadProjects()" class="btn-retry" style="margin-left:8px">Réessayer</button>`;
+    const icons = await Promise.all(repos.map(r => fetchIcon(r.name, r.default_branch)));
+    const n = repos.length;
+    const label = n === 0
+      ? 'Aucun outil disponible'
+      : `${n} outil${n > 1 ? 's' : ''} disponible${n > 1 ? 's' : ''}`;
+    const cards = repos
+      .map((r, i) => renderCard(r, icons[i], ICON_GRADIENTS[i % 4]))
+      .join('');
+    document.getElementById('projects').innerHTML = `
+      <div class="status-bar">
+        <div class="status-dot" aria-hidden="true"></div>
+        ${label}${source === 'api' ? ' · mis à jour il y a quelques secondes' : ' · dates non actualisées'}
+        <span style="margin-left:auto;opacity:.6">${sourceLabel}</span>${retryBtn}
+      </div>
+      <div class="project-list">${cards}</div>
+      <div class="hub-footer">
+        Source : <a href="https://github.com/${GH_USER}" target="_blank" rel="noopener">github.com/${GH_USER}</a>
+        · GitHub Pages détectées automatiquement
+        · Projet communautaire non officiel, non affilié à Sqorz
+      </div>
+    `;
+  }
+
+  const THEME_ICONS = { auto: '🌓', light: '☀️', dark: '🌙' };
+  const themeBtn = document.getElementById('themeBtn');
+
+  function currentPref() {
+    return localStorage.getItem('theme') || 'auto';
+  }
+
+  function applyTheme(pref) {
+    const isDark = pref === 'dark' ||
+      (pref === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('dark', isDark);
+    if (pref === 'auto') delete document.documentElement.dataset.themePref;
+    else document.documentElement.dataset.themePref = pref;
+    themeBtn.textContent = THEME_ICONS[pref];
+    themeBtn.setAttribute('aria-label', 'Thème actuel : ' + (pref === 'auto' ? 'automatique' : pref === 'light' ? 'clair' : 'sombre') + ' (cliquer pour changer)');
+    if (pref === 'auto') localStorage.removeItem('theme');
+    else localStorage.setItem('theme', pref);
+  }
+
+  function nextPref(p) {
+    return p === 'auto' ? 'light' : p === 'light' ? 'dark' : 'auto';
+  }
+
+  themeBtn.addEventListener('click', () => applyTheme(nextPref(currentPref())));
+  applyTheme(currentPref());
+  // --- Mes suivis (favoris + récents inter-outils) ---
+  function suiviRow(label, url, type, key) {
+    const x = type && key
+      ? `<button class="unfav-btn" data-unfav-type="${esc(type)}" data-unfav-key="${esc(key)}" title="Ne plus suivre" aria-label="Ne plus suivre ${esc(label)}">✕</button>`
+      : '';
+    return `<div class="suivi-row"><a href="${url}">${esc(label)}</a>${x}</div>`;
+  }
+  function renderSuivis() {
+    const wrap = document.getElementById('suivis');
+    if (!wrap) return;
+    const pilots = readFavs('pilots');
+    const clubs = readFavs('clubs');
+    const recent = readRecent(3);
+    if (!pilots.length && !clubs.length && !recent.length) { wrap.innerHTML = ''; return; }
+    let html = '<section class="suivis" aria-label="Mes suivis"><h2>★ Mes suivis</h2>';
+    if (pilots.length) {
+      html += '<h3>Pilotes</h3>' + pilots.map(f =>
+        suiviRow('🏃 ' + f.name, pilotUrl(f.name), 'pilots', f.key)).join('');
+    }
+    if (clubs.length) {
+      html += '<h3>Clubs</h3>' + clubs.map(f =>
+        suiviRow('📍 ' + f.name, clubUrl(f.key), 'clubs', f.key)).join('');
+    }
+    if (recent.length) {
+      html += '<h3>Récents</h3>' + recent.map(r =>
+        suiviRow((r.t === 'clubs' ? '📍 ' : '🏃 ') + r.n,
+          r.t === 'clubs' ? clubUrl(r.k) : pilotUrl(r.n), null, null)).join('');
+    }
+    wrap.innerHTML = html + '</section>';
+  }
+
+  // --- Recherche universelle ---
+  function renderSearchResults(items) {
+    const box = document.getElementById('hubSearchResults');
+    if (!box) return;
+    if (!items.length) { box.hidden = true; box.innerHTML = ''; return; }
+    box.innerHTML = items.map((it, i) =>
+      `<a href="${it.url}" role="option" data-idx="${i}">${esc(it.label)}</a>`).join('');
+    box.hidden = false;
+  }
+  function wireSearch() {
+    const inp = document.getElementById('hubSearch');
+    if (!inp) return;
+    inp.addEventListener('input', () => renderSearchResults(routeSearch(inp.value)));
+    inp.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      const items = routeSearch(inp.value);
+      if (items.length) location.href = items[0].url;
+    });
+    inp.addEventListener('blur', () => setTimeout(() => {
+      const box = document.getElementById('hubSearchResults');
+      if (box) { box.hidden = true; }
+    }, 150));
+  }
+
+  // --- Panneau « Données » : fraîcheur des sources (meta de bmx-race-stats) + 2 KPI ---
+  // Les KPI (pilotes/clubs) viennent de hub-search.json, déjà chargé pour la recherche.
+  const DATA_SOURCES = [
+    { label: 'Sqorz · France',      file: 'pilots-index.meta.json' },
+    { label: 'JSTiming · Europe UEC', file: 'uec-index.meta.json' },
+    { label: 'Sqorz · Mondiaux',    file: 'uci-index.meta.json' },
+    { label: 'UCI · Coupe du monde', file: 'uci-worldcup-index.meta.json' },
+  ];
+  const metaDays = iso => Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86400000));
+  const metaAge = d => d === 0 ? 'auj.' : d === 1 ? 'hier' : `il y a ${d} j`;
+
+  async function refreshFreshness() {
+    const host = document.getElementById('srcs');
+    if (!host || typeof host.querySelectorAll !== 'function') return;
+    const rows = host.querySelectorAll('.src');
+    if (!rows || !rows.length) return;
+    const base = pagesBase('bmx-race-stats');
+    const ages = [];
+    for (let i = 0; i < DATA_SOURCES.length && i < rows.length; i++) {
+      try {
+        const r = await fetch(base + DATA_SOURCES[i].file);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const j = await r.json();
+        const d = metaDays(j.generated);
+        ages.push(d);
+        const row = rows[i];
+        if (typeof row.classList.toggle === 'function') {
+          row.classList.toggle('ok', d <= 3);
+          row.classList.toggle('stale', d > 10);
+        }
+        if (typeof row.querySelector === 'function') {
+          const age = row.querySelector('.age');
+          if (age) age.textContent = metaAge(d);
+        }
+        if (typeof row.setAttribute === 'function') row.setAttribute('title', 'Généré le ' + formatDate(j.generated));
+      } catch { ages.push(Infinity); }
+    }
+    const worst = ages.reduce((a, b) => Math.max(a, b), 0);
+    const note = document.getElementById('sideNote');
+    if (note) note.textContent = worst > 10 ? '⚠ Données à rafraîchir'
+      : worst > 3 ? 'Données un peu anciennes'
+      : 'Toutes les données sont à jour';
+    const dot = document.getElementById('sideDot');
+    if (dot && typeof dot.classList.toggle === 'function') {
+      dot.classList.toggle('warn', worst > 3 && worst <= 10);
+      dot.classList.toggle('stale', worst > 10);
+    }
+  }
+
+  // Repli mobile : replié par défaut sous 520 px, dépliable ; toujours ouvert au-dessus.
+  function syncSide() {
+    const panel = document.getElementById('sidePanel');
+    const btn = document.getElementById('sideToggle');
+    if (!panel || !btn || typeof panel.classList.toggle !== 'function') return;
+    const folded = typeof window.matchMedia === 'function'
+      ? (window.matchMedia('(max-width:520px)').matches || false) : false;
+    const openNow = typeof panel.classList.contains === 'function'
+      ? panel.classList.contains('open') : true;
+    panel.classList.toggle('open', !folded || openNow);
+    btn.setAttribute('aria-expanded', (!folded || openNow) ? 'true' : 'false');
+  }
+  function initSide() {
+    const btn = document.getElementById('sideToggle');
+    if (!btn || typeof btn.addEventListener !== 'function') return;
+    btn.addEventListener('click', () => {
+      if (typeof window.matchMedia === 'function' && window.matchMedia('(max-width:520px)').matches) {
+        const panel = document.getElementById('sidePanel');
+        if (panel && typeof panel.classList.toggle === 'function') panel.classList.toggle('open');
+      }
+      syncSide();
+    });
+    if (typeof window.addEventListener === 'function') window.addEventListener('resize', syncSide);
+    syncSide();
+  }
+
+  // --- Démarrage : recherche + suivis synchrones, projets en arrière-plan ---
+  document.getElementById('main').innerHTML = `
+    <div class="main-layout">
+      <div class="center">
+        <div class="search-wrap">
+          <input id="hubSearch" type="text" placeholder="Pilote, club, ou « Dupont vs Martin »…" autocomplete="off" aria-label="Recherche universelle">
+          <div class="search-results" id="hubSearchResults" role="listbox" hidden></div>
+        </div>
+        <div id="suivis"></div>
+        <div id="projects"></div>
+      </div>
+      <aside class="side" aria-label="Données en un coup d'œil" id="sidePanel">
+        <button type="button" class="side-head" id="sideToggle" aria-expanded="true">
+          <span class="side-title"><span class="side-dot" id="sideDot"></span> Données</span>
+          <span class="side-chev" aria-hidden="true">▾</span>
+        </button>
+        <div class="side-body">
+          <div class="srcs" id="srcs">
+            <div class="src"><span class="l"><span class="dot"></span><b>Sqorz · France</b></span><span class="age">…</span></div>
+            <div class="src"><span class="l"><span class="dot"></span><b>JSTiming · Europe UEC</b></span><span class="age">…</span></div>
+            <div class="src"><span class="l"><span class="dot"></span><b>Sqorz · Mondiaux</b></span><span class="age">…</span></div>
+            <div class="src"><span class="l"><span class="dot"></span><b>UCI · Coupe du monde</b></span><span class="age">…</span></div>
+          </div>
+          <div class="side-sep"></div>
+          <div class="stats">
+            <div class="stat"><div class="v" id="pilotTotal">…</div><div class="k">Pilotes</div></div>
+            <div class="stat"><div class="v" id="clubTotal">…</div><div class="k">Clubs</div></div>
+          </div>
+          <div class="side-note" id="sideNote">Chargement…</div>
+        </div>
+      </aside>
+    </div>
+  `;
+  renderSuivis();
+  wireSearch();
+  // Index de recherche en différé (80 Ko) ; ré-affiche si une requête est en cours.
+  fetch('hub-search.json').then(r => {
+    if (!r.ok) return null;
+    return r.json();
+  }).then(j => {
+    if (!j || !j.pilots) return;
+    searchIdx = j;
+    const inp = document.getElementById('hubSearch');
+    if (inp && inp.value.trim()) renderSearchResults(routeSearch(inp.value));
+    const pTot = document.getElementById('pilotTotal');
+    const cTot = document.getElementById('clubTotal');
+    if (pTot) pTot.textContent = (j.pilots || []).length.toLocaleString('fr-FR');
+    if (cTot) cTot.textContent = Object.keys(j.clubs || {}).length.toLocaleString('fr-FR');
+  }).catch(() => {});
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-unfav-type]');
+    if (!b) return;
+    removeFav(b.dataset.unfavType, b.dataset.unfavKey);
+  });
+  loadProjects();
+  initSide();
+  refreshFreshness().catch(() => {});
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js');
+  }
+</script>
+
+</body>
+</html>
