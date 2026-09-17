@@ -15,14 +15,14 @@
     if (saved) document.documentElement.dataset.themePref = saved;
   })();
 </script>
-<title>BMX-Race · Hub</title>
+<title>BMX-Race · Dashboard</title>
 <meta name="description" content="Accès centralisé aux outils de statistiques BMX Race : stats club, head-to-head, catégorie et recherche pilote.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ludsoc.github.io/bmx-race-tools/">
-<meta property="og:title" content="BMX-Race · Hub">
+<meta property="og:title" content="BMX-Race · Dashboard">
 <meta property="og:description" content="Accès centralisé aux outils de statistiques BMX Race : stats club, head-to-head, catégorie et recherche pilote.">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="BMX-Race · Hub">
+<meta name="twitter:title" content="BMX-Race · Dashboard">
 <meta name="twitter:description" content="Accès centralisé aux outils de statistiques BMX Race : stats club, head-to-head, catégorie et recherche pilote.">
 <link rel="stylesheet" href="./theme.css">
 <link rel="manifest" href="./manifest.json">
@@ -240,7 +240,7 @@
             <rect x="13" y="13" width="8" height="8" rx="1.5"/>
           </svg>
         </span>
-        BMX-Race Hub
+BMX-Race Dashboard
       </div>
 
       <div style="display:flex; gap:8px; align-items:center">
@@ -248,7 +248,7 @@
       <button type="button" id="themeBtn" class="theme-btn" aria-label="Changer le thème (auto / clair / sombre)"></button>
       </div>
     </div>
-    <h1>BMX-Race Hub</h1>
+    <h1>BMX-Race Dashboard</h1>
     <p>Tous mes outils BMX-Race — statistiques, historiques pilotes, analyses par catégorie.</p>
   </div>
 </div>
@@ -464,11 +464,32 @@
     }).format(new Date(iso));
   }
 
-  function toolCard(t, gradient) {
+  // Logo d'un outil : extrait <svg> du .logo de son propre index.html (même origine,
+  // servi par le service worker) ; échoue silencieusement → repli sur les initiales.
+  function sanitizeSvg(svgText) {
+    return svgText
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/\s+on\w+="[^"]*"/gi, '')
+      .replace(/\s+on\w+='[^']*'/gi, '');
+  }
+  async function fetchToolLogo(dir) {
+    try {
+      const r = await fetch(new Request(dir + 'index.html', { cache: 'no-cache' }));
+      if (!r.ok) return null;
+      const doc = new DOMParser().parseFromString(await r.text(), 'text/html');
+      const svg = doc.querySelector('.logo svg');
+      return svg ? sanitizeSvg(svg.outerHTML) : null;
+    } catch (e) { return null; }
+  }
+
+  function toolCard(t, gradient, logo) {
+    const iconHtml = logo
+      ? logo
+      : `<span style="font-size:15px;font-weight:800">${initials(t.name)}</span>`;
     return `
       <article class="project-card">
         <div class="project-icon" style="background:${gradient}" aria-hidden="true">
-          <span style="font-size:15px;font-weight:800">${initials(t.name)}</span>
+          ${iconHtml}
         </div>
         <div class="project-info">
           <div class="project-name">${esc(t.display)}</div>
@@ -481,14 +502,15 @@
 
   // Liste unique : les 5 outils du monorepo, en liens internes relatifs — même PWA,
   // sans onglet externe vers les anciennes GitHub Pages.
-  function renderProjects() {
+  async function renderProjects() {
     const n = TOOLS_LOCAL.length;
+    const logos = await Promise.all(TOOLS_LOCAL.map(t => fetchToolLogo(t.dir)));
     document.getElementById('projects').innerHTML = `
       <div class="status-bar">
         <div class="status-dot" aria-hidden="true"></div>
         ${n} outil${n > 1 ? 's' : ''} disponible${n > 1 ? 's' : ''}
       </div>
-      <div class="project-list">${TOOLS_LOCAL.map((t, i) => toolCard(t, ICON_GRADIENTS[i % 4])).join('')}</div>
+      <div class="project-list">${TOOLS_LOCAL.map((t, i) => toolCard(t, ICON_GRADIENTS[i % 4], logos[i])).join('')}</div>
       <div class="hub-footer">
         Outils du monorepo
         <a href="https://github.com/${GH_USER}/bmx-race-tools" target="_blank" rel="noopener">github.com/${GH_USER}/bmx-race-tools</a>

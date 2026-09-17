@@ -2,12 +2,13 @@
   <!-- Fond dégradé bleu acier -->
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#3f566f"/>
+      <stop offset="0%" style="stop-color:#2e4158"/>
+      <stop offset="55%" style="stop-color:#3f566f"/>
       <stop offset="100%" style="stop-color:#8aa6c2"/>
     </linearGradient>
   </defs>
-  <rect width="512" height="512" rx="100" fill="url(#bg)"/>
-  <!-- Lettre S stylisée -->
-  <text x="256" y="340" font-family="Arial Black, sans-serif" font-size="300" font-weight="900"
-        text-anchor="middle" fill="white" opacity="0.95">S</text>
+  <rect width="512" height="512" rx="110" fill="url(#bg)"/>
+  <!-- BDROID / Arial Black : sérieuse, lisible en taille réduite -->
+  <text x="256" y="256" font-family="Arial Black, Arial, sans-serif" font-size="182" font-weight="900"
+        text-anchor="middle" dominant-baseline="central" fill="white" opacity="0.96">BMX</text>
 </svg>
