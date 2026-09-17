@@ -9,7 +9,7 @@
 <title>BMX-Race · Indice de performance</title>
 <meta name="description" content="Classement des pilotes BMX français par indice de performance : toutes les courses comptent (France, Europe, Mondiaux).">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://ludsoc.github.io/bmx-race-rankings/">
+<meta property="og:url" content="https://ludsoc.github.io/bmx-race-tools/ranking/">
 <meta property="og:title" content="BMX-Race · Indice de performance">
 <meta property="og:description" content="Classement des pilotes BMX français par indice de performance : toutes les courses comptent (France, Europe, Mondiaux).">
 <meta name="twitter:card" content="summary">
@@ -24,6 +24,9 @@
   })();
 </script>
 <link rel="stylesheet" href="../theme.css">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<meta name="theme-color" content="#6a8caf">
 <style>
 *{box-sizing:border-box}
 html,body{margin:0; padding:0}
@@ -857,6 +860,21 @@ footer a:hover{text-decoration:underline}
   loadCatRef();
   loadLrp();
 })();
+</script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      const dev = ["127.0.0.1", "localhost", "::1"].includes(location.hostname);
+      if (dev) {
+        navigator.serviceWorker.getRegistrations().then(list => {
+          if (!list.length) return;
+          Promise.all(list.map(r => r.unregister())).then(() => location.reload());
+        });
+        return;
+      }
+      navigator.serviceWorker.register("../service-worker.js").catch(e => console.warn("[bmx] service worker :", e.message));
+    });
+  }
 </script>
 </body>
 </html>
