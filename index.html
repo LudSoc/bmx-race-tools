@@ -256,38 +256,16 @@
 <main id="main"></main>
 
 <script>
-  function renderSkeleton(count = 3) {
-    const host = document.getElementById('projects');
-    if (!host) return;
-    const cards = Array.from({ length: count }, () => `
-      <div class="project-card">
-        <div class="skel skel-icon"></div>
-        <div class="project-info">
-          <div class="skel skel-line medium"></div>
-          <div class="skel skel-line long"></div>
-          <div class="skel skel-line short" style="margin-top:6px"></div>
-        </div>
-        <div class="skel skel-btn"></div>
-      </div>
-    `).join('');
-    host.innerHTML = `
-      <div class="status-bar">
-        <div class="status-dot" style="background:var(--warn)" aria-hidden="true"></div>
-        Chargement…
-      </div>
-      <div class="project-list">${cards}</div>
-    `;
-  }
-
   const GH_USER = 'ludsoc';
-  const HUB_REPO = 'bmx-race-hub';
-  const DISPLAY_NAMES = {
-    'bmx-race-club':      'BMX-Race · Stats Club',
-    'bmx-race-head2head': 'BMX-Race · Head to Head',
-    'bmx-race-category':  'BMX-Race · Stats Catégorie',
-    'bmx-race-stats':     'BMX-Race · Stats Pilote',
-    'bmx-race-rankings':  'BMX-Race · Indice de performance',
-  };
+  // Outils du monorepo bmx-race-tools : liens internes relatifs (même PWA, même scope).
+  // Pas de listing GitHub externe : on resterait sur d'anciennes Pages (nouvel onglet).
+  const TOOLS_LOCAL = [
+    { dir: 'stats/',    name: 'bmx-race-stats',     display: 'BMX-Race · Stats Pilote',   desc: "Recherchez un pilote BMX Race et consultez son historique complet : résultats, podiums, progressions et comparaisons." },
+    { dir: 'club/',     name: 'bmx-race-club',      display: 'BMX-Race · Stats Club',     desc: "Analysez les performances d'un club BMX Race : classements, évolutions et comparatifs par année." },
+    { dir: 'h2h/',      name: 'bmx-race-head2head', display: 'BMX-Race · Head to Head',    desc: "Comparez les performances de deux pilotes BMX Race face à face : victoires, podiums et évolution dans le temps." },
+    { dir: 'category/', name: 'bmx-race-category',  display: 'BMX-Race · Stats Catégorie', desc: "Classements et statistiques BMX Race par catégorie d'âge : évolutions, podiums et comparatifs entre organisations." },
+    { dir: 'ranking/',  name: 'bmx-race-rankings',  display: 'BMX-Race · Indice de performance', desc: "Classement national des pilotes BMX Race par indice de performance : qui domine le plus sa concurrence, par catégorie et par club." },
+  ];
   const ICON_GRADIENTS = [
     'linear-gradient(135deg,#2e4158,#6a8caf)',
     'linear-gradient(135deg,#3f566f,#8aa6c2)',
@@ -463,75 +441,7 @@
     return out;
   }
 
-  // Liste locale de secours : l'API GitHub anonyme est limitée à 60 req/h/IP
-  // (403 fréquents derrière une IP partagée). branch = branche par défaut du dépôt.
-  const STATIC_PROJECTS = [
-    { name: 'bmx-race-stats', branch: 'main', description: 'Recherchez un pilote BMX Race et consultez son historique complet : résultats, podiums, progressions et comparaisons.' },
-    { name: 'bmx-race-club', branch: 'main', description: "Analysez les performances d'un club BMX Race : classements, évolutions et comparatifs par année." },
-    { name: 'bmx-race-head2head', branch: 'main', description: 'Comparez les performances de deux pilotes BMX Race face à face : victoires, podiums et évolution dans le temps.' },
-    { name: 'bmx-race-category', branch: 'master', description: "Classements et statistiques BMX Race par catégorie d'âge : évolutions, podiums et comparatifs entre organisations." },
-    { name: 'bmx-race-rankings', branch: 'main', description: "Classement national des pilotes BMX Race par indice de performance : qui domine le plus sa concurrence, par catégorie et par club." },
-  ];
-  const REPOS_CACHE_KEY = 'bmxRaceHubRepos';
-  const REPOS_CACHE_TTL = 24 * 3600 * 1000; // 1 jour
-
-  function readReposCache() {
-    try {
-      const raw = localStorage.getItem(REPOS_CACHE_KEY);
-      if (!raw) return null;
-      const { at, repos } = JSON.parse(raw);
-      if (!at || !Array.isArray(repos) || Date.now() - at > REPOS_CACHE_TTL) return null;
-      return repos;
-    } catch { return null; }
-  }
-  function writeReposCache(repos) {
-    try { localStorage.setItem(REPOS_CACHE_KEY, JSON.stringify({ at: Date.now(), repos })); } catch {}
-  }
-
-  async function fetchRepos() {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 8000);
-    try {
-      const res = await fetch(
-        `https://api.github.com/users/${GH_USER}/repos?per_page=100&sort=updated`,
-        { signal: ctrl.signal }
-      );
-      if (!res.ok) throw new Error(`GitHub API ${res.status}`);
-      let repos;
-      try { repos = await res.json(); }
-      catch(e) { throw new Error('Réponse invalide de l\'API GitHub'); }
-      return repos
-        .filter(r => r.has_pages && r.name !== HUB_REPO);
-    } finally { clearTimeout(timer); }
-  }
-
-  function sanitizeSvg(svgText) {
-    return svgText
-      .replace(/<script[\s\S]*?<\/script>/gi, '')
-      .replace(/\s+on\w+="[^"]*"/gi, '')
-      .replace(/\s+on\w+='[^']*'/gi, '');
-  }
-
-  async function fetchIcon(repoName, defaultBranch = 'main') {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 5000);
-    try {
-      const res = await fetch(
-        `https://raw.githubusercontent.com/${GH_USER}/${repoName}/${defaultBranch}/index.html`,
-        { signal: ctrl.signal }
-      );
-      clearTimeout(timer);
-      if (!res.ok) return null;
-      const html = await res.text();
-      const doc = new DOMParser().parseFromString(html, 'text/html');
-      const logo = doc.querySelector('.logo');
-      const svg = logo?.querySelector('svg');
-      return svg ? sanitizeSvg(svg.outerHTML) : null;
-    } catch(e) {
-      clearTimeout(timer);
-      return null;
-    }
-  }
+  
 
   function initials(name) {
     return name.split(/[-_]/)
@@ -554,74 +464,34 @@
     }).format(new Date(iso));
   }
 
-  function renderCard(repo, icon, gradient) {
-    const iconHtml = icon
-      ? icon
-      : `<span style="font-size:15px;font-weight:800">${initials(repo.name)}</span>`;
-    const desc = esc(repo.description || 'Aucune description disponible');
-    const displayName = esc(DISPLAY_NAMES[repo.name] || repo.name);
-    const url = `https://${GH_USER}.github.io/${repo.name}/`;
-    const meta = repo.updated_at
-      ? `<div class="project-meta">
-            <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.75a.75.75 0 0 0-1.5 0v3.5a.75.75 0 0 0 .22.53l2.25 2.25a.75.75 0 1 0 1.06-1.06L8.5 7.94V4.75z"/>
-            </svg>
-            Mis à jour le ${formatDate(repo.updated_at)}
-          </div>`
-      : '';
+  function toolCard(t, gradient) {
     return `
       <article class="project-card">
         <div class="project-icon" style="background:${gradient}" aria-hidden="true">
-          ${iconHtml}
+          <span style="font-size:15px;font-weight:800">${initials(t.name)}</span>
         </div>
         <div class="project-info">
-          <div class="project-name">${displayName}</div>
-          <div class="project-desc">${desc}</div>
-          ${meta}
+          <div class="project-name">${esc(t.display)}</div>
+          <div class="project-desc">${esc(t.desc)}</div>
         </div>
-        <a class="project-btn" href="${url}" target="_blank" rel="noopener" aria-label="Ouvrir ${displayName} (nouvelle fenêtre)">Ouvrir →</a>
+        <a class="project-btn" href="${t.dir}" aria-label="Ouvrir ${esc(t.display)}">Ouvrir →</a>
       </article>
     `;
   }
 
-  async function loadProjects() {
-    const expectedCount = Object.keys(DISPLAY_NAMES).length || 3;
-    renderSkeleton(expectedCount);
-    // API → cache local (24 h) → liste statique : le hub s'affiche toujours.
-    let repos = null, source = 'api';
-    try {
-      repos = await fetchRepos();
-      writeReposCache(repos);
-    } catch (err) {
-      repos = readReposCache();
-      source = repos ? 'cache' : 'static';
-      if (!repos) repos = STATIC_PROJECTS.map(p => ({
-        name: p.name, description: p.description,
-        updated_at: null, default_branch: p.branch, has_pages: true,
-      }));
-    }
-    const sourceLabel = { api: 'via GitHub API', cache: 'via cache local', static: 'liste locale' }[source];
-    const retryBtn = source === 'api'
-      ? ''
-      : ` <button onclick="loadProjects()" class="btn-retry" style="margin-left:8px">Réessayer</button>`;
-    const icons = await Promise.all(repos.map(r => fetchIcon(r.name, r.default_branch)));
-    const n = repos.length;
-    const label = n === 0
-      ? 'Aucun outil disponible'
-      : `${n} outil${n > 1 ? 's' : ''} disponible${n > 1 ? 's' : ''}`;
-    const cards = repos
-      .map((r, i) => renderCard(r, icons[i], ICON_GRADIENTS[i % 4]))
-      .join('');
+  // Liste unique : les 5 outils du monorepo, en liens internes relatifs — même PWA,
+  // sans onglet externe vers les anciennes GitHub Pages.
+  function renderProjects() {
+    const n = TOOLS_LOCAL.length;
     document.getElementById('projects').innerHTML = `
       <div class="status-bar">
         <div class="status-dot" aria-hidden="true"></div>
-        ${label}${source === 'api' ? ' · mis à jour il y a quelques secondes' : ' · dates non actualisées'}
-        <span style="margin-left:auto;opacity:.6">${sourceLabel}</span>${retryBtn}
+        ${n} outil${n > 1 ? 's' : ''} disponible${n > 1 ? 's' : ''}
       </div>
-      <div class="project-list">${cards}</div>
+      <div class="project-list">${TOOLS_LOCAL.map((t, i) => toolCard(t, ICON_GRADIENTS[i % 4])).join('')}</div>
       <div class="hub-footer">
-        Source : <a href="https://github.com/${GH_USER}" target="_blank" rel="noopener">github.com/${GH_USER}</a>
-        · GitHub Pages détectées automatiquement
+        Outils du monorepo
+        <a href="https://github.com/${GH_USER}/bmx-race-tools" target="_blank" rel="noopener">github.com/${GH_USER}/bmx-race-tools</a>
         · Projet communautaire non officiel, non affilié à Sqorz
       </div>
     `;
@@ -818,7 +688,7 @@
   renderSuivis();
   wireSearch();
   // Index de recherche en différé (80 Ko) ; ré-affiche si une requête est en cours.
-  fetch('hub-search.json').then(r => {
+  fetch('stats/hub-search.json').then(r => {
     if (!r.ok) return null;
     return r.json();
   }).then(j => {
@@ -836,7 +706,7 @@
     if (!b) return;
     removeFav(b.dataset.unfavType, b.dataset.unfavKey);
   });
-  loadProjects();
+  renderProjects();
   initSide();
   refreshFreshness().catch(() => {});
 
