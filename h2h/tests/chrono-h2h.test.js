@@ -46,6 +46,7 @@ const harnessSrc = [
   block(html, 'function renderH2HHeader(stats, viewScore) {'),
   block(html, 'function raceKeyOf(d) {'),
   block(html, 'function phaseOrder(name) {'),
+  block(html, 'function frPhase(name) {'),
   block(html, 'function sharedRaces(aDetails, bDetails) {'),
   block(html, 'function flattenSharedRaces(confrontations) {'),
   block(html, 'function renderRaceTable(races) {'),
@@ -54,7 +55,7 @@ const harnessSrc = [
   block(html, 'function filterConfrontations(confrontations, cat, year, sameRaceOnly) {'),
   block(html, 'function confrontationYears(confrontations) {'),
   block(html, 'function renderYearFilter(years, activeYear) {'),
-].join('\n') + '\nreturn { CHRONO_METRICS, fmtChrono, bestChrono, chronoBests, computeChronoStats, renderH2HTable, renderRaceTable, flattenSharedRaces, renderChronoTable, renderViewSelector, renderH2HHeader, raceKeyOf, sharedRaces, phaseOrder, specialLabel, renderSharedRaces, eventNameCell, filterConfrontations, confrontationYears, renderYearFilter, __setPilots: (a, b) => { pilotA = a; pilotB = b; } };';
+].join('\n') + '\nreturn { CHRONO_METRICS, fmtChrono, bestChrono, chronoBests, computeChronoStats, renderH2HTable, renderRaceTable, flattenSharedRaces, renderChronoTable, renderViewSelector, renderH2HHeader, raceKeyOf, sharedRaces, phaseOrder, frPhase, specialLabel, renderSharedRaces, eventNameCell, filterConfrontations, confrontationYears, renderYearFilter, __setPilots: (a, b) => { pilotA = a; pilotB = b; } };';
 const H = new Function('__SC', harnessSrc)(SC);
 
 // --- bestChrono : règles d'exclusion ---
@@ -220,6 +221,14 @@ test('phaseOrder : manches → éliminatoires → finale → super finale', () =
     H.phaseOrder('Finale') < H.phaseOrder('Super Final'), 'ordre total');
 });
 
+test('frPhase : « Moto 1 » → « Manche 1 » en français', () => {
+  assert.equal(H.frPhase('Moto 1'), 'Manche 1');
+  assert.equal(H.frPhase('moto 2'), 'Manche 2', 'minuscule aussi');
+  assert.equal(H.frPhase('Manche 3'), 'Manche 3', 'déjà en français : inchangé');
+  assert.equal(H.frPhase('Finale'), 'Finale');
+  assert.equal(H.frPhase(''), '');
+});
+
 test('sharedRaces : finale en premier, manches ensuite', () => {
   const out = H.sharedRaces(
     [{ phaseName: 'Super Final', phaseCode: 'TTF', raceName: 'SF', result: 1 },
@@ -315,7 +324,7 @@ test('renderRaceTable : manches + vainqueurs, vide si rien', () => {
     { event: { eventDate: '2026-05-10', eventName: 'E2' }, account: {}, cls: { className: 'Elite' }, phase: 'Finale', key: '1%F', a: 1, b: 3 },
     { event: { eventDate: '2026-05-10', eventName: 'E2' }, account: {}, cls: { className: 'Elite' }, phase: 'Manche 2', key: '2%M2', a: 4, b: 2 },
   ]);
-  assert.ok(out.includes('<th>Manche</th>'), 'colonne Manche');
+  assert.ok(out.includes('<th>Course</th>'), 'colonne Course');
   assert.ok(out.includes('Finale') && out.includes('Manche 2'), 'phases listées');
   assert.ok(out.includes('🥇'), 'médaille 1er');
   const dnf = H.renderRaceTable([

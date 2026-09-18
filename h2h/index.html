@@ -1256,7 +1256,7 @@
     .cat-filter-row { padding: 10px 14px }
 
     /* Tableau H2H : colonnes date et catégorie masquées sur très petit écran.
-       Vue « Manches communes » : la colonne manche reste visible. */
+       Vue « Course communes » : la colonne manche reste visible. */
     .h2h-table .ev-date { display: none }
     .h2h-table .ev-cat { display: none }
     .h2h-table.races-table .ev-cat { display: table-cell }
@@ -1939,6 +1939,12 @@ function phaseOrder(name) {
   return 60;
 }
 
+// Nom de phase affiché en français : « Moto 1 » → « Manche 1 » (données Sqorz en anglais).
+// Testable.
+function frPhase(name) {
+  return /^moto\b/i.test(name || '') ? String(name).replace(/^moto\b/i, 'Manche') : (name || '');
+}
+
 // Clé d'une course (manche) : raceName + phaseCode (cf. raceUrl `${raceName}%${phaseCode}`).
 // Sans les deux → course non identifiable (données UEC : noms de phases seuls, sans manches).
 // Formes expansée (raceName/phaseCode/result/phaseName) et slim (rn/pc/r/n) acceptées :
@@ -2280,7 +2286,7 @@ function renderSharedRaces(shared) {
     const win = !la && !lb && s.a !== s.b;
     const a = win && s.a < s.b ? `<b>${fa}</b>` : fa;
     const b = win && s.b < s.a ? `<b>${fb}</b>` : fb;
-    return `<span class="shared-race"><span class="sr-phase">${escape(s.phase || 'Manche')}</span> ${a} – ${b}</span>`;
+    return `<span class="shared-race"><span class="sr-phase">${escape(frPhase(s.phase) || 'Manche')}</span> ${a} – ${b}</span>`;
   }).join('<span class="sr-sep" aria-hidden="true"> · </span>');
   return `<tr class="shared-races-row"><td colspan="6"><span aria-hidden="true">🏁</span> ${items}</td></tr>`;
 }
@@ -2374,7 +2380,7 @@ function computeAndRenderH2H() {
 // Absent quand aucun duel chronométré (rien d'autre à afficher que les rangs).
 function renderViewSelector(chronoStats, activeView, rankCount, racesCount = 0) {
   const views = [{ key: 'rank', label: '🏆 Classement final', n: rankCount }]
-    .concat(racesCount > 0 ? [{ key: 'races', label: '🏁 Manches communes', n: racesCount }] : [])
+    .concat(racesCount > 0 ? [{ key: 'races', label: '🏁 Course communes', n: racesCount }] : [])
     .concat(chronoStats.map(s => ({ key: s.key, label: s.label, n: s.duels })));
   if (views.length <= 1) return '';
   const pills = views.map(v => {
@@ -2418,7 +2424,7 @@ function renderRaceTable(races) {
     return `<tr tabindex="0">
       <td class="ev-date">${fmtDate(r.event.eventDate)}</td>
       <td class="ev-name">${eventNameCell(r)}</td>
-      <td class="ev-cat">${escape(r.phase || 'Manche')}</td>
+      <td class="ev-cat">${escape(frPhase(r.phase) || 'Manche')}</td>
       <td class="rank-a${aWins ? ' winner' : ''}">${cell(r.a)}</td>
       <td class="rank-b${bWins ? ' winner' : ''}">${cell(r.b)}</td>
       <td class="win-icon">${winIcon}</td>
@@ -2431,7 +2437,7 @@ function renderRaceTable(races) {
         <tr>
           <th>Date</th>
           <th>Événement</th>
-          <th>Manche</th>
+          <th>Course</th>
           <th>${nameA}</th>
           <th>${nameB}</th>
           <th></th>
@@ -2483,7 +2489,7 @@ function renderH2H() {
     ${table}`
     : view === 'races'
       ? `<div class="section-title" style="padding:0 18px;margin-bottom:0">
-      🏁 Manches communes
+      🏁 Course communes
       <span class="meta">${races.length} manche(s)</span>
     </div>
     ${renderRaceTable(races)}`
