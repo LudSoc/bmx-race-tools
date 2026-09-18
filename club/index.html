@@ -538,6 +538,8 @@ footer a:hover{text-decoration:underline}
 
   // --- Référentiel catégories (niveaux) — optionnel, chargé en arrière-plan ---
   const REF_LEVEL_LABELS = { national: 'National', regional: 'Régional', departemental: 'Départemental', uec: 'UEC', uci: 'UCI' };
+  // Tri « comme les autres outils » : niveau d'abord, puis nom dans le niveau.
+  const LVL_ORDER = { regional: 0, national: 1, uec: 2, uci: 3 };
   let catRef = null;
 
   // Niveau d'un code JSTiming/Sqorz : FR d'abord, puis UEC, Mondiaux, Coupe du monde.
@@ -549,6 +551,23 @@ footer a:hover{text-decoration:underline}
       if (entry && entry.level) return entry.level;
     }
     return '';
+  }
+
+  // Libellé d'une catégorie : groupes FR → noms Sqorz → référentiel (UEC/UCI/WC) → code.
+  // Pour l'UEC, catRef donne le nom officiel (« Boys 6 », « Men 17-24 »…) au lieu du code (B06…).
+  function categoryLabel(code, className) {
+    if (!code) return className || '';
+    const grp = CODE_TO_GROUP.get(code);
+    if (grp) return grp.label;
+    if (CLASS_NAMES[code]) return CLASS_NAMES[code];
+    if (catRef) {
+      const sections = ['categories', 'categoriesUec', 'categoriesUci', 'categoriesWorldCup'];
+      for (const src of sections) {
+        const entry = catRef[src] && catRef[src][code];
+        if (entry && entry.label) return entry.label;
+      }
+    }
+    return className || code;
   }
 
   async function loadCatRef() {
@@ -1172,7 +1191,7 @@ footer a:hover{text-decoration:underline}
         const code   = m.cls.perpetualClassCode || m.cls.className || '?';
         const grp    = CODE_TO_GROUP.get(code);
         const catKey = grp ? grp.key : code;
-        const label  = grp ? grp.label : (CLASS_NAMES[code] || code);
+        const label  = categoryLabel(code, m.cls.className);
         if (!catMap.has(catKey)) catMap.set(catKey, { label, wins: 0, podiums: 0, total: 0, pilotKeys: new Set(), levels: new Map() });
         const bucket = catMap.get(catKey);
         const lvl    = refLevelFor(code);
@@ -1195,7 +1214,12 @@ footer a:hover{text-decoration:underline}
         podiums:    b.podiums,
         rate:       b.total ? Math.round(100 * b.podiums / b.total) : 0,
       }))
-      .sort((a, b) => a.label.localeCompare(b.label, 'fr'));
+      .sort((a, b) => {
+        const la = LVL_ORDER[a.level] !== undefined ? LVL_ORDER[a.level] : 99;
+        const lb = LVL_ORDER[b.level] !== undefined ? LVL_ORDER[b.level] : 99;
+        if (la !== lb) return la - lb;
+        return a.label.localeCompare(b.label, 'fr');
+      });
   }
 
   // --- Graphe progression annuelle ---
