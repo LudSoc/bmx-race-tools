@@ -350,6 +350,16 @@ footer a:hover{text-decoration:underline}
   .ranking-table th:first-child,.ranking-table td:first-child{min-width:28px}
   .ranking-table th:nth-child(2),.ranking-table td:nth-child(2){min-width:100px}
   .ranking-table th:nth-child(3),.ranking-table td:nth-child(3){min-width:60px}
+
+  /* Tableau scrollable horizontalement : liseré droit indiquant qu'on peut glisser */
+  .table-card{position:relative}
+  .table-card::after{
+    content:''; pointer-events:none;
+    position:absolute; top:0; right:0; bottom:0; width:36px;
+    background:linear-gradient(to right, transparent, var(--card));
+    transition:opacity .2s;
+  }
+  .table-card.scrolled-end::after{opacity:0}
   #backToTop{bottom:16px; right:14px; width:40px; height:40px; font-size:18px}
 }
 @media(max-width:400px){
@@ -1371,6 +1381,9 @@ footer a:hover{text-decoration:underline}
     resultsEl.innerHTML = headerHtml + filtersHtml + progressionHtml + catsHtml
       + `<div class="card table-card"><div class="table-scroll">${tableHtml}</div></div>`;
 
+    // Indicateur de scroll horizontal du tableau
+    resultsEl.querySelectorAll('.card.table-card').forEach(bindScrollIndicator);
+
     // Événements sur les filtres
     resultsEl.querySelectorAll('.yp-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1669,6 +1682,17 @@ footer a:hover{text-decoration:underline}
     });
   }
 
+  function bindScrollIndicator(tableCard) {
+    const scr = tableCard.querySelector('.table-scroll');
+    if (!scr) return;
+    const update = () => {
+      const atEnd = scr.scrollLeft + scr.clientWidth >= scr.scrollWidth - 4;
+      tableCard.classList.toggle('scrolled-end', atEnd);
+    };
+    scr.addEventListener('scroll', update, { passive: true });
+    update();
+  }
+
   function renderRanking() {
     const clubs  = buildAllClubsStats(rankingYear);
     const sorted = sortedClubs(clubs);
@@ -1758,6 +1782,9 @@ footer a:hover{text-decoration:underline}
     }
 
     rankingSection.innerHTML = yearBarHtml + `<div class="card table-card">${tableContent}</div>`;
+
+    // Indicateur de scroll horizontal du tableau
+    bindScrollIndicator(rankingSection.querySelector('.card.table-card'));
 
     // Année
     rankingSection.querySelectorAll('[data-ry]').forEach(btn => {
