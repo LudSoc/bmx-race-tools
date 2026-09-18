@@ -180,6 +180,16 @@ footer a:hover{text-decoration:underline}
   main{padding:0 16px 24px}
   input.control{width:100%}
   .field{flex:1 1 140px}
+
+  /* Tableau scrollable horizontalement : liseré droit indiquant qu'on peut glisser */
+  .table-scroll-wrap{position:relative; overflow:hidden}
+  .table-scroll-wrap::after{
+    content:''; pointer-events:none;
+    position:absolute; top:0; right:0; bottom:0; width:36px;
+    background:linear-gradient(to right, transparent, var(--card));
+    transition:opacity .2s;
+  }
+  .table-scroll-wrap.scrolled-end::after{opacity:0}
 }
 </style>
 </head>
@@ -628,7 +638,7 @@ footer a:hover{text-decoration:underline}
       const b = document.getElementById('emptyReset');
       if (b) b.addEventListener('click', resetFilters);
     } else {
-      tableWrap.innerHTML = `<div class="table-scroll"><table class="ranking-table">
+      tableWrap.innerHTML = `<div class="table-scroll-wrap"><div class="table-scroll"><table class="ranking-table">
         <thead><tr><th title="Rang dans le filtre actif (rang général rappelé en petit quand il diffère)">#</th><th>Pilote</th><th>Club</th><th title="Âge sportif sur la saison (année de saison − année de naissance)">Âge</th><th title="Engagements sur la fenêtre">Eng.</th><th title="Indice de performance">Indice</th><th title="Évolution vs semaine précédente">Tend.</th></tr></thead>
         <tbody>${list.map((r, i) => {
           const fr = franks.get(r.n);
@@ -658,7 +668,17 @@ footer a:hover{text-decoration:underline}
           <td>${trendLabel(r.trend)}</td>
         </tr>`;
         }).join('')}</tbody>
-      </table></div>`;
+      </table></div></div>`;
+    }
+    const scr = tableWrap.querySelector('.table-scroll');
+    const wrapEl = tableWrap.querySelector('.table-scroll-wrap');
+    if (scr && wrapEl) {
+      const updateScrollIndicator = () => {
+        const atEnd = scr.scrollLeft + scr.clientWidth >= scr.scrollWidth - 4;
+        wrapEl.classList.toggle('scrolled-end', atEnd);
+      };
+      scr.addEventListener('scroll', updateScrollIndicator, { passive: true });
+      updateScrollIndicator();
     }
     moreBtn.hidden = rows.length <= shown;
     const nFav = favKeys().size;
