@@ -2066,7 +2066,12 @@
       if ((finalPh && finalPh.result != null) || (classified && c.rank <= 8 && bigField)) {
         s.finalsReached++;
       }
-      if (details.some(d => isKnockoutPhase(d) && !isTimeTrialPhase(d) && d.result != null) || (classified && bigField)) {
+      // Phases finales : seules les phases KO réellement courues comptent (une demi
+      // ou une finale publiée). Quand l'événement ne publie pas les phases KO, le
+      // rang ne prouve une finale que s'il est top-8 (même fallback que
+      // « finales atteintes ») — un simple classement (rang quelconque) ne suffit
+      // pas, sinon tout pilote classé d'un plateau > 8 serait « phases finales ».
+      if (details.some(d => isKnockoutPhase(d) && !isTimeTrialPhase(d) && d.result != null) || (classified && c.rank <= 8 && bigField)) {
         s.finalPhasesReached++;
       }
       let hasMoto = false;
