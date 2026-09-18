@@ -92,3 +92,33 @@ test('computeStats : vraie finale gagnée toujours comptée', () => {
   assert.equal(s.wins, 1, 'victoire en peloton conservée');
   assert.equal(s.finalsReached, 1);
 });
+
+test('computeStats : petit plateau ≤ 8 sans finale publiée → pas d’inférence', () => {
+  // U7/U9 (5-7 pilotes, que des manches) : auparavant « top 8 ⇒ finale » comptait
+  // tout le monde à 100 %.
+  const small = (rank, details) => ({
+    event: { eventId: 'e2', eventDate: '2026-05-10', eventName: 'Coupe club' },
+    account: { accountCode: 'a', accountName: 'A' },
+    cls: { className: 'U7 FILLE', perpetualClassCode: 'U7FR' },
+    totalParticipants: rank <= 7 ? 7 : 8,
+    competitor: { firstName: 'Sidonie', lastName: 'SOCIE', rank, competitorRankDetails: details },
+  });
+  const motosOnly = [
+    { phaseName: 'Moto 1', result: 4 },
+    { phaseName: 'Moto 2', result: 5 },
+    { phaseName: 'Moto 3', result: 6 },
+  ];
+  assert.equal(H.computeStats([small(6, motosOnly)]).finalsReached, 0, 'que des manches, 7 pilotes → aucune inférence');
+  assert.equal(H.computeStats([small(8, motosOnly)]).finalsReached, 0, '8 pilotes, pas de finale publiée → aucune inférence');
+});
+
+test('computeStats : petit plateau ≤ 8 mais finale publiée → comptée', () => {
+  const m = ttMatch(6);
+  m.totalParticipants = 6;
+  m.competitor.competitorRankDetails = [
+    { phaseName: 'Moto 1', result: 2 },
+    { phaseName: 'Finale', result: 6 },
+  ];
+  const s = H.computeStats([m]);
+  assert.equal(s.finalsReached, 1, 'phase Finale présente → comptée');
+});

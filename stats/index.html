@@ -2058,10 +2058,15 @@
       // Hors contre-la-montre : en TT les runs sont en solo (result=1 partout),
       // une « Super Final » n'est ni une victoire ni un podium de phase.
       const finalPh = details.find(d => isFinalPhase(d) && !isTimeTrialPhase(d));
-      if ((finalPh && finalPh.result != null) || (classified && c.rank <= 8)) {
+      // Fallback rang : top-8 ne prouve une finale que si le plateau dépassait 8
+      // coureurs. Sinon, toutes les petites classes 5-8 pilotes (U7/U9…) sans finale
+      // publiée (que des manches) apparaîtraient « 100 % finale atteinte ». Un
+      // `totalParticipants` manquant (vieilles données) = aucun indice : 0.
+      const bigField = (m.totalParticipants || 0) > 8;
+      if ((finalPh && finalPh.result != null) || (classified && c.rank <= 8 && bigField)) {
         s.finalsReached++;
       }
-      if (details.some(d => isKnockoutPhase(d) && !isTimeTrialPhase(d) && d.result != null) || classified) {
+      if (details.some(d => isKnockoutPhase(d) && !isTimeTrialPhase(d) && d.result != null) || (classified && bigField)) {
         s.finalPhasesReached++;
       }
       let hasMoto = false;
