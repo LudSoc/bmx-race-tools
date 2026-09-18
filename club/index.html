@@ -351,15 +351,24 @@ footer a:hover{text-decoration:underline}
   .ranking-table th:nth-child(2),.ranking-table td:nth-child(2){min-width:100px}
   .ranking-table th:nth-child(3),.ranking-table td:nth-child(3){min-width:60px}
 
-  /* Tableau scrollable horizontalement : liseré droit indiquant qu'on peut glisser */
+  /* Tableau scrollable horizontalement : liseré + chevron indiquant qu'on peut glisser */
   .table-card{position:relative}
   .table-card::after{
     content:''; pointer-events:none;
-    position:absolute; top:0; right:0; bottom:0; width:36px;
-    background:linear-gradient(to right, transparent, var(--card));
-    transition:opacity .2s;
+    position:absolute; top:0; right:0; bottom:0; width:56px;
+    background:linear-gradient(to right, transparent, color-mix(in srgb, var(--card) 72%, transparent) 62%, var(--card));
+    transition:opacity .25s;
   }
-  .table-card.scrolled-end::after{opacity:0}
+  .table-card::before{
+    content:'›'; pointer-events:none;
+    position:absolute; top:0; right:6px; bottom:0; z-index:1;
+    display:flex; align-items:center; font-size:22px; font-weight:900; line-height:1;
+    color:var(--accent); animation:scrNudge 1.5s ease-in-out infinite;
+  }
+  .table-card.scrolled-end::after,
+  .table-card.scrolled-end::before{opacity:0}
+  @keyframes scrNudge{0%,100%{transform:translateX(0)}50%{transform:translateX(-5px)}}
+  @media(prefers-reduced-motion: reduce){.table-card::before{animation:none}}
   #backToTop{bottom:16px; right:14px; width:40px; height:40px; font-size:18px}
 }
 @media(max-width:400px){

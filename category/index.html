@@ -403,11 +403,20 @@
     .table-scroll-wrap{position:relative; overflow:hidden}
     .table-scroll-wrap::after{
       content:''; pointer-events:none;
-      position:absolute; top:0; right:0; bottom:0; width:40px;
-      background:linear-gradient(to right, transparent, var(--card));
-      transition:opacity .2s;
+      position:absolute; top:0; right:0; bottom:0; width:56px;
+      background:linear-gradient(to right, transparent, color-mix(in srgb, var(--card) 72%, transparent) 62%, var(--card));
+      transition:opacity .25s;
     }
-    .table-scroll-wrap.scrolled-end::after{opacity:0}
+    .table-scroll-wrap::before{
+      content:'›'; pointer-events:none;
+      position:absolute; top:0; right:6px; bottom:0; z-index:4;
+      display:flex; align-items:center; font-size:22px; font-weight:900; line-height:1;
+      color:var(--accent); animation:scrNudge 1.5s ease-in-out infinite;
+    }
+    .table-scroll-wrap.scrolled-end::after,
+    .table-scroll-wrap.scrolled-end::before{opacity:0}
+    @keyframes scrNudge{0%,100%{transform:translateX(0)}50%{transform:translateX(-5px)}}
+    @media(prefers-reduced-motion: reduce){.table-scroll-wrap::before{animation:none}}
     .table-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
     .ranking-table th{top:unset}
     .ranking-table th,.ranking-table td{padding:5px 5px; white-space:nowrap}
