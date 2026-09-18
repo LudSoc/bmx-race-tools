@@ -106,6 +106,10 @@ body.has-results.scrolled .topbar .brand-row{width:100%; margin:0}
 main{max-width:1180px; margin:-80px auto 40px; padding:0 24px 32px; position:relative; z-index:2}
 body.has-results.scrolled main{margin-top:24px}
 
+/* Scroll : la recherche disparaît — sans elle la fiche club épingle
+   directement en haut (dès la bande partie), sans bande claire au-dessus. */
+body.has-results.scrolled #searchCard{display:none}
+
 /* Base components */
 .card{
   background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
