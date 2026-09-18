@@ -216,6 +216,7 @@
   .suivi-row a:hover{color:var(--accent)}
   .unfav-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;padding:2px 6px;border-radius:6px}
   .unfav-btn:hover{color:var(--accent);background:var(--card-soft)}
+  .suivis-body{display:block}
 
   /* Mobile : « Mes suivis » compacté comme le panneau « Données » (placé avant les outils) */
   @media(max-width:760px){
@@ -236,6 +237,11 @@
     .project-btn{width:100%;text-align:center;margin-top:4px}
     .status-bar{flex-wrap:wrap;gap:4px}
     .status-bar span[style]{margin-left:0 !important;flex-basis:100%}
+    .suivis .side-head{cursor:pointer}
+    .suivis .side-chev{display:inline-block}
+    .suivis .suivis-body{display:none}
+    .suivis.open .suivis-body{display:block}
+    .suivis.open .side-chev{transform:rotate(180deg)}
   }
 </style>
 </head>
@@ -557,6 +563,19 @@ BMX-Race Dashboard
   themeBtn.addEventListener('click', () => applyTheme(nextPref(currentPref())));
   applyTheme(currentPref());
   // --- Mes suivis (favoris + récents inter-outils) ---
+  // Même comportement mobile que le panneau « Données » : replié sous 520 px
+  // (en-tête + chevron), dépliable, toujours ouvert au-dessus.
+  let suivisOpenOnMobile = false;
+  function syncSuivis() {
+    const panel = document.getElementById('suivisPanel');
+    const btn = document.getElementById('suivisToggle');
+    if (!panel || !btn) return;
+    const folded = typeof window.matchMedia === 'function'
+      ? (window.matchMedia('(max-width:520px)').matches || false) : false;
+    const open = !folded || suivisOpenOnMobile;
+    panel.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
   function suiviRow(label, url, type, key) {
     const x = type && key
       ? `<button class="unfav-btn" data-unfav-type="${esc(type)}" data-unfav-key="${esc(key)}" title="Ne plus suivre" aria-label="Ne plus suivre ${esc(label)}">✕</button>`
@@ -570,21 +589,28 @@ BMX-Race Dashboard
     const clubs = readFavs('clubs');
     const recent = readRecent(3);
     if (!pilots.length && !clubs.length && !recent.length) { wrap.innerHTML = ''; return; }
-    let html = '<section class="suivis" aria-label="Mes suivis"><h2>★ Mes suivis</h2>';
+    let body = '';
     if (pilots.length) {
-      html += '<h3>Pilotes</h3>' + pilots.map(f =>
+      body += '<h3>Pilotes</h3>' + pilots.map(f =>
         suiviRow('🏃 ' + f.name, pilotUrl(f.name), 'pilots', f.key)).join('');
     }
     if (clubs.length) {
-      html += '<h3>Clubs</h3>' + clubs.map(f =>
+      body += '<h3>Clubs</h3>' + clubs.map(f =>
         suiviRow('📍 ' + f.name, clubUrl(f.key), 'clubs', f.key)).join('');
     }
     if (recent.length) {
-      html += '<h3>Récents</h3>' + recent.map(r =>
+      body += '<h3>Récents</h3>' + recent.map(r =>
         suiviRow((r.t === 'clubs' ? '📍 ' : '🏃 ') + r.n,
           r.t === 'clubs' ? clubUrl(r.k) : pilotUrl(r.n), null, null)).join('');
     }
-    wrap.innerHTML = html + '</section>';
+    wrap.innerHTML = `<section class="suivis" id="suivisPanel" aria-label="Mes suivis">
+      <button type="button" class="side-head" id="suivisToggle" aria-expanded="true">
+        <span class="side-title">★ Mes suivis</span>
+        <span class="side-chev" aria-hidden="true">▾</span>
+      </button>
+      <div class="suivis-body">${body}</div>
+    </section>`;
+    syncSuivis();
   }
 
   // --- Recherche universelle ---
@@ -685,6 +711,17 @@ BMX-Race Dashboard
     if (typeof window.addEventListener === 'function') window.addEventListener('resize', syncSide);
     syncSide();
   }
+  function initSuivisToggle() {
+    document.addEventListener('click', e => {
+      if (!e.target.closest || !e.target.closest('#suivisToggle')) return;
+      if (typeof window.matchMedia === 'function' && window.matchMedia('(max-width:520px)').matches) {
+        suivisOpenOnMobile = !suivisOpenOnMobile;
+      }
+      syncSuivis();
+    });
+    if (typeof window.addEventListener === 'function') window.addEventListener('resize', syncSuivis);
+    syncSuivis();
+  }
 
   // --- Démarrage : recherche + suivis synchrones, projets en arrière-plan ---
   document.getElementById('main').innerHTML = `
@@ -740,6 +777,7 @@ BMX-Race Dashboard
   });
   renderProjects();
   initSide();
+  initSuivisToggle();
   refreshFreshness().catch(() => {});
 
   if ('serviceWorker' in navigator) {
