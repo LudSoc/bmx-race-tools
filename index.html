@@ -664,7 +664,7 @@ BMX-Race Dashboard
         ages.push(d);
         const row = rows[i];
         if (typeof row.classList.toggle === 'function') {
-          row.classList.toggle('ok', d <= 3);
+          row.classList.toggle('ok', d <= 8);
           row.classList.toggle('stale', d > 10);
         }
         if (typeof row.querySelector === 'function') {
@@ -677,11 +677,11 @@ BMX-Race Dashboard
     const worst = ages.reduce((a, b) => Math.max(a, b), 0);
     const note = document.getElementById('sideNote');
     if (note) note.textContent = worst > 10 ? '⚠ Données à rafraîchir'
-      : worst > 3 ? 'Données un peu anciennes'
+      : worst > 8 ? 'Données un peu anciennes'
       : 'Toutes les données sont à jour';
     const dot = document.getElementById('sideDot');
     if (dot && typeof dot.classList.toggle === 'function') {
-      dot.classList.toggle('warn', worst > 3 && worst <= 10);
+      dot.classList.toggle('warn', worst > 8 && worst <= 10);
       dot.classList.toggle('stale', worst > 10);
     }
   }
