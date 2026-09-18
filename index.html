@@ -130,8 +130,12 @@
   .error-card a{color:var(--accent)}
 
   /* Layout 2 colonnes + panneau latéral « Données » */
-  .main-layout{display:grid;grid-template-columns:1fr 240px;gap:20px;align-items:start}
-  .side{position:sticky;top:16px;background:var(--card);border:1px solid var(--line);
+  .main-layout{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:20px;align-items:start;
+    grid-template-areas:"search side" "suivis side" "outils side"}
+  .search-wrap{grid-area:search}
+  #suivis{grid-area:suivis}
+  #projects{grid-area:outils}
+  .side{grid-area:side;position:sticky;top:16px;background:var(--card);border:1px solid var(--line);
     border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;font-size:11.5px}
   .side-head{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;
     padding:0;border:none;background:none;font:inherit;color:var(--ink);cursor:default;
@@ -158,8 +162,13 @@
   .stat .k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
   .side-note{font-size:10px;color:var(--muted);margin-top:10px;line-height:1.5}
   @media(max-width:760px){
-    .main-layout{grid-template-columns:1fr}
+    .main-layout{grid-template-columns:1fr;
+      grid-template-areas:"search" "suivis" "side" "outils"}
     .side{position:static}
+    .suivis{padding:14px 16px;font-size:11.5px}
+    .suivis h2{font-size:10px;letter-spacing:.7px}
+    .suivis h3{font-size:11.5px;margin:10px 0 4px}
+    .suivi-row{font-size:12px;padding:3px 0}
   }
   @media(max-width:520px){
     .side-head{cursor:pointer}
@@ -512,7 +521,6 @@ BMX-Race Dashboard
       </div>
       <div class="project-list">${TOOLS_LOCAL.map((t, i) => toolCard(t, ICON_GRADIENTS[i % 4], logos[i])).join('')}</div>
       <div class="hub-footer">
-        Outils du monorepo
         <a href="https://github.com/${GH_USER}/bmx-race-tools" target="_blank" rel="noopener">github.com/${GH_USER}/bmx-race-tools</a>
         · Projet communautaire non officiel, non affilié à Sqorz
       </div>
@@ -677,14 +685,11 @@ BMX-Race Dashboard
   // --- Démarrage : recherche + suivis synchrones, projets en arrière-plan ---
   document.getElementById('main').innerHTML = `
     <div class="main-layout">
-      <div class="center">
-        <div class="search-wrap">
-          <input id="hubSearch" type="text" placeholder="Pilote, club, ou « Dupont vs Martin »…" autocomplete="off" aria-label="Recherche universelle">
-          <div class="search-results" id="hubSearchResults" role="listbox" hidden></div>
-        </div>
-        <div id="suivis"></div>
-        <div id="projects"></div>
+      <div class="search-wrap">
+        <input id="hubSearch" type="text" placeholder="Pilote, club, ou « Dupont vs Martin »…" autocomplete="off" aria-label="Recherche universelle">
+        <div class="search-results" id="hubSearchResults" role="listbox" hidden></div>
       </div>
+      <div id="suivis"></div>
       <aside class="side" aria-label="Données en un coup d'œil" id="sidePanel">
         <button type="button" class="side-head" id="sideToggle" aria-expanded="true">
           <span class="side-title"><span class="side-dot" id="sideDot"></span> Données</span>
@@ -705,6 +710,7 @@ BMX-Race Dashboard
           <div class="side-note" id="sideNote">Chargement…</div>
         </div>
       </aside>
+      <div id="projects"></div>
     </div>
   `;
   renderSuivis();
