@@ -1295,8 +1295,6 @@ footer a:hover{text-decoration:underline}
     const eventCount  = getCoveredEventIds(pilots);
     const finaleEntries = countFinaleEntries(pilots);
     const finaleRate    = totalParts > 0 ? Math.round(100 * finaleEntries / totalParts) : 0;
-    const catsData      = buildCatsData(pilotsAll);
-    const bestCat       = [...catsData].sort((a, b) => b.wins - a.wins || b.podiums - a.podiums)[0] || null;
     const yearlyStats   = buildYearlyStats();
 
     // Années disponibles (depuis la map, pas filtrées)
@@ -1316,7 +1314,6 @@ footer a:hover{text-decoration:underline}
           <div class="club-kpi mint"><div class="k">Vainqueurs</div><div class="v">${pilots.filter(p => p.stats.wins > 0).length}</div><div class="kpi-sub">pilotes différents</div></div>
           <div class="club-kpi teal"><div class="k">Événements</div><div class="v">${eventCount}</div></div>
           <div class="club-kpi lime"><div class="k">Taux de finale</div><div class="v">${finaleRate}%</div><div class="kpi-sub">${finaleEntries} / ${totalParts}</div></div>
-          <div class="club-kpi lavender"><div class="k">Top catégorie</div><div class="v" style="font-size:16px;line-height:1.3">${bestCat ? escape(bestCat.label) : '—'}</div><div class="kpi-sub">${bestCat ? bestCat.wins + ' victoire' + (bestCat.wins !== 1 ? 's' : '') : ''}</div></div>
         </div>
       </div>`;
 
