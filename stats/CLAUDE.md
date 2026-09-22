@@ -284,6 +284,14 @@ Structure interne : tableau de pilotes avec leurs participations à des événem
 
 Pour regénérer : `node build-index.js` (fait toutes les requêtes API région → orgs → events).
 
+### Chaîne de fraîcheur hebdomadaire (à connaître avant de toucher)
+
+1. **Lundi ≈09h UTC** — cron `build-index.yml` du dépôt `bmx-race-stats` (fork local `../../sqorz_stats`) régénère les index (Sqorz + UEC/JSTiming + Coupe du monde UCI) et les forces de plateau, **publie les JSON sur R2** (`R2_BASE`) et committe les `<index>.meta.json` dans `bmx-race-stats@main`.
+2. **Lundi 11h30 UTC** — workflow `sync-index-metas.yml` de **ce** dépôt (`.github/workflows/`) copie les 6 metas (`pilots-index`, `uci-index`, `uec-index`, `uci-worldcup-index`, `field-strength-fr`, `field-strength-uec` → `stats/*.meta.json`) depuis `bmx-race-stats@main` et pousse sur `main` → déploiement GitHub Pages.
+3. Côté client, `common.js::loadIndexCached` lit d'abord ce **meta même-origine** (`metaUrl: './pilots-index.meta.json'`) : son `index.sha256` sert de **pointeur de version** pour invalider le cache `Cache API` (`bmx-index-v1`). Si le meta n'avance pas, l'app sert la copie en cache de l'index — données figées (symptôme « les données ne se mettent plus à jour le lundi »). Vérifier alors `generated` dans `stats/*.meta.json` (site) vs celles de R2/`bmx-race-stats`.
+
+⚠️ `perf-rankings.json` (outil `ranking/`) n'est **pas** couvert par ce cron : il est régénéré à la main (`sqorz_stats/tools/build-perf-rankings.cjs`) puis recopié via `club/tools/sync-data.sh` — à rafraîchir séparément.
+
 ## Index UCI (`uci-index.json`)
 
 Fichier séparé (≈2,8 Mo) généré par le même `build-index.js` à partir de la région `UCI` (orga `ucibmxworlds` — « UCI BMX Racing »). Chargé par l'app en parallèle de l'index FR ; s'il est absent, l'app fonctionne sans la partie UCI.

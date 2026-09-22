@@ -1,0 +1,47 @@
+name: Sync index metas
+
+# Re-synchronise les metas d'index (stats/, générés chaque lundi par le cron
+# « Build pilots index » du dépôt bmx-race-stats) vers ce dépôt qui héberge le
+# site. Ces metas sont le pointeur de fraîcheur du cache client (sha256 attendu) :
+# sans mise à jour, le client garde l'index en cache et sert des données périmées.
+
+on:
+  schedule:
+    - cron: '30 11 * * 1' # chaque lundi 11h30 UTC, après le cron de données (≈09h)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Télécharger les metas depuis bmx-race-stats (main)
+        run: |
+          FILES="pilots-index uci-index uec-index uci-worldcup-index field-strength-fr field-strength-uec"
+          for b in $FILES; do
+            for attempt in 1 2 3; do
+              if curl -fsSL --retry 2 \
+                "https://raw.githubusercontent.com/LudSoc/bmx-race-stats/main/${b}.meta.json" \
+                -o "stats/${b}.meta.json"; then
+                break
+              fi
+              sleep 5
+            done
+          done
+
+      - name: Vérifier les changements
+        run: |
+          git add stats/*.meta.json
+          if git diff --cached --quiet; then
+            echo "Aucun changement de meta — rien à commiter."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "stats: synchronisation des metas d'index (cron hebdo)"
+          git push
+          echo "Metas mises à jour et publiées."
