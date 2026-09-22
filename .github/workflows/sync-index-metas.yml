@@ -32,16 +32,26 @@ jobs:
               sleep 5
             done
           done
+          # Classement perf (indice hebdo) → outil ranking/ : même dépôt source,
+          # même cadence (lundi). Fichier ~770 Ko, notable via git.
+          for attempt in 1 2 3; do
+            if curl -fsSL --retry 2 \
+              "https://raw.githubusercontent.com/LudSoc/bmx-race-stats/main/perf-rankings.json" \
+              -o "ranking/perf-rankings.json"; then
+              break
+            fi
+            sleep 5
+          done
 
       - name: Vérifier les changements
         run: |
-          git add stats/*.meta.json
+          git add stats/*.meta.json ranking/perf-rankings.json
           if git diff --cached --quiet; then
             echo "Aucun changement de meta — rien à commiter."
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "stats: synchronisation des metas d'index (cron hebdo)"
+          git commit -m "stats, ranking: synchronisation metas d'index + classement perf (cron hebdo)"
           git push
-          echo "Metas mises à jour et publiées."
+          echo "Metas et classement mis à jour et publiés."
