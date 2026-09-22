@@ -1377,6 +1377,21 @@
   const RESULTS_CACHE_KEY = 'bmxResultsCacheV' + RESULTS_CACHE_VERSION;
   const RESULTS_CACHE_TTL = 6 * 60 * 60 * 1000; // 6h
 
+  // Meta de l'index de données chargé (sha + generated) : le cache des résultats de
+  // recherche est TAGGUÉ avec cette version. Si l'index a été régénéré depuis la
+  // sauvegarde du cache (sha différent / generated plus récent), le cache est ignoré
+  // et la recherche est rejouée sur l'index frais — sinon on sert les courses périmées
+  // dans la timeline malgré le re-téléchargement de l'index (bug D-note 2026-09-22).
+  let INDEX_SOURCE = null; // { sha256, generated } — lu après chargement de l'index
+  async function readIndexMeta() {
+    try {
+      const r = await fetch('./pilots-index.meta.json', { cache: 'no-cache' });
+      if (!r.ok) return null;
+      const m = await r.json();
+      return { sha256: (m && m.index && m.index.sha256) || null, generated: (m && m.generated) || '' };
+    } catch { return null; }
+  }
+
   function slimMatch(m) {
     return {
       account: { accountCode: m.account.accountCode, accountName: m.account.accountName },
@@ -1410,6 +1425,8 @@
       const payload = JSON.stringify({
         cacheKey: resultsCacheKey(query),
         timestamp: Date.now(),
+        indexSha: (INDEX_SOURCE && INDEX_SOURCE.sha256) || null,
+        indexGenerated: (INDEX_SOURCE && INDEX_SOURCE.generated) || '',
         matches: matches.map(slimMatch),
         seriesMatches: seriesMatches.map(slimSeriesMatch),
         uciMatches: (uciMatches || []).map(slimMatch),
@@ -3978,12 +3995,19 @@
   (async function init() {
     const initState = parseUrlState();
     await loadPilotsIndex();
+    INDEX_SOURCE = await readIndexMeta();
     renderRecentSearches();
     const state = initState;
     if (state.name) {
       applyStateToUi(state);
       const cached = loadResultsCache(norm(state.name));
-      if (cached) {
+      // Cache de résultats utilisable seulement s'il a été sauvé contre le même
+      // index que celui chargé (même sha) ou, à défaut, pas avant la génération de
+      // l'index courant. Sans INDEX_SOURCE (hors-ligne), on garde l'ancien cache.
+      const cacheValid = !!cached && (!INDEX_SOURCE
+        ? true
+        : cached.indexSha === INDEX_SOURCE.sha256 || (cached.indexGenerated && cached.indexGenerated >= INDEX_SOURCE.generated));
+      if (cacheValid) {
         lastMatches = cached.matches;
         lastSeriesMatches = cached.seriesMatches;
         lastUciMatches = cached.uciMatches || [];
