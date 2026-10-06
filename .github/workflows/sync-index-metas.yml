@@ -54,10 +54,23 @@ jobs:
             fi
             sleep 5
           done
+          # LRP (Liste des Riders Potentiels, catégories canoniques) : réduite et
+          # filtrée par la liste d'exclusion côté bmx-race-stats (reduce-lrp.cjs),
+          # copiée ici au lieu d'un transfert manuel. Publiée par le site dans
+          # stats/ — consommée par stats/index.html (loadLrpLevels). Changements
+          # rares (réimport FFC ou exclusion) → commit seulement si différent.
+          for attempt in 1 2 3; do
+            if curl -fsSL --retry 2 \
+              "https://raw.githubusercontent.com/LudSoc/bmx-race-stats/main/pilots-lrp-2026.json" \
+              -o "stats/pilots-lrp-2026.json"; then
+              break
+            fi
+            sleep 5
+          done
 
       - name: Vérifier les changements
         run: |
-          git add stats/*.meta.json ranking/perf-rankings.json stats/hub-search.json
+          git add stats/*.meta.json ranking/perf-rankings.json stats/hub-search.json stats/pilots-lrp-2026.json
           if git diff --cached --quiet; then
             echo "Aucun changement de meta — rien à commiter."
             exit 0
