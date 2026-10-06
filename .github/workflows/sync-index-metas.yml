@@ -42,10 +42,22 @@ jobs:
             fi
             sleep 5
           done
+          # Mini-index de recherche du hub (tous les pilotes + clubs) : liste de
+          # TOUS les noms republiés → doit suivre le cron, sinon il conserve les
+          # pilotes retirés des index (exclusions RGPD). Pas de .meta.json : le
+          # panneau « Données » du hub ne liste que les 4 index de compétition.
+          for attempt in 1 2 3; do
+            if curl -fsSL --retry 2 \
+              "https://raw.githubusercontent.com/LudSoc/bmx-race-stats/main/hub-search.json" \
+              -o "stats/hub-search.json"; then
+              break
+            fi
+            sleep 5
+          done
 
       - name: Vérifier les changements
         run: |
-          git add stats/*.meta.json ranking/perf-rankings.json
+          git add stats/*.meta.json ranking/perf-rankings.json stats/hub-search.json
           if git diff --cached --quiet; then
             echo "Aucun changement de meta — rien à commiter."
             exit 0
