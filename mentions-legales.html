@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%234a7ab5'/><text x='16' y='23' font-family='system-ui' font-size='20' font-weight='800' fill='white' text-anchor='middle'>S</text></svg>">
+<script>
+  (() => {
+    const saved = localStorage.getItem('theme');
+    const isDark = saved === 'dark' ||
+      (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('dark', isDark);
+    if (saved) document.documentElement.dataset.themePref = saved;
+  })();
+</script>
+<title>Mentions légales · BMX-Race Dashboard</title>
+<meta name="description" content="Mentions légales et politique de confidentialité du site BMX-Race Dashboard (outils de statistiques BMX Race).">
+<link rel="stylesheet" href="./theme.css">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;padding:32px 20px 64px}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:8px}
+  h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 28px}
+  nav.back{display:inline-block;margin-bottom:24px;padding:9px 16px;background:var(--card);border:1px solid var(--line-strong);border-radius:10px;color:var(--accent);font-size:14px;font-weight:600;text-decoration:none}
+  nav.back:hover{background:var(--card-soft);border-color:var(--accent)}
+  section{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;margin-bottom:16px;box-shadow:var(--shadow)}
+  h2{font-size:17px;font-weight:800;margin:0 0 12px;letter-spacing:-.01em}
+  h3{font-size:14px;font-weight:700;margin:18px 0 6px;color:var(--ink-2)}
+  p{margin:0 0 12px;font-size:14.5px}
+  ul{margin:0 0 12px;padding-left:22px;font-size:14.5px}
+  li{margin-bottom:6px}
+  li:last-child{margin-bottom:0}
+  a{color:var(--accent)}
+  a:hover{color:var(--accent-hi)}
+  .tag{display:inline-block;padding:1px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent-hi);font-size:12px;font-weight:600;vertical-align:1px}
+  table{width:100%;border-collapse:collapse;margin:0 0 12px;font-size:14px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{width:34%;color:var(--ink-2);font-weight:700}
+  .placeholder{background:var(--accent-soft);color:var(--accent-hi);border-radius:5px;padding:0 5px;font-weight:600}
+  .note{background:var(--card-soft);border-left:3px solid var(--accent);border-radius:8px;padding:12px 14px;font-size:13.5px;color:var(--ink-2)}
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:13px}
+  footer a{color:var(--accent)}
+  @media print{.wrap{max-width:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>Mentions légales</h1>
+  </header>
+  <p class="sub">Dernière mise à jour : 05/10/2026 — Site BMX-Race Dashboard (outils de statistiques BMX Race).</p>
+
+  <nav><a class="back" href="./">← Retour à l'accueil</a></nav>
+
+  <!-- ================= ÉDITEUR ================= -->
+  <section id="editeur">
+    <h2>1. Éditeur du site</h2>
+    <table>
+      <tr><th>Nom</th><td>Socié</td></tr>
+      <tr><th>Prénom</th><td>Ludovic</td></tr>
+      <tr><th>Qualité</th><td>Particulier — projet personnel et non commercial</td></tr>
+      <tr><th>Courriel</th><td><a href="mailto:ludovic.socie@gmail.com">ludovic.socie@gmail.com</a></td></tr>
+      <tr><th>Directeur de la publication</th><td>Ludovic Socié</td></tr>
+    </table>
+    <p class="note">Modèle à faire valider par un professionnel du droit avant diffusion publique : ces mentions ne constituent pas un avis juridique.</p>
+  </section>
+
+  <!-- ================= HÉBERGEURS ================= -->
+  <section id="hebergeurs">
+    <h2>2. Hébergeurs</h2>
+    <p>Le site est un site statique hébergé par des prestataires situés <strong>hors Union européenne</strong>. Les données personnelles sont donc transmises et stockées aux États-Unis :</p>
+    <ul>
+      <li><strong>GitHub, Inc.</strong> (hébergement du site via GitHub Pages) — 88 Colin P Kelly Jr St, San Francisco, CA 94107, États-Unis. Responsable du traitement : Microsoft Corp. Le contrat de protection des données (DPA) et les clauses contractuelles types (SCC) de Microsoft sont publiés et s'appliquent à l'hébergement.</li>
+      <li><strong>Cloudflare, Inc.</strong> (stockage objet des fichiers de données et cache réseau) — 101 Townsend St, San Francisco, CA 94107, États-Unis. DPA et SCC publiés par Cloudflare et applicables au traitement ; ils peuvent être consultés sur le site de Cloudflare ou transmis sur demande.</li>
+    </ul>
+    <p>Ces deux prestataires sont les seuls destinataires hors UE : aucun autre transfert vers un pays tiers n'est réalisé. Les transferts reposent sur les garanties contractuelles des fournisseurs (DPA + SCC) ; ils n'ont pas fait l'objet d'une analyse d'impact de transfert distincte, l'activité étant un site statique public dont les données proviennent de sources déjà publiques.</p>
+  </section>
+
+  <!-- ================= DONNÉES PERSONNELLES ================= -->
+  <section id="donnees">
+    <h2>3. Données personnelles</h2>
+
+    <h3>Responsable du traitement</h3>
+    <p>Ludovic Socié, joignable à <a href="mailto:ludovic.socie@gmail.com">ludovic.socie@gmail.com</a>, est responsable des traitements décrits ci-dessous, au sens de l'article 4.7 du RGPD.</p>
+
+    <h3>Données concernant des mineurs</h3>
+    <p>Les compétitions BMX comportent des catégories d'enfants et d'adolescents. Les données publiées concernant des mineurs sont strictement identiques à celles des adultes : nom, club, catégorie, âge déclaré, résultats et temps. Elles proviennent exclusivement des résultats officiels publiés par les fédérations et les organisateurs, et sont nécessaires à l'information sportive du public.</p>
+    <p>Les mineurs et leurs représentants peuvent à tout moment demander l'<strong>effacement</strong> ou l'<strong>opposition</strong> selon la procédure décrite ci-dessous : la demande est appliquée dès la régénération suivante des index, sans condition.</p>
+
+    <h3>Finalités et base légale</h3>
+    <p>Les seules finalités sont la <strong>recherche, l'affichage et la comparaison de résultats de compétitions de BMX Racing</strong> publiés par les plateformes sources (voir §5). Ces traitements reposent sur <strong>l'intérêt légitime</strong> du responsable à rendre accessibles des résultats sportifs publics (art. 6.1.f du RGPD), après mise en balance avec les droits et libertés des personnes concernées, notamment les mineurs (art. 8 du RGPD).</p>
+
+    <h3>Données traitées</h3>
+    <ul>
+      <li><strong>Identité publique des concurrents</strong> : prénom, nom (tels que déclarés par l'organisateur).</li>
+      <li><strong> Affiliation</strong> : club / organisation (nom ou code pays pour les compétitions internationales).</li>
+      <li><strong>Données de compétition</strong> : catégorie, numéro de plaque, âge déclaré, classements et résultats par manche/phase, temps de course le cas échéant, noms et dates des compétitions, points de championnat.</li>
+      <li><strong>Niveau national / régional</strong> : provenant d'une liste nominative publiée par la Fédération Française de Cyclisme (LRP — liste des riders potentiels). Seuls le prénom, le nom et la catégorie sont repris, pour afficher un niveau de pratique. Les autres champs de cette liste — dont le numéro de licence, l'âge, le sexe et le club — ne sont pas repris et ne sont pas publiés.</li>
+      <li><strong>Données calculées</strong> : indice de performance « 🏅 » (moyennes de rangs pondérés, forces de plateau, temps de course, shrinkage), différencié de toute décision à portée juridique.</li>
+    </ul>
+    <p><strong>Aucune</strong> donnée dite « sensible » (santé, opinions, convictions, orientation sexuelle, données biométriques) n'est collectée ni publiée. <strong>Aucune photographie, aucune coordonnée (adresse, téléphone, adresse électronique), aucun numéro de licence</strong> n'est exploité. Aucune donnée n'est utilisée à des fins de profilage, de publicité, de prospection ou de filtrage.</p>
+
+    <h3>Destinataires</h3>
+    <p>Destinataires : les prestataires d'hébergement listés au §2 (hébergeur et stockage), et les visiteurs du site, ces données étant par nature publiques. Aucune donnée n'est vendue, louée ou cédée à des tiers.</p>
+
+    <h3>Durées de conservation</h3>
+    <p>Les index de données sont <strong>régénérés chaque semaine</strong> : la durée de conservation est alignée sur celle des sources, sans conservation supplémentaire.</p>
+    <table>
+      <tr><th>Données de compétition (nom, club, âge, résultats, temps, points)</th>
+          <td>Republiées tant qu'elles figurent dans les sources, puis archivées. <strong>La nécessité de cette conservation est réévaluée au moins tous les 3 ans.</strong> Aucune durée fixe n'est appliquée : l'historique sportif public est la finalité même du service.</td></tr>
+      <tr><th>Liste d'exclusion (opposition, erreurs d'attribution)</th>
+          <td><strong>Conservée sans limite de durée</strong>, tant que la personne concernée est identifiée. <strong>Le registre des oppositions n'est pas public</strong> : il ne contient aucun nom, seulement une empreinte numérique (HMAC-SHA256) calculée à partir du nom et d'une clé secrète detenue hors du dépôt ; sans cette clé, il est illisible — y compris pour un tiers qui tenterait de retrouver un nom parmi les 17 000 noms déjà publics dans les index. Le motif et la date de la demande sont conservés à titre de traçabilité. Une exclusion ne peut être retirée de la liste sans risque de réapparition du pilote à la régénération suivante : c'est ce qui rend l'effacement réellement opposable dans le temps.</td></tr>
+      <tr><th>Preuve d'une demande (droit d'accès, opposition, effacement)</th>
+          <td><strong>3 ans</strong> à compter du dernier échange, afin de pouvoir démontrer le traitement de la demande.</td></tr>
+      <tr><th>Favoris, recherches récentes, thème d'affichage</th>
+          <td>Stockés <strong>uniquement dans votre navigateur</strong>, jamais transmis au serveur ni à un tiers. Effaçables à tout moment par la suppression des données de site de votre navigateur, ou par la suppression de vos favoris dans l'application.</td></tr>
+      <tr><th>Cache technique des résultats de recherche</th>
+          <td><strong>6 heures</strong>, dans le navigateur uniquement. Invalidé dès qu'un nouvel index est publié.</td></tr>
+      <tr><th>Journaux techniques des hébergeurs</th>
+          <td><strong>12 mois maximum</strong>, selon les conditions propres à GitHub et Cloudflare. Hors du contrôle du responsable.</td></tr>
+    </table>
+
+    <h3>Effacement et opposition : comment c'est mis en œuvre</h3>
+    <p>Les demandes d'<strong>effacement</strong> (art. 17) et d'<strong>opposition</strong> (art. 21) sont traitées au niveau de la génération des index, et non manuellement :</p>
+    <ul>
+      <li>Le pilote concerné est inscrit dans une <strong>liste d'exclusion</strong> (identité, motif et date de la demande).</li>
+      <li>Cette liste est appliquée <strong>automatiquement à chaque génération d'index</strong> — événements, colonnes de résultats, classements de championnat, classements européens et coupe du monde. Le pilote est retiré de l'ensemble des fichiers publiés, ainsi que des classements et indices qui en sont dérivés.</li>
+      <li>En cas d'<strong>homonymie</strong> (deux pilotes distincts portant le même nom), la demande peut être restreinte à une seule organisation ou à une période, afin de ne pas retirer les résultats de l'homonyme.</li>
+      <li>Les fichiers étant réémis chaque semaine, <strong>l'effet est définitif</strong> : le pilote ne réapparaît pas lors des régénérations ultérieures.</li>
+    </ul>
+    <p class="note">Les corrections portant sur les <strong>données d'origine</strong> (prénom, nom, club déclarés par l'organisateur) doivent être demandées à la plateforme source, qui reste l'éditeur de ces données : voir le §4.</p>
+
+    <h3>Vos droits</h3>
+    <p>Vous disposez des droits d'<strong>accès</strong>, de <strong>rectification</strong>, d'<strong>effacement</strong>, de <strong>limitation</strong>, d'<strong>opposition</strong> (y compris pour motif légitime) et de <strong>portabilité</strong> (art. 15 à 22 du RGPD).</p>
+    <ul>
+      <li>Pour exercer vos droits : courriel à <a href="mailto:ludovic.socie@gmail.com">ludovic.socie@gmail.com</a>, en précisant l'(s) compétition(s) ou le(s) pilote(s) concerné(s) et vos coordonnées. Une réponse est apportée dans un délai d'un mois.</li>
+      <li>Un droit d'accès ou de portabilité sur une personne identifiée suppose de pouvoir la désigner sans ambiguïté : indiquez la compétition et la date, ou la classe et le numéro de plaque.</li>
+      <li>Pour un mineur représenté par un titulaire de l'autorité parentale : la même démarche s'applique.</li>
+      <li>Réclamation possible auprès de la <strong>CNIL</strong> — 3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07 — ou via <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">www.cnil.fr</a>.</li>
+    </ul>
+  </section>
+
+  <!-- ================= REGISTRE ================= -->
+  <section id="registre">
+    <h2>4. Registre des traitements</h2>
+    <p>Le registre des traitements prévus par l'article 30 du RGPD est tenu ci-dessous. Chaque ligne décrit un traitement ; il est mis à jour à chaque évolution du site.</p>
+    <table>
+      <tr><th>Finalité</th>
+          <td>Recherche, affichage, comparaison et mise en forme de résultats de compétitions de BMX Racing.</td></tr>
+      <tr><th>Base légale</th>
+          <td>Intérêt légitime du responsable (art. 6.1.f), après mise en balance avec les droits des personnes concernées, notamment les mineurs (art. 8).</td></tr>
+      <tr><th>Catégories de données</th>
+          <td>Données d'identification publique (prénom, nom), affiliation, données de compétition (catégorie, numéro de plaque, âge déclaré, classements, temps, points), données calculées (indice de performance). Aucune coordonnée, aucune photographie, aucune donnée sensible.</td></tr>
+      <tr><th>Destinataires</th>
+          <td>GitHub, Inc. (hébergement) et Cloudflare, Inc. (stockage et cache), Visiteurs du site.</td></tr>
+      <tr><th>Transferts hors UE</th>
+          <td>Oui — États-Unis, encadrés par les DPA et clauses contractuelles types des fournisseurs (voir §2).</td></tr>
+      <tr><th>Durées de conservation</th>
+          <td>Alignées sur les sources pour les données de compétition, sans limite pour la liste d'exclusion, 3 ans pour la preuve d'une demande, 6 heures pour le cache navigateur. Tableau détaillé au §3.</td></tr>
+      <tr><th>Mesures de sécurité</th>
+          <td>Site statique sans authentification ni base de données applicative ; code et données de compilation versionnés dans des dépôts Git et publiés en lecture seule via GitHub Pages ; secrets d'accès au stockage objet conservés hors des dépôts, dans les secrets du fournisseur.</td></tr>
+    </table>
+    <p class="note">Ce registre est tenu conformément à l'article 30 du RGPD : il ne comporte aucune donnée personnelle et ne permet pas d'identifier une personne. Il est détenu par Ludovic Socié, joignable à <a href="mailto:ludovic.socie@gmail.com">ludovic.socie@gmail.com</a>.</p>
+  </section>
+
+  <!-- ================= SOURCES ================= -->
+  <section id="sources">
+    <h2>5. Origine et fiabilité des données</h2>
+    <p>Les données proviennent exclusivement de sources publiques :</p>
+    <ul>
+      <li><a href="https://our.sqorz.com/orgs" target="_blank" rel="noopener noreferrer">Sqorz</a> — compétitions nationales et Mondiaux UCI en France ;</li>
+      <li><a href="https://www.jstiming.nl" target="_blank" rel="noopener noreferrer">JSTiming</a> — compétitions européennes (UEC) ;</li>
+      <li><a href="https://www.uci.org" target="_blank" rel="noopener noreferrer">UCI</a> — Coupe du monde BMX Racing.</li>
+    </ul>
+    <p>Les noms, clubs, âges et résultats sont repris <strong>tels que déclarés par les organisateurs</strong>. Aucune reprise de données n'a lieu en amont : en cas d'erreur, la demande de rectification doit être adressée à la plateforme source, qui reste l'éditeur des données d'origine. Les ordres de grandeur et la méthode de calcul de l'indice de performance sont indiqués dans chaque application (encadré « ℹ️ Comment est-il calculé ? »).</p>
+  </section>
+
+  <!-- ================= COOKIES ================= -->
+  <section id="cookies">
+    <h2>6. Cookies et traceurs</h2>
+    <p>Le site n'<strong>utilise aucun cookie</strong>, aucun traceur publicitaire, aucun outil de mesure d'audience et aucun service tiers de statistiques. Aucun bandeau de consentement n'est donc nécessaire.</p>
+    <p>Le seul stockage côté navigateur est le <strong>stockage local</strong> (<code>localStorage</code>) de votre thème d'affichage, de vos pilotes favoris et de vos recherches récentes. Ces éléments restent sur votre appareil, ne sont jamais envoyés à un serveur et sont supprimés en effaçant les données de site de votre navigateur.</p>
+  </section>
+
+  <!-- ================= IP ================= -->
+  <section id="propriete">
+    <h2>7. Propriété intellectuelle</h2>
+    <p>Les éléments de mise en page, les textes et le code des applications de ce site sont la propriété de l'éditeur. Toute reproduction ou représentation, totale ou partielle, sans autorisation écrite préalable est interdite. Les données de compétition appartiennent à leurs titulaires respectifs ; aucune revendication de propriété n'est formulée sur ces données.</p>
+  </section>
+
+  <!-- ================= CONTACT ================= -->
+  <section id="contact">
+    <h2>8. Analyse d’impact relative à la protection des données (art. 35 RGPD)</h2>
+    <p>Pour toute question relative au site, à ses données ou à l'exercice de vos droits : <a href="mailto:ludovic.socie@gmail.com">ludovic.socie@gmail.com</a>.</p>
+  <section>
+    <h2>9. Contact</h2>
+    <p>Pour toute question relative aux présentes mentions légales, vous pouvez vous adresser à : <strong>Ludovic Socié — ludovic.socie@gmail.com</strong>. Aucune autre information de contact (adresse physique, numéro de téléphone) n'est collectée ou publiée.</p>
+  </section>
+
+  <footer>
+    <p>© <span id="year">2026</span> Ludovic Socié — BMX-Race Dashboard.<br>
+      <a href="./mentions-legales.html">Mentions légales</a> · <a href="./">Accueil</a></p>
+  </footer>
+
+</div>
+<script>document.getElementById('year').textContent = String(new Date().getFullYear());</script>
+</body>
+</html>
