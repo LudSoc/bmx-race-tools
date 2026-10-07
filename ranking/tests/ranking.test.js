@@ -28,13 +28,14 @@ const harness = [
   block('function matchNiveau(status, sel) {'),
   block('function pilotAge(r, seasonYear) {'),
   block('function matchPilotAge(a, sel) {'),
+  block('function ageOptionLabel(sel, seasonYear) {'),
   block('function pilotSuggestions(rows, q, limit = 8) {'),
   block('function locateHits(rows, q) {'),
   block('function applyFilters(rows, f) {'),
   block('function stdRanks(rows) {'),
   block('function rankFmt(n) {'),
   block('function trendLabel(t) {'),
-].join('\n') + '\nreturn { norm, normStr, clubKey, isoFr, catSexe, isCruiserCat, catInfo, pilotLevel, pilotStatus, lrpStatus, matchNiveau, pilotAge, matchPilotAge, pilotSuggestions, locateHits, applyFilters, stdRanks, rankFmt, trendLabel };';
+].join('\n') + '\nreturn { norm, normStr, clubKey, isoFr, catSexe, isCruiserCat, catInfo, pilotLevel, pilotStatus, lrpStatus, matchNiveau, pilotAge, matchPilotAge, ageOptionLabel, pilotSuggestions, locateHits, applyFilters, stdRanks, rankFmt, trendLabel };';
 const H = new Function(harness)();
 const H2src = [
   block('function catSexe(code, label) {'),
@@ -212,9 +213,11 @@ test('applyFilters : niveau (élite / national / ni national ni élite)', () => 
 });
 
 test('pilotLevel sur données réelles : volumes élite/national plausibles', t => {
-  const refPath = path.join(__dirname, '..', '..', 'sqorz_stats', 'categories-ref.json');
-  if (!fs.existsSync(refPath)) {
-    t.skip('sqorz_stats/categories-ref.json absent (repo local uniquement)');
+  // Référentiel local au monorepo (bmx-race-tools/stats), repli sur le repo sœur sqorz_stats.
+  const refPath = [path.join(__dirname, '..', '..', 'stats', 'categories-ref.json'),
+    path.join(__dirname, '..', '..', '..', 'sqorz_stats', 'categories-ref.json')].find(fs.existsSync);
+  if (!refPath) {
+    t.skip('categories-ref.json absent (repo local uniquement)');
     return;
   }
   const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
@@ -271,10 +274,12 @@ test('matchNiveau : none = ni national ni élite', () => {
   assert.equal(H.matchNiveau('', 'none'), true);
 });
 
-test('statut LRP sur données réelles : volumes + partition de la liste (nécessite sqorz_stats)', t => {
-  const lrpPath = path.join(__dirname, '..', '..', 'sqorz_stats', 'pilots-lrp-2026.json');
-  if (!fs.existsSync(lrpPath)) {
-    t.skip('sqorz_stats/pilots-lrp-2026.json absent (repo local uniquement)');
+test('statut LRP sur données réelles : volumes + partition de la liste', t => {
+  // Liste LRP locale au monorepo (bmx-race-tools/stats), repli sur le repo sœur sqorz_stats.
+  const lrpPath = [path.join(__dirname, '..', '..', 'stats', 'pilots-lrp-2026.json'),
+    path.join(__dirname, '..', '..', '..', 'sqorz_stats', 'pilots-lrp-2026.json')].find(fs.existsSync);
+  if (!lrpPath) {
+    t.skip('pilots-lrp-2026.json absent (repo local uniquement)');
     return;
   }
   const lrpArr = JSON.parse(fs.readFileSync(lrpPath, 'utf8'));
@@ -374,7 +379,7 @@ test('applyFilters : âge réel par année', () => {
   const n8 = H.applyFilters(j.rows, { ...base, min: 5, age: '8' }).length;
   const n11 = H.applyFilters(j.rows, { ...base, min: 5, age: '11' }).length;
   const n1724 = H.applyFilters(j.rows, { ...base, min: 5, age: '17-24' }).length;
-  assert.ok(n6 > 120 && n6 < 260, `6- plausible (${n6})`);
+  assert.ok(n6 > 200 && n6 < 350, `6- plausible (${n6})`);
   assert.ok(n8 > 320 && n8 < 500, `8 ans plausible (${n8})`);
   assert.ok(n11 > 350 && n11 < 550, `11 ans plausible (${n11})`);
   assert.ok(n1724 > 800 && n1724 < 1500, `17-24 plausible (${n1724})`);
@@ -443,11 +448,34 @@ test('pool français : club FR réel, mais toutes les courses comptent', () => {
   const base = { q: '', cat: '', clubQ: '', min: 3, sexe: '', age: '', seasonYear: sy, favKeys: null, clubNameOf: () => '', catInfoOf: infoOf };
   const ragot = j.rows.find(r => r.n === 'Mathis RAGOT RICHARD');
   assert.ok(ragot, 'Ragot présent');
-  assert.equal(ragot.e, 29, '12 FR + 11 UEC + 6 Coupe du monde fusionnés');
+  assert.equal(ragot.e, 24, 'FR + UEC + Coupe du monde fusionnés (fenêtre glissante : 29 puis 24 au fil des rebuilds)');
   assert.ok(ragot.score > 800 && ragot.score < 900, `WC dilue (mid-pack mondial) : ${ragot.score}`);
   for (const absent of ['Jules KASPER', 'Evi BLOK', 'James CLITHEROE']) {
     assert.ok(!j.rows.some(r => r.n === absent), `étranger exclu (${absent})`);
   }
   assert.ok(j.rows.every(r => r.club), 'club toujours renseigné (pool = club FR)');
   assert.ok(H.applyFilters(j.rows, { ...base, min: 5, sexe: 'H', age: '28' }).some(r => r.n === 'Mathis RAGOT RICHARD'), 'Ragot (1998) : 28 ans');
+});
+
+test('UI : plus aucune référence à l\'âge affichée (colonne « Année naiss. », filtre « Année de naissance »)', () => {
+  assert.ok(src.includes('>Année naiss.</th>'), 'en-tête de colonne = Année naiss.');
+  assert.ok(src.includes('<label for="ageSel">Année de naissance</label>'), 'libellé du filtre = Année de naissance');
+  assert.ok(!src.includes('>Âge</th>'), 'aucun en-tête « Âge »');
+  assert.ok(!src.includes('>Âge<'), 'aucun libellé « Âge » affiché');
+  assert.ok(!src.includes('ans</span>'), 'plus de suffixe « ans » dans les cellules');
+  assert.ok(/ageCell = r\.by != null \? r\.by/.test(src), 'la cellule affiche le champ by (année de naissance)');
+  assert.ok(/Né\$\{ci\.sexe === 'F' \? 'e' : ''\} en \$\{r\.by\}/.test(src), 'infobulle « Né(e) en AAAA »');
+  assert.ok(src.includes('id="ageExample"'), 'exemple d\'aide injecté par JS (pas de ${…} non évalué)');
+  assert.ok(!/\$\{new Date\(\)/.test(src), 'aucun template literal non évalué dans le HTML statique');
+});
+
+test('ageOptionLabel : le filtre s\'affiche en années de naissance (saison − âge)', () => {
+  assert.equal(H.ageOptionLabel('6-', 2026), 'nés en 2020 ou après');
+  assert.equal(H.ageOptionLabel('7', 2026), 'nés en 2019');
+  assert.equal(H.ageOptionLabel('11', 2026), 'nés en 2015');
+  assert.equal(H.ageOptionLabel('17-24', 2026), 'nés de 2002 à 2009');
+  assert.equal(H.ageOptionLabel('25-29', 2026), 'nés de 1997 à 2001');
+  assert.equal(H.ageOptionLabel('30+', 2026), 'nés en 1996 et avant');
+  assert.equal(H.ageOptionLabel('7', null), '7', 'saison inconnue : repli sur la valeur');
+  assert.equal(H.ageOptionLabel('', 2026), '', 'Tous inchangé');
 });

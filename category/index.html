@@ -1261,13 +1261,13 @@
       bestRank: null,
       rankSum: 0, rankCount: 0,
       pctSum: 0, pctCount: 0,
-      ageMap: new Map(),
-      dominantAge: null,
+      byMap: new Map(),
+      dominantBy: null,
     };
     for (const m of matches) {
       const c = m.competitor;
-      if (typeof c.age === 'number') {
-        s.ageMap.set(c.age, (s.ageMap.get(c.age) || 0) + 1);
+      if (typeof c.by === 'number') {
+        s.byMap.set(c.by, (s.byMap.get(c.by) || 0) + 1);
       }
       if (typeof c.rank === 'number') {
         if (c.rank === 1) s.wins++;
@@ -1296,8 +1296,8 @@
     }
     s.avgRank = s.rankCount ? s.rankSum / s.rankCount : null;
     s.avgPct = s.pctCount ? s.pctSum / s.pctCount : null;
-    if (s.ageMap.size) {
-      s.dominantAge = [...s.ageMap.entries()].sort((a, b) => b[1] - a[1])[0][0];
+    if (s.byMap.size) {
+      s.dominantBy = [...s.byMap.entries()].sort((a, b) => b[1] - a[1])[0][0];
     }
     return s;
   }
@@ -1458,9 +1458,9 @@
   function applyYearFilter(rows) {
     if (currentYearFilter === 'all') return rows;
     return rows.filter(r => {
-      const age = r.stats.dominantAge;
-      if (age == null) return true;
-      return currentYearFilter === '1' ? age % 2 === 1 : age % 2 === 0;
+      const by = r.stats.dominantBy;
+      if (by == null) return true;
+      return currentYearFilter === '1' ? by % 2 === 1 : by % 2 === 0;
     });
   }
 
@@ -1598,7 +1598,7 @@
                      : rank === 2 ? `<span class="rpill r2">2</span>`
                      : rank === 3 ? `<span class="rpill r3">3</span>`
                      : rank;
-      const ageStr = s.dominantAge != null ? ` <span class="pilot-age">(${s.dominantAge})</span>` : '';
+      const ageStr = s.dominantBy != null ? ` <span class="pilot-age">(né en ${s.dominantBy})</span>` : '';
       const pilotLink = `<span class="pilot-name">${escape(row.name)}</span>${ageStr}`;
       const winsCell = s.wins > 0
         ? `<span class="wins-badge">${s.wins}</span>`
@@ -1866,11 +1866,11 @@
   function openPilotDetail(row) {
     modalName.textContent = row.name;
     const ageEl = document.getElementById('pilotModalAge');
-    if (ageEl) ageEl.textContent = row.stats.dominantAge != null ? `${row.stats.dominantAge} ans` : '';
-    const age = row.stats.dominantAge;
-    const yearLabel = age != null && isUCat()
-      ? ` · ${age} ans · ${age % 2 === 1 ? '1ère année' : '2ème année'}`
-      : age != null ? ` · ${age} ans` : '';
+    if (ageEl) ageEl.textContent = row.stats.dominantBy != null ? `Né(e) en ${row.stats.dominantBy}` : '';
+    const by = row.stats.dominantBy;
+    const yearLabel = by != null && isUCat()
+      ? ` · né(e) en ${by} · ${by % 2 === 1 ? '1ère année' : '2ème année'}`
+      : by != null ? ` · né(e) en ${by}` : '';
     // Club : groupName du match le plus récent
     const sorted0 = [...row.matches].sort((a, b) =>
       (b.event.eventDate || '').localeCompare(a.event.eventDate || ''));

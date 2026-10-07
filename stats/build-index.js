@@ -27,11 +27,14 @@ const norm = s => (s || '').toLowerCase()
 // phases MÊME sans résultat : elles indiquent jusqu'où il est allé (ex. « Final » présente =
 // qualifié jusqu'en finale) — l'indice de performance en déduit la phase la plus profonde atteinte
 // pour graduer la pénalité (spec indice-perf §4.4).
-function slimCompetitor(c) {
+function slimCompetitor(c, year) {
   const out = {
     fn: c.firstName, ln: c.lastName,
-    rank: c.rank, plate: c.plate, age: c.age, gn: c.groupName,
+    rank: c.rank, plate: c.plate, gn: c.groupName,
   };
+  if (Number.isInteger(year) && Number.isInteger(c.age) && c.age >= 1 && c.age <= 99 && year - c.age > 1900) {
+    out.by = year - c.age;
+  }
   const classed = typeof c.rank === 'number' && c.rank < 100000;
   const details = (c.competitorRankDetails || [])
     .filter(d => d.phaseName && (classed ? d.result != null : true))
@@ -110,6 +113,8 @@ async function buildRegion(regionCode, outFile) {
         continue;
       }
 
+      const year = Number((ev.eventDate || '').slice(0, 4)) || null;
+
       const classes = (detail.classRanks || [])
         .filter(cls => (cls.competitorRankSummaries || []).length > 0)
         .map(cls => {
@@ -118,7 +123,7 @@ async function buildRegion(regionCode, outFile) {
             className: cls.className || '',
             perpetualClassCode: cls.perpetualClassCode || null,
             total: summaries.length,
-            competitors: summaries.map(slimCompetitor),
+            competitors: summaries.map(c => slimCompetitor(c, year)),
           };
         });
 

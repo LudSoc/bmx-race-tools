@@ -1429,7 +1429,7 @@ function findPilotByNormKey(key) {
       for (const c of (cls.competitors || [])) {
         const k = norm((c.firstName || '') + ' ' + (c.lastName || '')).trim();
         if (k === key && !seen.has(k)) {
-          seen.set(k, { firstName: c.firstName || '', lastName: c.lastName || '', groupName: c.groupName || '', age: c.age ?? null, normKey: k });
+          seen.set(k, { firstName: c.firstName || '', lastName: c.lastName || '', groupName: c.groupName || '', by: c.by ?? null, normKey: k });
         }
       }
     }
@@ -1676,7 +1676,7 @@ function searchPilots(query, excludeNormKey = null) {
         if (excludeNormKey && key === excludeNormKey) continue;
         if (!tokens.every(t => key.includes(t))) continue;
         if (!map.has(key)) {
-          map.set(key, { firstName: c.firstName || '', lastName: c.lastName || '', groupName: c.groupName || '', age: c.age ?? null, normKey: key, eventCount: 0 });
+          map.set(key, { firstName: c.firstName || '', lastName: c.lastName || '', groupName: c.groupName || '', by: c.by ?? null, normKey: key, eventCount: 0 });
         }
         map.get(key).eventCount++;
       }
@@ -1696,7 +1696,7 @@ function setupAutocomplete(input, dropdown, onSelect, getExcludeKey) {
     if (!items.length) { dropdown.classList.remove('open'); dropdown.innerHTML = ''; return; }
     dropdown.innerHTML = items.map((p, i) =>
       `<div class="ac-item" data-idx="${i}" tabindex="-1">
-        <span class="ac-name">${escape(p.firstName + ' ' + p.lastName)}${p.age != null ? `<span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:6px">${p.age} ans</span>` : ''}</span>
+        <span class="ac-name">${escape(p.firstName + ' ' + p.lastName)}${p.by != null ? `<span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:6px">Né(e) en ${p.by}</span>` : ''}</span>
         ${p.groupName ? `<span class="ac-meta">${escape(clubDisplayName(p.groupName))}</span>` : ''}
       </div>`
     ).join('');
@@ -1752,7 +1752,7 @@ function setupAutocomplete(input, dropdown, onSelect, getExcludeKey) {
 // ── 3.3 Badge pilote sélectionné ─────────────────
 function renderBadge(pilot) {
   const fullName = escape(pilot.firstName + ' ' + pilot.lastName);
-  const meta = [clubDisplayName(pilot.groupName), pilot.age != null ? `${pilot.age} ans` : null].filter(Boolean).map(escape).join(' · ');
+  const meta = [clubDisplayName(pilot.groupName), pilot.by != null ? `Né(e) en ${pilot.by}` : null].filter(Boolean).map(escape).join(' · ');
   return `<div class="pilot-selected-badge">
     <div class="psb-name">${fullName}</div>
     ${meta ? `<span class="psb-meta">${meta}</span>` : ''}
@@ -1859,7 +1859,7 @@ function computeTopOpponents(pilot, maxN = 10) {
             lastName: c.lastName || '',
             normKey: oppKey,
             groupName: c.groupName || '',
-            age: c.age ?? null,
+            by: c.by ?? null,
             eventKeys: new Set(),
             winsA: 0, winsB: 0,
           });
@@ -1890,7 +1890,7 @@ function renderSuggestions(opponents) {
   }
   suggestionsList.innerHTML = opponents.map(opp => {
     const name = escape(opp.firstName + ' ' + opp.lastName);
-    const meta = [clubDisplayName(opp.groupName), opp.age != null ? `${opp.age} ans` : null].filter(Boolean).map(escape).join(' · ');
+    const meta = [clubDisplayName(opp.groupName), opp.by != null ? `Né(e) en ${opp.by}` : null].filter(Boolean).map(escape).join(' · ');
     const score = `${opp.winsA} – ${opp.winsB}`;
     return `<div class="suggestion-item" role="button" tabindex="0" data-norm-key="${escape(opp.normKey)}">
       <div style="flex:1;min-width:0">
@@ -2104,8 +2104,8 @@ function renderH2HHeader(stats, viewScore) {
   const bLeads = winsB > winsA;
   const nameA = escape(pilotA.firstName + ' ' + pilotA.lastName);
   const nameB = escape(pilotB.firstName + ' ' + pilotB.lastName);
-  const metaA = [clubDisplayName(pilotA.groupName), pilotA.age != null ? `${pilotA.age} ans` : null].filter(Boolean).map(escape).join(' · ');
-  const metaB = [clubDisplayName(pilotB.groupName), pilotB.age != null ? `${pilotB.age} ans` : null].filter(Boolean).map(escape).join(' · ');
+  const metaA = [clubDisplayName(pilotA.groupName), pilotA.by != null ? `Né(e) en ${pilotA.by}` : null].filter(Boolean).map(escape).join(' · ');
+  const metaB = [clubDisplayName(pilotB.groupName), pilotB.by != null ? `Né(e) en ${pilotB.by}` : null].filter(Boolean).map(escape).join(' · ');
   const clubA = metaA ? `<div class="hp-club">${metaA}</div>` : '';
   const clubB = metaB ? `<div class="hp-club">${metaB}</div>` : '';
   const period = stats.firstDate

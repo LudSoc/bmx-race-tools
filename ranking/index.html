@@ -255,24 +255,8 @@ footer a:hover{text-decoration:underline}
         </select>
       </div>
       <div class="field">
-        <label for="ageSel">Âge</label>
-        <select class="control" id="ageSel">
-          <option value="">Tous</option>
-          <option value="6-">6 ans et moins</option>
-          <option value="7">7 ans</option>
-          <option value="8">8 ans</option>
-          <option value="9">9 ans</option>
-          <option value="10">10 ans</option>
-          <option value="11">11 ans</option>
-          <option value="12">12 ans</option>
-          <option value="13">13 ans</option>
-          <option value="14">14 ans</option>
-          <option value="15">15 ans</option>
-          <option value="16">16 ans</option>
-          <option value="17-24">17/24 ans</option>
-          <option value="25-29">25/29 ans</option>
-          <option value="30+">30 ans et plus</option>
-        </select>
+        <label for="ageSel">Année de naissance</label>
+        <select class="control" id="ageSel"></select>
       </div>
       <div class="field">
         <label for="clubInp">Club</label>
@@ -292,7 +276,7 @@ footer a:hover{text-decoration:underline}
       <summary>ℹ️ Comment est calculé ce classement ?</summary>
       <div class="perf-how-body">
         <p>Chaque pilote est noté de 0 à 1000 par son <strong>indice de performance</strong> : places ajustées de la taille et de la force des plateaux, régularité, chronos, le tout ramené vers 500 quand il y a peu de courses. Seules les <strong>courses</strong> comptent (pas les classements de championnats), <strong>toutes sources</strong> : France (Sqorz), Coupes et Championnats d'Europe UEC (JSTiming) et Mondiaux UCI. Le pool est français (licenciés en club : un groupement club en course FR — les étrangers, même vus en France, sont exclus), mais <strong>toutes</strong> les courses de ces pilotes comptent, en France comme à l'international.</p>
-        <p>L'<strong>âge</strong> est l'âge sportif réel (année de saison − année de naissance déduite des engagements) : un garçon de 11 ans qui roule en U13 sort bien dans « 11 ans ». Le <strong>sexe</strong> se lit sur la catégorie dominante (les catégories mixtes sont masquées quand un sexe est choisi). Le <strong>niveau</strong> est décidé par la <strong>liste LRP</strong> (Liste Régionale de Progression, même source que Stats Pilote) : <span class="rank-badge rank-badge-elite">Élite</span> pour les pilotes de la liste en catégorie Élite, <span class="rank-badge rank-badge-national">National</span> pour ceux listés en national (jamais avant 13 ans). Les autres (liste régionale ou hors liste) n'ont pas de badge et sortent dans le filtre « Ni national ni élite » ; si la liste LRP est indisponible, repli sur le référentiel de catégories. Un pilote qui roule en 20″ et en cruiser est signalé par un badge ⇄. Le <strong>#</strong> est le rang dans le filtre actif, avec le rang général rappelé en petit (référence : seuil d'engagements min, sans les autres filtres — aucun rappel dans la vue par défaut).</p>
+        <p>La colonne <strong>Année naiss.</strong> affiche l'année de naissance déduite des engagements : un garçon de 11 ans qui roule en U13 est né en <span id="ageExample">2015</span> (année de saison − âge sportif). Le filtre <strong>Année de naissance</strong> choisit une tranche d'années de naissance. Le <strong>sexe</strong> se lit sur la catégorie dominante (les catégories mixtes sont masquées quand un sexe est choisi). Le <strong>niveau</strong> est décidé par la <strong>liste LRP</strong> (Liste Régionale de Progression, même source que Stats Pilote) : <span class="rank-badge rank-badge-elite">Élite</span> pour les pilotes de la liste en catégorie Élite, <span class="rank-badge rank-badge-national">National</span> pour ceux listés en national (jamais avant 13 ans). Les autres (liste régionale ou hors liste) n'ont pas de badge et sortent dans le filtre « Ni national ni élite » ; si la liste LRP est indisponible, repli sur le référentiel de catégories. Un pilote qui roule en 20″ et en cruiser est signalé par un badge ⇄. Le <strong>#</strong> est le rang dans le filtre actif, avec le rang général rappelé en petit (référence : seuil d'engagements min, sans les autres filtres — aucun rappel dans la vue par défaut).</p>
         <p>Détail complet des coefficients : voir la fiche d'un pilote sur <a id="perfHelpLink" href="#">Stats Pilote</a>, encadré « Comment est-il calculé ? ».</p>
       </div>
     </details>
@@ -439,6 +423,28 @@ footer a:hover{text-decoration:underline}
     if (sel === '25-29') return a >= 25 && a <= 29;
     if (sel === '30+') return a >= 30;
     return a === parseInt(sel, 10);
+  }
+  // Libellé d'une tranche du filtre affiché en année de naissance (testable).
+  // La valeur interne reste un âge sportif (saison − naissance) pour la logique ;
+  // l'utilisateur ne voit que des années de naissance.
+  function ageOptionLabel(sel, seasonYear) {
+    if (!seasonYear) return sel;
+    const y = n => String(seasonYear - n);
+    if (sel === '6-') return `nés en ${y(6)} ou après`;
+    if (sel === '7') return `nés en ${y(7)}`;
+    if (sel === '8') return `nés en ${y(8)}`;
+    if (sel === '9') return `nés en ${y(9)}`;
+    if (sel === '10') return `nés en ${y(10)}`;
+    if (sel === '11') return `nés en ${y(11)}`;
+    if (sel === '12') return `nés en ${y(12)}`;
+    if (sel === '13') return `nés en ${y(13)}`;
+    if (sel === '14') return `nés en ${y(14)}`;
+    if (sel === '15') return `nés en ${y(15)}`;
+    if (sel === '16') return `nés en ${y(16)}`;
+    if (sel === '17-24') return `nés de ${y(24)} à ${y(17)}`;
+    if (sel === '25-29') return `nés de ${y(29)} à ${y(25)}`;
+    if (sel === '30+') return `nés en ${y(30)} et avant`;
+    return sel;
   }
 
   // --- Suggestions de pilotes (testable) : au plus `limit` lignes contenant q,
@@ -650,7 +656,7 @@ footer a:hover{text-decoration:underline}
       if (b) b.addEventListener('click', resetFilters);
     } else {
       tableWrap.innerHTML = `<div class="table-scroll-wrap"><div class="table-scroll"><table class="ranking-table">
-        <thead><tr><th title="Rang dans le filtre actif (rang général rappelé en petit quand il diffère)">#</th><th>Pilote</th><th>Club</th><th title="Âge sportif sur la saison (année de saison − année de naissance)">Âge</th><th title="Engagements sur la fenêtre">Eng.</th><th title="Indice de performance">Indice</th><th title="Évolution vs semaine précédente">Tend.</th></tr></thead>
+        <thead><tr><th title="Rang dans le filtre actif (rang général rappelé en petit quand il diffère)">#</th><th>Pilote</th><th>Club</th><th title="Année de naissance déduite des engagements">Année naiss.</th><th title="Engagements sur la fenêtre">Eng.</th><th title="Indice de performance">Indice</th><th title="Évolution vs semaine précédente">Tend.</th></tr></thead>
         <tbody>${list.map((r, i) => {
           const fr = franks.get(r.n);
           const gr = refRanks.get(r.n);
@@ -663,10 +669,9 @@ footer a:hover{text-decoration:underline}
           const lvl = pilotStatus(r, seasonYear, lrpLevels, catRef);
           const lvlBadge = lvl
             ? `<span class="rank-badge rank-badge-${lvl}" title="${lvl === 'elite' ? 'Pilote élite (liste LRP)' : 'Pilote de niveau national (liste LRP)'}">${lvl === 'elite' ? 'Élite' : 'National'}</span>` : '';
-          const age = pilotAge(r, seasonYear);
-          const ageCell = age != null
-            ? `${age} <span style="color:var(--muted); font-size:11px">ans</span>` : '—';
-          const ageTitle = age != null && r.by != null ? `Né${ci.sexe === 'F' ? 'e' : ''} en ${r.by}` : 'Âge inconnu';
+          // La colonne affiche l'année de naissance (`by`), jamais l'âge.
+          const ageCell = r.by != null ? r.by : '—';
+          const ageTitle = r.by != null ? `Né${ci.sexe === 'F' ? 'e' : ''} en ${r.by}` : 'Année de naissance inconnue';
           const hit = hitSet.has(i) ? ' class="pilot-hit"' : '';
           const anchor = i === target ? ' id="pilotHit"' : '';
           return `<tr${anchor}${hit}>
@@ -738,6 +743,14 @@ footer a:hover{text-decoration:underline}
       ]);
       DATA = rj;
       CLUBS = (cj && cj.mapping) || {};
+      const seasonYear = parseInt(((DATA._meta && DATA._meta.windowTo) || '').slice(0, 4), 10) || null;
+      // Libellés du filtre en années de naissance ; repli sur l'année courante si la fenêtre manque.
+      const labelYear = seasonYear || new Date().getFullYear();
+      ageSel.innerHTML = ['', '6-', '7', '8', '9', '10', '11', '12', '13',
+        '14', '15', '16', '17-24', '25-29', '30+'].map(v =>
+        `<option value="${v}">${v ? ageOptionLabel(v, labelYear) : 'Tous'}</option>`).join('');
+      const ageExample = document.getElementById('ageExample');
+      if (ageExample) ageExample.textContent = String(labelYear - 11);
       minSel.innerHTML = [3, 4, 5, 8, 10, 15, 20].map(m =>
         `<option value="${m}"${m === state.min ? ' selected' : ''}>${m}+</option>`).join('');
       Object.assign(state, parseUrlState());

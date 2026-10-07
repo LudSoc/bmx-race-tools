@@ -72,14 +72,18 @@ le classement est pré-calculé par le build hebdo, là où vit déjà la force 
 - **Tableau** : rang (**dans le filtre actif**, recalculé 1,2,2,4 sur la vue ; rang général
   rappelé en petit quand il diffère — référence : seuil d'engagements min seul, donc aucun
   rappel dans la vue par défaut), pilote (lien fiche `bmx-race-stats/?name=`), club (lien
-  `bmx-race-club/?club=` + nom complet via `clubs.json` vendu), âge sportif (infobulle = année
-  de naissance), engagements,
-  indice, tendance. 100 lignes/page + « charger plus ».
+  `bmx-race-club/?club=` + nom complet via `clubs.json` vendu), **année de naissance**
+  (en-tête exact « Année naiss. », champ `by`, infobulle « Né(e) en AAAA » — jamais
+  l'âge, **ACTÉ le 2026-10-06**),
+  engagements, indice, tendance. 100 lignes/page + « charger plus ».
 - **Filtres** (état dans l'URL : `?cat=&sexe=&age=&club=&q=&min=`) : catégorie (liste), sexe
   (Filles & femmes / Garçons & hommes, déduit de la catégorie dominante — les catégories
-  mixtes sont masquées quand un sexe est choisi), âge sportif réel (année de saison −
-  année de naissance `by`, 6 ans et moins puis 7, 8…16 ans exacts, 17 ans et plus ;
-  un 11 ans en U13 sort dans « 11 ans »), localisation pilote (saisie + suggestions top 8
+   mixtes sont masquées quand un sexe est choisi), **Année de naissance** (libellé exact du filtre ;
+  options affichées en années
+  de naissance « nés en AAAA » — 2020 ou après, 2019, 2018…17 ans exacts, tranches 17/24,
+  25/29, 1996 et avant ; valeur interne inchangée = âge sportif `saison − by`, URL `?age=`
+  préservée, **ACTÉ le 2026-10-06** ; un 11 ans né en 2015 en U13 sort dans « nés en 2015 »),
+  localisation pilote (saisie + suggestions top 8
   au classement — clic ou flèches + Entrée = focus sur le pilote, Entrée seule = occurrence
   suivante, `?q=` partagé saute au pilote au chargement), club (recherche avec suggestions
   `Nom (CODE)`), engagements min (3–20).
