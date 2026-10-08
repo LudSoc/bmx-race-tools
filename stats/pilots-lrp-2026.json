@@ -7,7 +7,7 @@
     "national": 1090,
     "regional": 1279,
     "source": "liste-ref.txt",
-    "reducedAt": "2026-10-05",
+    "reducedAt": "2026-10-06",
     "_doc": "Réduit par tools/reduce-lrp.cjs : seuls prenom, nom, categorieFra et level sont consommés par le site. Les autres champs de l’export FFC (dont le numéro de licence, l’âge, le sexe et le club) ont été retirés : ils n’étaient pas utilisés. La liste d’exclusion RGPD (art. 17 / 21) est également appliquée. Repartir d’un export FFC complet pour régénérer (ce fichier est dérivé).",
     "_keptFields": [
       "prenom",
