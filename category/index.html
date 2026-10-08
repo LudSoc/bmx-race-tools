@@ -7,14 +7,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%234a7ab5'/><text x='16' y='23' font-family='system-ui' font-size='20' font-weight='800' fill='white' text-anchor='middle'>S</text></svg>">
 <title>BMX-Race · Stats Catégorie — pilotes français</title>
-<meta name="description" content="Classements et statistiques BMX Race des pilotes français par catégorie d'âge : évolutions, podiums et comparatifs entre organisations.">
+<meta name="description" content="Classements et statistiques BMX Race des pilotes français par catégorie nationale (tranche d'âge et genre) : évolutions, podiums et comparatifs entre organisations.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ludsoc.github.io/bmx-race-tools/category/">
 <meta property="og:title" content="BMX-Race · Stats Catégorie — pilotes français">
-<meta property="og:description" content="Classements et statistiques BMX Race des pilotes français par catégorie d'âge : évolutions, podiums et comparatifs entre organisations.">
+<meta property="og:description" content="Classements et statistiques BMX Race des pilotes français par catégorie nationale (tranche d'âge et genre) : évolutions, podiums et comparatifs entre organisations.">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="BMX-Race · Stats Catégorie — pilotes français">
-<meta name="twitter:description" content="Classements et statistiques BMX Race des pilotes français par catégorie d'âge : évolutions, podiums et comparatifs entre organisations.">
+<meta name="twitter:description" content="Classements et statistiques BMX Race des pilotes français par catégorie nationale (tranche d'âge et genre) : évolutions, podiums et comparatifs entre organisations.">
 <script>
   (() => {
     const saved = localStorage.getItem('theme');
@@ -163,25 +163,6 @@
     box-shadow:var(--shadow); overflow:hidden;
   }
   .cat-selector-panel[hidden]{display:none}
-  .cat-selector-filter{
-    width:100%; box-sizing:border-box;
-    font:inherit; font-size:12.5px; color:var(--ink);
-    padding:9px 12px; border:none; border-bottom:1px solid var(--line);
-    background:var(--card-soft);
-  }
-  .cat-selector-filter:focus{outline:none}
-  .cat-selector-orgrow{display:flex; align-items:center; gap:8px; padding:8px 10px 7px; background:var(--card-soft); border-bottom:1px solid var(--line)}
-  .cat-selector-orgrow label{font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; white-space:nowrap}
-  .cat-selector-orgsel{flex:1; min-width:0; font:inherit; font-size:12.5px; color:var(--ink); padding:6px 8px; border:1px solid var(--line); border-radius:7px; background:var(--card); cursor:pointer}
-  .cat-selector-orgsel:focus{outline:none; border-color:var(--accent)}
-  .cat-selector-reset{
-    font:inherit; font-size:11.5px; font-weight:600; color:var(--accent);
-    background:transparent; border:none; cursor:pointer; padding:5px 6px; border-radius:6px; white-space:nowrap;
-    transition:background .1s;
-  }
-  .cat-selector-reset:hover{background:color-mix(in srgb,var(--accent) 10%, transparent)}
-  .cat-selector-reset:focus-visible{outline:2px solid var(--accent); outline-offset:-1px}
-  .cat-org-hl{color:var(--accent); font-weight:600}
   .cat-selector-list{max-height:300px; overflow-y:auto; padding:4px}
   .cat-selector-option{
     display:block; width:100%; text-align:left;
@@ -194,15 +175,6 @@
   .cat-selector-option.selected{background:color-mix(in srgb,var(--accent) 16%, transparent)}
   .cat-selector-name{font-size:13px; font-weight:600; color:var(--ink); display:flex; align-items:baseline; gap:8px}
   .cat-selector-name .cat-count{font-size:10.5px; font-weight:500; color:var(--muted)}
-  .cat-selector-name .cat-code{font-size:10.5px; font-weight:600; color:var(--muted)}
-  .cat-selector-orgas{font-size:11px; color:var(--muted); margin-top:2px; line-height:1.4}
-  .cat-level-badge{display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:1px 7px;border-radius:99px;border:1px solid currentColor;line-height:1.5}
-  .cat-level-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-  .cat-level-national{color:#4e80ee;background:color-mix(in srgb,#4e80ee 10%,transparent)}
-  .cat-level-regional{color:#2bb3a3;background:color-mix(in srgb,#2bb3a3 12%,transparent)}
-  .cat-level-club{color:#b98a2e;background:color-mix(in srgb,#b98a2e 14%,transparent)}
-  .cat-level-uec{color:#9a6ff0;background:color-mix(in srgb,#9a6ff0 12%,transparent)}
-  .cat-level-uci{color:#e06b8a;background:color-mix(in srgb,#e06b8a 12%,transparent)}
   .cat-selector-empty{padding:10px; font-size:12.5px; color:var(--muted)}
 
 
@@ -282,19 +254,6 @@
   .perf-how-detail{margin-top:6px}
   .perf-how-detail>summary{cursor:pointer; font-weight:600; font-size:12px; color:var(--muted)}
   .perf-how-detail>summary:hover{color:var(--ink)}
-
-  /* Year filter */
-  .year-filter{display:flex; gap:5px}
-  .yf-btn{
-    font:inherit; font-size:12px; font-weight:600; cursor:pointer;
-    padding:5px 12px; min-height:36px; border-radius:99px;
-    background:var(--card-soft); border:1px solid var(--line-strong); color:var(--ink-2);
-    transition:border-color .15s, background .15s, color .15s;
-  }
-  .yf-btn:hover{border-color:var(--accent); color:var(--accent-hi)}
-  .yf-btn.active{background:var(--accent); border-color:var(--accent); color:#fff}
-  
-  
 
   .empty-state{padding:36px; text-align:center; color:var(--muted); font-size:13px}
   .results-summary{font-size:12px; color:var(--muted); margin-bottom:10px}
@@ -392,7 +351,6 @@
     .cat-stat-k{font-size:9px}
     .pilot-search-wrap{flex:1 1 0; min-width:0}
     .pilot-search-input{width:auto; flex:1; min-width:0}
-    .year-filter{flex-shrink:0}
 
     /* Sélecteur de colonne mobile */
     .mobile-stat-sel-wrap{display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:0}
@@ -471,7 +429,7 @@
     </div>
     <a class="hub-back" id="hubBackLink" href="#" aria-label="Retour au BMX-Race Dashboard">← BMX-Race Dashboard</a>
     <h1>BMX-Race · Stats Catégorie</h1>
-    <p>Comparez les performances des pilotes français d'une catégorie sur une saison — victoires, podiums, régularité — en agrégeant leurs courses France (Sqorz), Europe UEC et Mondiaux UCI. Un pilote est retenu s'il court au moins une course FR avec un club réel : les étrangers, même vus en course française, sont exclus.</p>
+    <p>Choisissez une catégorie nationale : tous les pilotes dont l'âge et le genre y correspondent sont classés, avec TOUS leurs engagements de la saison quelle que soit la catégorie d'origine (20″ et cruiser, régional et national). Un pilote est retenu s'il court au moins une course FR avec un club réel : les étrangers, même vus en course française, sont exclus.</p>
   </div>
 </div>
 
@@ -484,29 +442,13 @@
         </select>
       </div>
       <div class="field col-cat">
-        <span class="field-label" id="catSelectorLabel">Catégorie — nom complet (code Sqorz)</span>
+        <span class="field-label" id="catSelectorLabel">Catégorie nationale (tous engagements confondus)</span>
         <div class="cat-selector" id="catSelector">
           <button type="button" class="cat-selector-summary" id="catSelectorSummary" aria-expanded="false" aria-controls="catSelectorPanel" aria-haspopup="listbox">
             <span id="catSelectorValue">Choisir une catégorie…</span>
             <span class="cat-selector-chev" aria-hidden="true">▾</span>
           </button>
           <div class="cat-selector-panel" id="catSelectorPanel" hidden>
-            <div class="cat-selector-orgrow">
-              <label for="catOrgSel">Organisation</label>
-              <select id="catOrgSel" class="cat-selector-orgsel" autocomplete="off">
-                <option value="">Toutes les organisations</option>
-              </select>
-              <label for="catLevelSel">Niveau</label>
-              <select id="catLevelSel" class="cat-selector-orgsel" autocomplete="off" style="max-width:160px">
-                <option value="">Tous les niveaux</option>
-                <option value="national">National</option>
-                <option value="regional">Régional</option>
-                <option value="uec">UEC</option>
-                <option value="uci">UCI</option>
-              </select>
-              <button type="button" id="catSelectorReset" class="cat-selector-reset" title="Effacer le filtre orga, niveau et la recherche">Réinitialiser</button>
-            </div>
-            <input type="search" id="catSelectorFilter" class="cat-selector-filter" placeholder="Filtrer les catégories…" autocomplete="off" aria-label="Filtrer les catégories">
             <div class="cat-selector-list" id="catSelectorList" role="listbox" aria-label="Catégories"></div>
             <div class="cat-selector-empty" id="catSelectorEmpty" hidden>Aucune catégorie trouvée.</div>
           </div>
@@ -609,18 +551,53 @@
     'https://raw.githubusercontent.com/LudSoc/bmx-race-stats/main/uci-worldcup-index.json',
   ];
 
-  // Une « catégorie » = le nom exact de la classe (Sqorz, ou UEC namespacée `uec:`).
-  // Aucun regroupement : chaque code a sa propre entrée dans la liste, avec la
-  // liste des organisations qui courent cette classe exacte.
-  // Catégorie de parité d'âge (bandes U7…U15) → filtre « 1ère année (défavorable,
-  // plus jeunes) / 2ème année (favorable, plus âgés) ».
-  function isYouthParityCode(code) {
-    if (!code || code.includes('+')) return false;
-    let m = /^U?(\d{1,2})(?:[A-Z][A-Z0-9]*|\.C|\.)?$/i.exec(code);
-    if (!m) m = /^[GF](\d{1,2})(?:[A-Z][A-Z0-9]*)?$/i.exec(code);
-    if (!m) return false;
-    const band = +m[1];
-    return band >= 7 && band <= 15;
+  // Une « catégorie » = une tranche nationale de référence
+  // (`nat:<trancheKey>`, ex. `nat:gU11` = « U11 Garçon »).
+  // Le classement montre tous les pilotes dont l'âge sportif (saison −
+  // naissance) rentre dans la tranche ET dont le sexe correspond — avec TOUS
+  // leurs engagements de la saison quelle que soit la catégorie d'origine
+  // (20″ + cruiser, régional + national : un pilote double-pratique apparaît
+  // dans chaque vue dont il remplit les critères).
+  // Le SCORE ne porte que sur les engagements du format de la vue (20″ ou
+  // cruiser) ; le détail montre tout. Sans ça, U17 Garçon et Cruiser U17
+  // Garçon seraient strictement identiques.
+  const NAT_PREFIX = 'nat:';
+  // Tranche d'âge par trancheKey : [âge min, âge max] (âge sportif).
+  // Annexe 3 FFC (U9 = 8 ans et moins, U11 = 9-10 … U23 = 19-22, 17/24, 25/29,
+  // 30+, 17+ …) + constat données 2025-2026 : Elite courue dès 18 ans
+  // (18-36 observés).
+  // Supercross (sf/sg) EXCLU : pas de catégorie nationale au sens de
+  // l'Annexe 3 (derby, pas de tranche réglementaire) — voir EXCLUDED_TK.
+  // Testable.
+  const TRANCHE_AGES = {
+    fU7: [0, 6], gU7: [0, 6],
+    fU9: [0, 8], gU9: [0, 8],
+    fU11: [9, 10], gU11: [9, 10],
+    fU13: [11, 12], gU13: [11, 12],
+    fU15: [13, 14], gU15: [13, 14],
+    fU17: [15, 16], gU17: [15, 16],
+    u19f: [17, 18], u19h: [17, 18],
+    u23f: [19, 22], u23h: [19, 22],
+    ef: [18, Infinity], eh: [18, Infinity],
+    f17p: [17, Infinity], m17p: [17, Infinity],
+    f25p: [25, Infinity],
+    'm17-24': [17, 24],
+    'f17-24': [17, 24], 'm17-29': [17, 29], 'crM17-29': [17, 29],
+    'm25-29': [25, 29],
+    'm30p': [30, Infinity],
+    'm30-39': [30, 39],
+    crU15F: [13, 14], crU15G: [13, 14],
+    crU17F: [15, 16], crU17G: [15, 16],
+    crU19F: [17, 18],
+    'crM17-24': [17, 24],
+    'crM25-29': [25, 29],
+    'crM30-39': [30, 39],
+    'crM40-44': [40, 44], crM40p: [40, Infinity], crM45p: [45, Infinity],
+    'crF17-29': [17, 29], crF30p: [30, Infinity],
+  };
+  function bracketOf(tk) {
+    const b = TRANCHE_AGES[tk];
+    return b ? [b[0], b[1]] : null;
   }
 
   // --- State ---
@@ -633,13 +610,8 @@
   // Clé de classe = même convention que findClassCompetitors et le build (build-field.js).
   const fieldKeyOfEvent = m => `${m.account.accountCode}/${m.event.eventId}/${m.cls?.perpetualClassCode || m.cls?.className || ''}`;
   const fieldCtxFor = m => (m.account && m.account.accountCode === 'uec') ? perfUecField : perfFrField;
-  let currentCatCode = ''; // code exact de la catégorie sélectionnée (`uec:…` pour l'UEC, `uci:…` pour l'UCI)
-  let catList = [];        // [{ code, orgs:[…] }] pour l'année sélectionnée
-  let orgList = [];        // orgas de l'année (filtre de la liste des catégories)
-  let currentOrgFilter = ''; // orga sélectionnée dans le panneau (n'affecte PAS le classement)
-  let currentLevelFilter = ''; // niveau filtré (national/régional/uec/uci) — n'affecte PAS le classement
-  let catRef = null; // categories-ref.json chargé en arrière-plan (optionnel)
-  const REF_LEVEL_LABELS = { national:'National', regional:'Régional', uec:'UEC', uci:'UCI' };
+  let currentCatCode = ''; // tranche nationale `nat:<trancheKey>` (ex. `nat:gU11`)
+  let catList = [];        // [{ code, name, sex, format, minAge, maxAge, count, events, orgs:[…] }]
   let globalDataReady = false;
 
   const retryBtn = document.getElementById('retryBtn');
@@ -670,17 +642,6 @@
     if (wcIndex) out.push(...(wcIndex.events || []));
     return out;
   }
-
-  // Clé de catégorie : le code exact, namespacé `uec:` pour l'UEC et `uci:` pour
-  // l'UCI. Des codes JSTiming (G10–G16) collisionnent avec des perpetualClassCode
-  // Sqorz — sans namespace, les résultats FR et européens seraient mélangés dans
-  // une même catégorie. Aucun code Sqorz ne contient `:` → pas de collision possible.
-  const catSourceKey = (account, code) => {
-    if (account && account.accountCode === 'uec') return 'uec:' + code;
-    if (account && account.accountCode === 'ucibmxworlds') return 'uci:' + code;
-    if (account && account.accountCode === 'uciworldcup') return 'wc:' + code;
-    return code;
-  };
 
   // --- Pool français (règle sqorz_stats / ranking) : un pilote est français si
   // ≥1 engagement en course FR avec un club réel (groupName non vide et pas un
@@ -737,6 +698,139 @@
     _frenchPool = null;
   }
 
+  // --- Référentiel national (categories-ref.json) ---
+  // `natCats` : trancheKey → { label, sex, format } pour les entrées
+  // level == 'national' (39 tranches : 20″ + cruiser, F + M).
+  // `codeSex` : code exact → 'M'|'F' (vote de sexe des engagements).
+  // `codeFormat` : code exact → '20p'|'cruiser'|'tt' (portée du score).
+  // Le score d'une vue ne porte QUE sur les engagements de son format
+  // (sinon U17 Garçon ≡ Cruiser U17 Garçon) ; le détail affiche tout.
+  // Testable (données injectées via buildRefData).
+  let codeSex = null; // Map(code → 'M'|'F'), null tant que non chargé / en échec
+  let codeFormat = null; // Map(code → format), null tant que non chargé
+  let natCats = null; // Map(trancheKey → { label, sex, format })
+  let refCats = null; // référentiel brut (namespaces FR/UEC/UCI/WC pour le gate élite)
+  function codeSexOf(code) {
+    return codeSex ? (codeSex.get(code) || null) : null;
+  }
+  function dominantSex(matches, sexOf) {
+    let m = 0, f = 0;
+    for (const mt of matches || []) {
+      const s = sexOf(mt.cls && (mt.cls.perpetualClassCode || mt.cls.className));
+      if (s === 'M') m++;
+      else if (s === 'F') f++;
+    }
+    if (m === 0 && f === 0) return null;
+    if (m === f) return null;
+    return f > m ? 'F' : 'M';
+  }
+  // Format d'un engagement : celui de son code au référentiel, '20p' par
+  // défaut (codes régionaux non référencés = courses 20″ classiques).
+  // Testable.
+  function fmtOfCode(code) {
+    if (!code) return '20p';
+    if (codeFormat) {
+      const f = codeFormat.get(code);
+      if (f) return f;
+    }
+    return '20p';
+  }
+  // Un engagement compte dans le score d'une vue s'il est du même format.
+  // Le contre-la-montre ('tt', runs en solo) ne score jamais en 20″.
+  // Testable.
+  function inScope(fmt, catFormat) {
+    return catFormat === 'cruiser' ? fmt === 'cruiser' : fmt === '20p';
+  }
+  // Libellé canonique : préfère la forme affichable (« U11 Garçon ») aux clés
+  // techniques (« gU11 », sans espace). Testable.
+  function pickGroupLabel(entries) {
+    const nice = t => !!t && t.includes(' ');
+    for (const e of entries) {
+      const t = e.tranche || '';
+      if (/^U\d/i.test(e.code || '') && nice(t) && t !== e.trancheKey) return t;
+    }
+    for (const e of entries) {
+      const t = e.tranche || '';
+      if (t && t !== e.trancheKey && nice(t)) return t;
+    }
+    const cands = entries.map(e => e.tranche || e.label || '').filter(Boolean);
+    return cands[0] || entries[0].trancheKey;
+  }
+  // Tranches exclues de la liste nationale : supercross (derby, pas de
+  // catégorie nationale au sens de l'Annexe 3). Leurs codes restent votants
+  // pour le sexe (sex map complète).
+  // Testable (via buildRefData).
+  const EXCLUDED_TK = new Set(['sf', 'sg']);
+  // Groupes hors-référentiel : U7 Fille/Garçon (pas de catégorie nationale
+  // au sens de l'Annexe 3, ajoutés à la demande — tranche 6 ans et moins).
+  // Testable.
+  function withExtraGroups(nat) {
+    const out = new Map(nat);
+    if (!out.has('fU7')) out.set('fU7', { label: 'U7 Fille', sex: 'F', format: '20p' });
+    if (!out.has('gU7')) out.set('gU7', { label: 'U7 Garçon', sex: 'M', format: '20p' });
+    return out;
+  }
+  // Tranches du circuit élite : U19, U23, Elite (F+M). Ces vues ne concernent
+  // que les pilotes élite : un engagement y compte si couru au niveau
+  // national ou international (FR : level national strict — les déclinaisons
+  // régionales EHR/JHR/U19HR… ne comptent pas ; UEC/Coupe du monde : niveau
+  // international par construction). Testable.
+  const ELITE_TKS = new Set(['u19f', 'u19h', 'u23f', 'u23h', 'ef', 'eh']);
+  const FR_FOREIGN = new Set(['uec', 'ucibmxworlds', 'uciworldcup']);
+  function eliteTrancheOf(accountCode, code) {
+    if (!code || !refCats) return null;
+    let e = null;
+    if (accountCode === 'uec') e = (refCats.categoriesUec || {})[code];
+    else if (accountCode === 'ucibmxworlds') e = (refCats.categoriesUci || {})[code];
+    else if (accountCode === 'uciworldcup') e = (refCats.categoriesWorldCup || {})[code];
+    else e = (refCats.categories || {})[code];
+    if (!e || !ELITE_TKS.has(e.trancheKey)) return null;
+    if (!accountCode || !FR_FOREIGN.has(accountCode)) {
+      if (e.level !== 'national' || e.status) return null;
+    }
+    return e.trancheKey;
+  }
+  function buildRefData(cats) {
+    const sex = new Map();
+    const fmt = new Map();
+    const nat = new Map();
+    const natEntries = new Map();
+    for (const [code, e] of Object.entries(cats || {})) {
+      if (!e) continue;
+      if (e.sex === 'M' || e.sex === 'F') sex.set(code, e.sex);
+      if (e.format) fmt.set(code, e.format);
+      if (e.level === 'national' && e.trancheKey && !EXCLUDED_TK.has(e.trancheKey)) {
+        if (!natEntries.has(e.trancheKey)) natEntries.set(e.trancheKey, []);
+        natEntries.get(e.trancheKey).push({ code, tranche: e.tranche, label: e.label, trancheKey: e.trancheKey, sex: e.sex, format: e.format });
+      }
+    }
+    for (const [tk, entries] of natEntries) {
+      const ref0 = entries[0];
+      // « (provisoire) » = note de curation du référentiel, pas un nom : retiré.
+      const label = pickGroupLabel(entries).replace(/\s*\(provisoire\)\s*/gi, '').trim() || pickGroupLabel(entries);
+      nat.set(tk, { label, sex: ref0.sex || 'X', format: ref0.format || '20p' });
+    }
+    return { sex, fmt, nat };
+  }
+  async function loadCodeSex() {
+    try {
+      const r = await fetch('../stats/categories-ref.json', { cache: 'no-cache' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const j = await r.json();
+      const { sex, fmt, nat } = buildRefData(j && j.categories);
+      codeSex = sex;
+      codeFormat = fmt;
+      natCats = withExtraGroups(nat);
+      refCats = j;
+    } catch (e) {
+      codeSex = null;
+      codeFormat = null;
+      natCats = null;
+      refCats = null;
+      console.warn('[category] categories-ref.json indisponible (liste nationale absente) :', e && e.message);
+    }
+  }
+
   function pilotsCfg() {
     return {
       metaUrl: INDEX_META_URL, cacheKey: INDEX_CACHE_KEY, sources: INDEX_SOURCES,
@@ -776,35 +870,6 @@
     ]);
   }
 
-  // --- Référentiel catégories (niveaux) — chargé en arrière-plan, optionnel ---
-  // Pour test local : résolution relative depuis sqorz_tools/category_stats → ../sqorz_stats/
-  function refLevelFor(code) {
-    if (!catRef) return '';
-    let src = 'categories';
-    if (code.startsWith('uec:')) { src = 'categoriesUec'; }
-    else if (code.startsWith('uci:')) { src = 'categoriesUci'; }
-    else if (code.startsWith('wc:')) { src = 'categoriesWorldCup'; }
-    const key = code.indexOf(':') >= 0 ? code.slice(code.indexOf(':') + 1) : code;
-    const entry = catRef[src] && catRef[src][key];
-    return (entry && entry.level) || '';
-  }
-  async function loadCatRef() {
-    try {
-      // En prod (GitHub Pages), les repos sont séparés — résolution absolue.
-      // En local (file:// ou 127.0.0.1), fallback relatif depuis sqorz_tools/category_stats/.
-      const baseUrl = '../stats';
-      const r = await fetch(`${baseUrl}/categories-ref.json`, { cache: 'no-cache' });
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      catRef = await r.json();
-      sortCatList();
-    } catch (e) {
-      catRef = null;
-      console.warn('[category] categories-ref.json indisponible (optionnel) :', e && e.message);
-      return;
-    }
-    if (!catSelectorPanel.hidden) renderCatSelectorList(catSelectorFilter.value);
-  }
-
   async function loadIndex() {
     retryBtn.hidden = true;
     statusEl.classList.add('loading');
@@ -816,10 +881,11 @@
       pilotsIndex = await loadIndexCached(pilotsCfg());
       invalidatePoolCache();
       await loadClubNames();
+      // Sexe par code (petit fichier, même origine) : requis pour ne pas
+      // mélanger F/M — échec non bloquant (groupes non sexés en repli).
+      await loadCodeSex();
       finishPrimaryLoad();
-      // Chargement du référentiel niveaux en arrière-plan (optionnel, badges dans le sélecteur).
-      loadCatRef();
-      // UEC + UCI + WC : arrière-plan — la liste gagne les entrées ns à leur arrivée.
+      // UEC + UCI + WC : arrière-plan — le pool français s'affine à leur arrivée.
       loadUecInBackground();
       loadUciInBackground();
       loadWcInBackground();
@@ -858,8 +924,10 @@
     if (urlState.year) rankYearSel.value = urlState.year;
     snapYearToData();
     buildCatList();
-    if (urlState.cat && catList.some(e => e.code === urlState.cat)) {
-      currentCatCode = urlState.cat;
+    // Clés valables : `nat:<trancheKey>` du référentiel national.
+    const wanted = isValidCatCode(urlState.cat) ? urlState.cat : '';
+    if (wanted && catList.some(e => e.code === wanted)) {
+      currentCatCode = wanted;
       catSelectorValue.textContent = catDisplayName(currentCatCode);
     } else {
       currentCatCode = '';
@@ -912,16 +980,17 @@
     refreshCatListAfterIndex();
   }
 
-  // La liste gagne les entrées `uec:…`/`uci:…` (les codes FR sont inchangés → la
-  // sélection courante est préservée). Cas deep-link `?cat=uec:…`/`?cat=uci:…`
-  // arrivé avant l'index correspondant : on l'applique maintenant.
+  // La liste s'enrichit à l'arrivée des index d'arrière-plan (le pool français
+  // s'affine). Cas deep-link `?cat=nat:…` arrivé avant les données : on
+  // l'applique maintenant.
   function refreshCatListAfterIndex() {
     const keepCat = currentCatCode;
     const urlState = parseUrlState();
     buildCatList();
+    const urlWanted = isValidCatCode(urlState.cat) ? urlState.cat : '';
     const targetCat = (keepCat && catList.some(e => e.code === keepCat))
       ? keepCat
-      : (!keepCat && urlState.cat && catList.some(e => e.code === urlState.cat) ? urlState.cat : '');
+      : (!keepCat && urlWanted && catList.some(e => e.code === urlWanted) ? urlWanted : '');
     if (targetCat && targetCat !== keepCat) {
       currentCatCode = targetCat;
       catSelectorValue.textContent = catDisplayName(targetCat);
@@ -955,7 +1024,7 @@
   }
   retryBtn.onclick = loadIndex;
 
-  // --- URL state (?cat= code exact Sqorz & ?year=) ---
+  // --- URL state (?cat= nat:<trancheKey> & ?year= saison) ---
   function parseUrlState() {
     const p = new URLSearchParams(location.search);
     return { cat: p.get('cat') || '', year: p.get('year') || '' };
@@ -982,17 +1051,12 @@
   const catSelectorValue  = document.getElementById('catSelectorValue');
   const catSelectorPanel   = document.getElementById('catSelectorPanel');
   const catSelectorList    = document.getElementById('catSelectorList');
-  const catSelectorFilter  = document.getElementById('catSelectorFilter');
   const catSelectorEmpty   = document.getElementById('catSelectorEmpty');
-  const catOrgSel = document.getElementById('catOrgSel');
-  const catLevelSel = document.getElementById('catLevelSel');
-  const catSelectorReset   = document.getElementById('catSelectorReset');
 
   // --- Sorting state ---
   let currentRows = [];
   let currentSortCol = 'avgPct';
   let currentSortDir = 'asc';
-  let currentYearFilter = 'all';
   let currentEventCount = 0;
   let currentMobileStat = 4; // index 1-based, 4 = Victoires par défaut
   let pilotSearchQuery = ''; // saisie conservée entre les rendus (tri, parité…)
@@ -1018,116 +1082,140 @@
     setTextStatus(statusEl, msg, isError);
   }
 
-  // Nom « complet » d'une catégorie : la variante className la plus fréquente dans les données.
-  function dominantClassName(names) {
-    let best = '', bestCount = 0;
-    for (const [name, count] of names) {
-      if (count > bestCount) { best = name; bestCount = count; }
-    }
-    return best;
-  }
-
-  // Reconstruit le <select> des orgas de l'année (filtre de la liste des catégories).
-  function rebuildCatOrgSel() {
-    const prev = catOrgSel.value;
-    catOrgSel.innerHTML = '';
-    const allOpt = document.createElement('option');
-    allOpt.value = '';
-    allOpt.textContent = 'Toutes les organisations';
-    catOrgSel.appendChild(allOpt);
-    for (const o of orgList) {
-      const opt = document.createElement('option');
-      opt.value = o;
-      opt.textContent = o;
-      catOrgSel.appendChild(opt);
-    }
-    catOrgSel.value = orgList.includes(prev) ? prev : '';
-    if (currentOrgFilter && !orgList.includes(currentOrgFilter)) currentOrgFilter = '';
-  }
-
-  // --- Liste des catégories : chaque classe exacte (Sqorz ou UEC namespacée) ---
-  // + son nom complet + ses organisations ---
+  // --- Liste des catégories nationales (`nat:<trancheKey>`) ---
+  // Référence = natCats (level == 'national'). Chaque entrée affiche le nombre
+  // de pilotes de la saison qui rentrent dans la tranche d'âge ET le genre ET
+  // ont couru au moins une fois dans le format (20″/cruiser) — sinon U17 et
+  // Cruiser U17 seraient identiques (les autres tranches sont quand même
+  // listées, même à 0).
   function buildCatList() {
     catList = [];
     const year = rankYearSel.value;
-    const map = new Map(); // code → { code, names:Map<className,count>, orgs:Set<accountName> }
-    const orgSet = new Set(); // orgas ayant des événements cette année
+    const seasonY = Number(year);
+    if (!Number.isInteger(seasonY) || !natCats || !natCats.size) { sortCatList(); return; }
+    // Passe 1 : par pilote — année modale, sexe majoritaire, formats courus,
+    // statut élite (≥1 engagement national+ en U19/U23/Elite).
+    const pilots = new Map(); // normKey → { byVotes:Map, m, f, f20, fcr, elite, events:Set, orgs:Set }
     for (const { account, event, classes } of allIndexedEvents()) {
-      if (year && !(event.eventDate || '').startsWith(year + '-')) continue;
-      if (account.accountName) orgSet.add(account.accountName);
+      if (!(event.eventDate || '').startsWith(year + '-')) continue;
+      if (!isFrAccount(account)) continue;
       for (const cls of (classes || [])) {
-        if (!cls.perpetualClassCode) continue;
-        const code = catSourceKey(account, cls.perpetualClassCode);
-        let e = map.get(code);
-        if (!e) { e = { code, names: new Map(), orgs: new Set() }; map.set(code, e); }
-        const name = (cls.className || '').trim();
-        if (name) e.names.set(name, (e.names.get(name) || 0) + 1);
-        if (account.accountName) e.orgs.add(account.accountName);
+        const sx = codeSexOf(cls.perpetualClassCode);
+        const fx = fmtOfCode(cls.perpetualClassCode);
+        const el = eliteTrancheOf(account.accountCode, cls.perpetualClassCode);
+        for (const c of (cls.competitors || [])) {
+          const by = birthYearOf(c, event);
+          if (by == null) continue;
+          const key = norm((c.firstName || c.fn || '') + ' ' + (c.lastName || c.ln || ''));
+          if (!key) continue;
+          let p = pilots.get(key);
+          if (!p) { p = { byVotes: new Map(), m: 0, f: 0, f20: 0, fcr: 0, elite: false, events: new Set(), orgs: new Set() }; pilots.set(key, p); }
+          p.byVotes.set(by, (p.byVotes.get(by) || 0) + 1);
+          if (sx === 'M') p.m++;
+          else if (sx === 'F') p.f++;
+          if (fx === 'cruiser') p.fcr++;
+          else if (fx === '20p') p.f20++;
+          if (el) p.elite = true;
+          if (event.eventId) p.events.add(event.eventId);
+          if (account.accountName) p.orgs.add(account.accountName);
+        }
       }
     }
-    catList = [...map.values()]
-      .map(e => ({ code: e.code, name: dominantClassName(e.names), orgs: [...e.orgs].sort((a, b) => a.localeCompare(b, 'fr')) }));
-    sortCatList();
-    orgList = [...orgSet].sort((a, b) => a.localeCompare(b, 'fr'));
-    rebuildCatOrgSel();
-  }
-
-  // Tri : niveau d'abord (régional → national → UEC → UCI), puis nom affiché
-  // alphabétique dans le niveau (repli sur le code si pas de nom).
-  // Recalculé après le chargement de catRef (niveaux encore inconnus au premier build).
-  function sortCatList() {
-    const lvlOrder = { regional: 0, national: 1, uec: 2, uci: 3 };
-    catList.sort((a, b) => {
-      const la = refLevelFor(a.code) in lvlOrder ? lvlOrder[refLevelFor(a.code)] : 99;
-      const lb = refLevelFor(b.code) in lvlOrder ? lvlOrder[refLevelFor(b.code)] : 99;
-      if (la !== lb) return la - lb;
-      const byName = (a.name || a.code).localeCompare(b.name || b.code, 'fr', { sensitivity: 'base' });
-      if (byName !== 0) return byName;
-      return a.code.localeCompare(b.code, 'fr', { sensitivity: 'base' });
+    // Passe 2 : pour chaque tranche, les pilotes qui y rentrent (âge + sexe +
+    // format couru ; circuit élite : statut élite requis — U19/U23/Elite ne
+    // concernent que les pilotes élite, pas les régionaux du même âge).
+    // Un pilote peut rentrer dans plusieurs tranches (ex. 18 ans : U19 + Elite).
+    const fit = new Map(); // tk → { pilots:Set, events:Set, orgs:Set }
+    for (const [key, p] of pilots) {
+      if (!p.byVotes.size) continue;
+      const by = [...p.byVotes.entries()].sort((a, b) => b[1] - a[1])[0][0];
+      const age = seasonY - by;
+      const sex = p.m === 0 && p.f === 0 ? null : (p.f > p.m ? 'F' : (p.m > p.f ? 'M' : null));
+      if (sex == null) continue; // égalité M/F ou sexe indéterminable → jamais mélangé
+      for (const [tk, g] of natCats) {
+        if (g.sex !== sex) continue;
+        const br = bracketOf(tk);
+        if (!br || age < br[0] || age > br[1]) continue;
+        if (g.format === 'cruiser' ? p.fcr === 0 : p.f20 === 0) continue;
+        if (ELITE_TKS.has(tk) && !p.elite) continue;
+        let a = fit.get(tk);
+        if (!a) { a = { pilots: new Set(), events: new Set(), orgs: new Set() }; fit.set(tk, a); }
+        a.pilots.add(key);
+        for (const ev of p.events) a.events.add(ev);
+        for (const o of p.orgs) a.orgs.add(o);
+      }
+    }
+    catList = [...natCats.entries()].map(([tk, g]) => {
+      const a = fit.get(tk);
+      return {
+        code: NAT_PREFIX + tk,
+        name: g.label,
+        sex: g.sex,
+        format: g.format,
+        count: a ? a.pilots.size : 0,
+        events: a ? a.events.size : 0,
+        orgs: a ? [...a.orgs].sort((x, y) => x.localeCompare(y, 'fr')) : [],
+      };
     });
+    sortCatList();
   }
 
-  // Libellé affiché : « Nom complet (CODE) » — l'identité (tri, agrégation, URL) reste le code exact.
+  // Tri : âge du plus jeune au plus vieux — âge min, puis âge max pour les
+  // tranches partant du même âge (U7 avant U9, tous deux « 8 ans et moins »).
+  // Les catégories de progression U19 → U23 → Élite sont regroupées à la fin
+  // dans cet ordre (U19 y compris Cruiser U19 Fille : même tranche 17/18),
+  // ensuite 20″ avant cruiser, M avant F ; codes inconnus tout à la fin.
+  // Testable.
+  function sortCatList() {
+    const tkOf = e => {
+      const code = String(e.code || '');
+      return code.startsWith(NAT_PREFIX) ? code.slice(NAT_PREFIX.length) : null;
+    };
+    const brOf = e => {
+      const tk = tkOf(e);
+      return tk ? bracketOf(tk) : null;
+    };
+    const minOf = e => { const br = brOf(e); return br ? br[0] : Infinity; };
+    const maxOf = e => { const br = brOf(e); return br ? br[1] : Infinity; };
+    const U19_TKS = ['u19f', 'u19h', 'crU19F'];
+    const U23_TKS = ['u23f', 'u23h'];
+    const LEAD_TKS = ['ef', 'eh']; // Élite (âge min 18 < U23 : la progression prime)
+    // 0 = standard, 1 = U19, 2 = U23, 3 = élite, 4 = inconnu.
+    const rankOf = e => {
+      const tk = tkOf(e);
+      if (!tk || !bracketOf(tk)) return 4;
+      if (U19_TKS.includes(tk)) return 1;
+      if (U23_TKS.includes(tk)) return 2;
+      if (LEAD_TKS.includes(tk)) return 3;
+      return 0;
+    };
+    const fmtOf = e => (e.format === 'cruiser' ? 1 : 0);
+    const sexOf = e => (e.sex === 'M' ? 0 : (e.sex === 'F' ? 1 : 2));
+    catList.sort((a, b) =>
+      (rankOf(a) - rankOf(b)) || (minOf(a) - minOf(b)) || (maxOf(a) - maxOf(b)) ||
+      (fmtOf(a) - fmtOf(b)) || (sexOf(a) - sexOf(b)) ||
+      String(a.code).localeCompare(String(b.code)));
+  }
+
+  // Clé de catégorie valable : `nat:<trancheKey>` présent au référentiel.
+  // Testable.
+  function isValidCatCode(code) {
+    if (!code || !natCats) return false;
+    const s = String(code);
+    return s.startsWith(NAT_PREFIX) && natCats.has(s.slice(NAT_PREFIX.length));
+  }
+
+  // Libellé affiché : le nom seul (« U11 Garçon »).
   function catDisplayName(code) {
     const e = catList.find(x => x.code === code);
-    const name = e && e.name ? e.name : code;
-    return name === code ? code : `${name} (${code})`;
+    return (e && e.name) || code;
   }
 
-  // Premières organisations d'une catégorie (+ « N autres » si trop long).
-  function catOrgsText(code, limit) {
-    const e = catList.find(x => x.code === code);
-    const orgs = e ? e.orgs : [];
-    const max = limit || 6;
-    const head = orgs.slice(0, max);
-    if (orgs.length <= max) return head.join(', ');
-    const extra = orgs.length - head.length;
-    return head.join(', ') + `, +${extra} autre${extra > 1 ? 's' : ''}`;
-  }
-
-  // Version HTML de la sous-ligne orgas : l'orga filtrée (si actif) est mise en évidence.
-  function catOrgsTextHtml(code, limit, hl) {
-    const e = catList.find(x => x.code === code);
-    const orgs = e ? e.orgs : [];
-    const max = limit || 6;
-    const head = orgs.slice(0, max);
-    const parts = head.map(o => (o === hl ? `<strong class="cat-org-hl">${escape(o)}</strong>` : escape(o)));
-    let s = parts.join(', ');
-    if (orgs.length > max) {
-      const extra = orgs.length - head.length;
-      s += `, +${extra} autre${extra > 1 ? 's' : ''}`;
-    }
-    return s;
-  }
-
-  function renderCatSelectorList(filter) {
-    const q = norm(filter || '');
+  // Liste brute des catégories nationales (sans filtrage) : nom + effectif.
+  function renderCatSelectorList() {
     const frag = document.createDocumentFragment();
     let shown = 0;
     for (const e of catList) {
-      if (currentOrgFilter && !e.orgs.includes(currentOrgFilter)) continue;
-      if (currentLevelFilter && refLevelFor(e.code) !== currentLevelFilter) continue;
-      if (q && !norm((e.name || '') + ' ' + e.code + ' ' + e.orgs.join(' ')).includes(q)) continue;
       shown++;
       const sel = e.code === currentCatCode;
       const opt = document.createElement('button');
@@ -1136,38 +1224,23 @@
       opt.setAttribute('role', 'option');
       opt.setAttribute('aria-selected', String(sel));
       opt.dataset.code = e.code;
-      const n = e.orgs.length;
-      const lvl = refLevelFor(e.code);
-      const lvlBadge = lvl ? ` <span class="cat-level-badge cat-level-${lvl}">${REF_LEVEL_LABELS[lvl] || lvl}</span>` : '';
+      const cruiserBadge = e.format === 'cruiser' ? ' <span class="cat-count">cruiser</span>' : '';
       opt.innerHTML =
-        `<span class="cat-selector-name"><span class="cat-fullname">${escape(e.name || e.code)}</span>${e.name ? ` <span class="cat-code">(${escape(e.code)})</span>` : ''} <span class="cat-count">${n} orga${n > 1 ? 's' : ''}</span>${lvlBadge}</span>` +
-        (n > 0
-          ? `<span class="cat-selector-orgas">${currentOrgFilter ? catOrgsTextHtml(e.code, 6, currentOrgFilter) : escape(catOrgsText(e.code))}</span>`
-          : '<span class="cat-selector-orgas" style="font-style:italic">Aucune organisation enregistrée</span>');
+        `<span class="cat-selector-name"><span class="cat-fullname">${escape(e.name || e.code)}</span> <span class="cat-count">${e.count} pilote${e.count > 1 ? 's' : ''}</span>${cruiserBadge}</span>`;
       opt.addEventListener('click', () => selectCat(e.code));
       frag.appendChild(opt);
     }
     catSelectorList.innerHTML = '';
     catSelectorList.appendChild(frag);
     catSelectorEmpty.hidden = shown > 0;
-    catSelectorEmpty.textContent = currentOrgFilter
-      ? 'Aucune catégorie pour cette organisation.'
-      : 'Aucune catégorie trouvée.';
+    catSelectorEmpty.textContent = 'Aucune catégorie trouvée.';
   }
 
   // --- Cat selector panel ---
   function openCatSelector() {
-    // On efface d'abord les filtres PUIS on rend la liste — sinon l'ancien
-    // filtre orga restait affiché malgré le <select> remis sur « Toutes ».
-    catSelectorFilter.value = '';
-    catOrgSel.value = '';
-    currentOrgFilter = '';
-    catLevelSel.value = '';
-    currentLevelFilter = '';
-    renderCatSelectorList('');
+    renderCatSelectorList();
     catSelectorPanel.hidden = false;
     catSelectorSummary.setAttribute('aria-expanded', 'true');
-    catSelectorFilter.focus();
   }
   function closeCatSelector() {
     catSelectorPanel.hidden = true;
@@ -1180,27 +1253,6 @@
   catSelectorSummary.addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); catSelectorSummary.click(); }
   });
-  catSelectorFilter.addEventListener('input', () => renderCatSelectorList(catSelectorFilter.value));
-  catOrgSel.addEventListener('change', () => {
-    currentOrgFilter = catOrgSel.value;
-    renderCatSelectorList(catSelectorFilter.value);
-  });
-  catLevelSel.addEventListener('change', () => {
-    currentLevelFilter = catLevelSel.value;
-    renderCatSelectorList(catSelectorFilter.value);
-  });
-  catSelectorReset.addEventListener('click', () => {
-    catOrgSel.value = '';
-    currentOrgFilter = '';
-    catLevelSel.value = '';
-    currentLevelFilter = '';
-    catSelectorFilter.value = '';
-    renderCatSelectorList('');
-    catSelectorFilter.focus();
-  });
-  catSelectorFilter.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeCatSelector();
-  });
   document.addEventListener('click', e => {
     if (!catSelectorPanel.hidden && !catSelectorPanel.contains(e.target) && !catSelectorSummary.contains(e.target)) {
       closeCatSelector();
@@ -1211,7 +1263,7 @@
     currentCatCode = code;
     catSelectorValue.textContent = catDisplayName(code);
     closeCatSelector();
-    renderCatSelectorList('');
+    renderCatSelectorList();
     updateRankBtnEnabled();
     replaceUrlState();
     if (currentRows.length > 0) debouncedSearch();
@@ -1231,12 +1283,12 @@
   rankYearSel.addEventListener('change', () => {
     replaceUrlState();
     buildCatList();
-    // La catégorie choisie n'existe peut-être pas pour la nouvelle année.
+    // L'année de naissance choisie n'existe peut-être pas pour la nouvelle saison.
     if (currentCatCode && !catList.some(e => e.code === currentCatCode)) {
       currentCatCode = '';
       catSelectorValue.textContent = 'Choisir une catégorie…';
     }
-    renderCatSelectorList('');
+    renderCatSelectorList();
     updateRankBtnEnabled();
     if (currentRows.length > 0) debouncedSearch();
   });
@@ -1250,6 +1302,18 @@
   function percentile(rank, total) {
     if (!total || total < 2 || typeof rank !== 'number') return null;
     return Math.max(1, Math.round(100 * rank / total));
+  }
+
+  // Année de naissance d'un engagement : champ `by` (index générés depuis le
+  // 2026-10-07) ou, à défaut, dérivée de `age` (anciens index : by = année de
+  // l'épreuve − âge). Sans les deux → null (pilote neutre pour le filtre).
+  // Testable.
+  function birthYearOf(c, event) {
+    if (c && typeof c.by === 'number') return c.by;
+    const y = Number((((event || {}).eventDate || (event || {}).eventEndDate) || '').slice(0, 4));
+    const a = c && c.age;
+    if (Number.isInteger(y) && Number.isInteger(a) && a >= 1 && a <= 99 && y - a > 1900) return y - a;
+    return null;
   }
 
   function computeStats(matches) {
@@ -1266,8 +1330,9 @@
     };
     for (const m of matches) {
       const c = m.competitor;
-      if (typeof c.by === 'number') {
-        s.byMap.set(c.by, (s.byMap.get(c.by) || 0) + 1);
+      const by = birthYearOf(c, m.event);
+      if (by != null) {
+        s.byMap.set(by, (s.byMap.get(by) || 0) + 1);
       }
       if (typeof c.rank === 'number') {
         if (c.rank === 1) s.wins++;
@@ -1373,29 +1438,38 @@
   // --- Main search ---
   function searchRanking() {
     const year = rankYearSel.value;
-    if (!currentCatCode) { setStatus('Choisir une catégorie.', true); return; }
-    currentYearFilter = 'all';
-    pilotSearchQuery = ''; // nouveau contexte (catégorie/année) : recherche réinitialisée
+    const seasonY = Number(year);
+    if (!currentCatCode || !isValidCatCode(currentCatCode)) { setStatus('Choisir une catégorie nationale.', true); return; }
+    const tk = String(currentCatCode).slice(NAT_PREFIX.length);
+    const cat = natCats.get(tk);
+    const br = bracketOf(tk);
+    if (!cat || !br || !Number.isInteger(seasonY)) { setStatus('Choisir une catégorie nationale.', true); return; }
+    pilotSearchQuery = ''; // nouveau contexte (catégorie/saison) : recherche réinitialisée
     pilotSearchPos = 0;
     pilotSearchCentered = false;
     pinnedPilotKeys = new Set(); // nouveau classement : couleurs persistantes effacées
 
-    // On agrège toutes les organisations qui courent cette classe exacte
-    // (FR + UEC namespacée `uec:…`).
+    // On agrège TOUS les engagements de la saison, toutes catégories et
+    // organisations FR confondues (20″ + cruiser, régional + national) ; on ne
+    // garde ensuite que les pilotes dont l'âge sportif rentre dans la tranche,
+    // dont le sexe correspond (jamais mélangé) et qui ont couru au moins une
+    // fois dans le format de la vue (sinon U17 ≡ Cruiser U17).
+    // Le SCORE (victoires, rangs, indice) ne porte que sur les engagements du
+    // format ; le détail (modale) montre TOUS les engagements.
     const pilotMap = new Map(); // normKey → {firstName, lastName, seenEvents: Set, matches[]}
     const eventIds = new Set();
 
     for (const { account, event, classes } of allIndexedEvents()) {
       if (year && !(event.eventDate || '').startsWith(year + '-')) continue;
+      if (!isFrAccount(account)) continue;
       for (const cls of (classes || [])) {
-        if (catSourceKey(account, cls.perpetualClassCode) !== currentCatCode) continue;
         eventIds.add(event.eventId);
         const competitors = cls.competitors || [];
         for (const c of competitors) {
-          const key = norm((c.firstName || '') + ' ' + (c.lastName || ''));
+          const key = norm((c.firstName || c.fn || '') + ' ' + (c.lastName || c.ln || ''));
           if (!key) continue;
           if (!pilotMap.has(key)) {
-            pilotMap.set(key, { firstName: c.firstName || '', lastName: c.lastName || '', seenEvents: new Set(), matches: [] });
+            pilotMap.set(key, { firstName: c.firstName || c.fn || '', lastName: c.lastName || c.ln || '', seenEvents: new Set(), matches: [] });
           }
           const pilot = pilotMap.get(key);
           if (pilot.seenEvents.has(event.eventId)) continue;
@@ -1415,8 +1489,8 @@
     const label = catDisplayName(currentCatCode);
     if (pilotMap.size === 0) {
       const yearMsg = year ? ` en ${year}` : '';
-      setStatus(`Aucun pilote trouvé dans la catégorie « ${label} »${yearMsg}.`);
-      resultsEl.innerHTML = `<div class="card"><div class="empty-state">Aucun résultat pour « ${escape(label)} »${year ? ` en ${year}` : ''}.</div></div>`;
+      setStatus(`Aucun pilote trouvé${yearMsg}.`);
+      resultsEl.innerHTML = `<div class="card"><div class="empty-state">Aucun résultat${year ? ` en ${year}` : ''}.</div></div>`;
       currentRows = [];
       return;
     }
@@ -1426,42 +1500,47 @@
     for (const [key, pilot] of pilotMap) {
       // Pool français uniquement (même règle que le classement général FR).
       if (!frenchKeys.has(key)) continue;
-      const stats = computeStats(pilot.matches);
+      const statsAll = computeStats(pilot.matches);
+      // Âge sportif dans la saison : doit rentrer dans la tranche.
+      if (statsAll.dominantBy == null) continue;
+      const age = seasonY - statsAll.dominantBy;
+      if (age < br[0] || age > br[1]) continue;
+      // Sexe strictement majoritaire — jamais mélangé.
+      if (dominantSex(pilot.matches, codeSexOf) !== cat.sex) continue;
+      // Circuit élite (U19/U23/Elite) : statut élite requis.
+      if (ELITE_TKS.has(tk) && !pilot.matches.some(mt => eliteTrancheOf(mt.account.accountCode, mt.cls && mt.cls.perpetualClassCode))) continue;
+      // Engagements du format de la vue : le score ne porte que sur eux
+      // (au moins un requis, sinon les vues 20″/cruiser seraient identiques).
+      const scored = pilot.matches.filter(mt =>
+        inScope(fmtOfCode(mt.cls && mt.cls.perpetualClassCode), cat.format));
+      if (!scored.length) continue;
+      const stats = computeStats(scored);
       rows.push({
         key,
         firstName: pilot.firstName,
         lastName: pilot.lastName,
         name: (pilot.firstName + ' ' + pilot.lastName).trim(),
         stats,
-        matches: pilot.matches,
-        perfIndex: computePerfIndex(pilot.matches),
+        matches: pilot.matches, // détail complet : tous les engagements
+        totalEntries: pilot.matches.length,
+        perfIndex: computePerfIndex(scored),
       });
     }
 
     if (rows.length === 0) {
       const yearMsg = year ? ` en ${year}` : '';
-      setStatus(`Aucun pilote français dans « ${label} »${yearMsg}.`);
-      resultsEl.innerHTML = `<div class="card"><div class="empty-state">Aucun pilote français pour « ${escape(label)} »${year ? ` en ${year}` : ''}.</div></div>`;
+      setStatus(`Aucun pilote français — ${label}${yearMsg}.`);
+      resultsEl.innerHTML = `<div class="card"><div class="empty-state">Aucun pilote français — ${escape(label)}${year ? ` en ${year}` : ''}.</div></div>`;
       currentRows = [];
       return;
     }
 
     const yearMsg = year ? ` (${year})` : '';
-    setStatus(`${rows.length} pilote(s) trouvé(s) dans « ${label} »${yearMsg}.`);
+    setStatus(`${rows.length} pilote(s) — ${label}${yearMsg}, tous engagements confondus.`);
 
     currentSortCol = 'wins';
     currentSortDir = 'desc';
     renderRankingTable(rows, 'wins', 'desc');
-  }
-
-  // --- Year filter ---
-  function applyYearFilter(rows) {
-    if (currentYearFilter === 'all') return rows;
-    return rows.filter(r => {
-      const by = r.stats.dominantBy;
-      if (by == null) return true;
-      return currentYearFilter === '1' ? by % 2 === 1 : by % 2 === 0;
-    });
   }
 
   // --- Category stats ---
@@ -1474,15 +1553,6 @@
       ${stat('🚴', totalPilots, 'Pilotes')}
       ${stat('🥇', winners, 'Vainqueurs')}
       ${stat('🏁', currentEventCount, 'Événements')}
-    </div>`;
-  }
-
-  function renderYearFilterBar() {
-    const a = currentYearFilter;
-    return `<div class="year-filter" role="tablist">
-      <button class="yf-btn${a==='all'?' active':''}" data-yf="all" role="tab" aria-selected="${a==='all'}">Toutes</button>
-      <button class="yf-btn${a==='1'?' active':''}" data-yf="1" role="tab" aria-selected="${a==='1'}">1ère année (défavorable)</button>
-      <button class="yf-btn${a==='2'?' active':''}" data-yf="2" role="tab" aria-selected="${a==='2'}">2ème année (favorable)</button>
     </div>`;
   }
 
@@ -1516,10 +1586,6 @@
   }
 
   // --- Render table ---
-  // Pas de filtre parité pour l'UEC : les concurrents UEC n'ont pas d'âge renseigné
-  // (le filtre ne les exclurait jamais — barre masquée sur les catégories `uec:…`).
-  const isUCat = () => isYouthParityCode(currentCatCode) && !String(currentCatCode || '').startsWith('uec:');
-
   function buildCols() {
     const cols = [
       { key: null,            label: '#',               sortable: false },
@@ -1568,9 +1634,8 @@
     currentSortCol = sortCol;
     currentSortDir = sortDir;
 
-    // Apply year filter then sort
-    const filteredRows = applyYearFilter(rows);
-    const sorted = [...filteredRows].sort((a, b) => {
+    // Tri direct (le groupe = déjà une année de naissance : pas de filtre parité)
+    const sorted = [...rows].sort((a, b) => {
       const av = getColValue(a, sortCol);
       const bv = getColValue(b, sortCol);
       // Nulls always last regardless of sort direction
@@ -1632,7 +1697,6 @@
     }).join('');
 
     document.body.classList.add('has-results');
-    const yearFilterHtml = isUCat() ? renderYearFilterBar() : '';
     const mobileStatOptions = COLS.slice(2).map((col, i) => {
       const idx = i + 3;
       return `<option value="${idx}"${idx === currentMobileStat ? ' selected' : ''}>${col.full || col.label}</option>`;
@@ -1649,7 +1713,6 @@
           <button class="pilot-search-clear" id="pilotSearchClear" title="Effacer">✕</button>
         </div>
         <div class="pilot-search-empty" id="pilotSearchEmpty" hidden></div>
-        ${yearFilterHtml}
       </div>
       <div class="mobile-stat-sel-wrap card">
         <label class="mobile-stat-sel-label">Stat affichée</label>
@@ -1736,15 +1799,6 @@
           dir = ascFirst.includes(col) ? 'asc' : 'desc';
         }
         renderRankingTable(currentRows, col, dir);
-      });
-    });
-
-    // Year filter handlers
-    resultsEl.querySelectorAll('.yf-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        currentYearFilter = btn.dataset.yf;
-        resultsEl.querySelectorAll('.yf-btn').forEach(b => b.setAttribute('aria-selected', String(b === btn)));
-        renderRankingTable(currentRows, currentSortCol, currentSortDir);
       });
     });
 
@@ -1868,15 +1922,23 @@
     const ageEl = document.getElementById('pilotModalAge');
     if (ageEl) ageEl.textContent = row.stats.dominantBy != null ? `Né(e) en ${row.stats.dominantBy}` : '';
     const by = row.stats.dominantBy;
-    const yearLabel = by != null && isUCat()
-      ? ` · né(e) en ${by} · ${by % 2 === 1 ? '1ère année' : '2ème année'}`
-      : by != null ? ` · né(e) en ${by}` : '';
+    // Parité 1ère/2ème année : pertinente de 6 à 17 ans dans la saison affichée.
+    const seasonY = Number(rankYearSel?.value);
+    const seasonAge = (by != null && Number.isInteger(seasonY)) ? seasonY - by : null;
+    const parity = (seasonAge != null && seasonAge >= 6 && seasonAge <= 17)
+      ? ` · ${by % 2 === 1 ? '1ère année' : '2ème année'}`
+      : '';
+    const yearLabel = by != null ? ` · né(e) en ${by}${parity}` : '';
     // Club : groupName du match le plus récent
     const sorted0 = [...row.matches].sort((a, b) =>
       (b.event.eventDate || '').localeCompare(a.event.eventDate || ''));
     const club = sorted0[0]?.competitor?.groupName || '';
     const clubStr = club ? ` · ${clubDisplayName(club)}` : '';
-    modalSub.textContent = `${row.stats.entries} engagement(s)${yearLabel}${clubStr}`;
+    const totalEntries = row.totalEntries != null ? row.totalEntries : row.stats.entries;
+    const entriesLabel = totalEntries > row.stats.entries
+      ? `${row.stats.entries} engagement(s) dans la catégorie · ${totalEntries} au total`
+      : `${row.stats.entries} engagement(s)`;
+    modalSub.textContent = `${entriesLabel}${yearLabel}${clubStr}`;
 
     const sorted = sorted0;
 

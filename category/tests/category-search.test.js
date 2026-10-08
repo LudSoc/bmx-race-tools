@@ -19,9 +19,7 @@ function block(start, indent = '  ') {
 const H = new Function('norm',
   block('function wrapSearchPos(pos, n) {') + '\n' +
   block('function stepSearchState(centered, pos, dir, n) {') + '\n' +
-  'let currentYearFilter = "all";\n' +
-  block('function renderYearFilterBar() {') +
-  '\nreturn { wrapSearchPos, stepSearchState, renderYearFilterBar, __setYF: (v) => { currentYearFilter = v; } };'
+  '\nreturn { wrapSearchPos, stepSearchState };'
 )(SC.norm);
 
 test('wrapSearchPos : circulaire dans les deux sens', () => {
@@ -43,12 +41,3 @@ test('stepSearchState : Entrée centre d’abord, puis navigue', () => {
   assert.deepEqual(H.stepSearchState(false, 0, 1, 0), { centered: true, pos: 0 });
 });
 
-test('renderYearFilterBar : libellés favorable/défavorable', () => {
-  H.__setYF('all');
-  const out = H.renderYearFilterBar();
-  assert.ok(out.includes('1ère année (défavorable)'), 'bouton 1ère année');
-  assert.ok(out.includes('2ème année (favorable)'), 'bouton 2ème année');
-  assert.ok(out.includes('data-yf="1"') && out.includes('data-yf="2"'), 'valeurs inchangées');
-  H.__setYF('2');
-  assert.ok(/data-yf="2" role="tab" aria-selected="true"/.test(H.renderYearFilterBar()), 'état actif');
-});

@@ -1,6 +1,7 @@
-// Tests du tri de la liste des catégories : niveau d'abord (régional → national
-// → UEC → UCI), puis nom affiché alphabétique dans le niveau (repli code).
-// Code extrait de index.html (pas recopié) ; refLevelFor simulé par niveaux.
+// Tests du tri des catégories nationales : âge croissant (min, puis max pour
+// les tranches partant du même âge), blocs U19 → U23 → Élite à la fin,
+// ensuite 20″ avant cruiser, M avant F, codes inconnus en tout dernier.
+// Code extrait de index.html (pas recopié).
 // Usage : node --test tests/cat-sort.test.js
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
@@ -8,68 +9,68 @@ const fs = require('fs');
 const path = require('path');
 
 const src = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
-function block(start, indent = '  ') {
+function block(start, endMark) {
   const i = src.indexOf(start);
   if (i < 0) throw new Error('marqueur introuvable : ' + start);
-  const j = src.indexOf('\n' + indent + '}\n', i);
+  const j = src.indexOf(endMark, i);
   if (j < 0) throw new Error('fin de bloc introuvable pour : ' + start);
-  return src.slice(i, j + ('\n' + indent + '}\n').length);
+  return src.slice(i, j + endMark.length);
 }
 
 const H = new Function(
-  'let catList = [];' +
-  'const refLevels = {};' +
-  'function refLevelFor(code) { return refLevels[code] || ""; }' +
-  block('function sortCatList() {') +
-  '\nreturn { sortCatList, __set: (list, lvls) => { catList = list.map(x => ({ ...x })); Object.keys(lvls).forEach(k => { refLevels[k] = lvls[k]; }); }, __codes: () => catList.map(x => x.code) };'
+  'const NAT_PREFIX = "nat:";\n' +
+  block('const TRANCHE_AGES = {', '  };\n') +
+  '\n' +
+  block('function bracketOf(tk) {', '\n  }\n') +
+  '\nlet catList = [];\n' +
+  block('function sortCatList() {', '\n  }\n') +
+  '\nreturn { sortCatList, __set: (list) => { catList = list.map(x => ({ ...x })); }, __codes: () => catList.map(x => x.code) };'
 )();
 
-test('sortCatList : niveaux d’abord, ordre régional→national→uec→uci, inconnus en fin', () => {
+test('sortCatList : âge croissant, élites à la fin, 20″ avant cruiser, M avant F', () => {
   H.__set([
-    { code: 'EF', name: 'Elite Femme' },
-    { code: '10FR', name: 'Fille 10 ans' },
-    { code: 'G10', name: 'Garçon 10' },
-    { code: 'uec:B11', name: 'Boys 11' },
-    { code: 'uci:U10B_20', name: 'U10 Boys 20' },
+    { code: 'nat:eh', name: 'Elite Homme', sex: 'M', format: '20p' },
+    { code: 'nat:gU7', name: 'U7 Garçon', sex: 'M', format: '20p' },
+    { code: 'nat:crM17-24', name: 'Cruiser Homme 17/24', sex: 'M', format: 'cruiser' },
+    { code: 'nat:m17-24', name: 'Homme 17/24', sex: 'M', format: '20p' },
+    { code: 'nat:gU11', name: 'U11 Garçon', sex: 'M', format: '20p' },
+    { code: 'nat:fU11', name: 'U11 Fille', sex: 'F', format: '20p' },
+    { code: 'nat:ef', name: 'Elite Femme', sex: 'F', format: '20p' },
     { code: 'XZZ', name: 'Inconnue' },
-  ], {
-    'EF': 'national', '10FR': 'regional', 'G10': 'national',
-    'uec:B11': 'uec', 'uci:U10B_20': 'uci',
-  });
+  ]);
   H.sortCatList();
-  assert.equal(H.__codes()[0], '10FR', 'régional d’abord');
-  assert.equal(H.__codes()[1], 'EF', 'national ensuite');
-  assert.equal(H.__codes()[2], 'G10');
-  assert.equal(H.__codes()[3], 'uec:B11', 'uec puis uci');
-  assert.equal(H.__codes()[4], 'uci:U10B_20');
-  assert.equal(H.__codes()[5], 'XZZ', 'niveau inconnu en fin');
+  assert.deepEqual(H.__codes(), ['nat:gU7', 'nat:gU11', 'nat:fU11', 'nat:m17-24', 'nat:crM17-24', 'nat:eh', 'nat:ef', 'XZZ']);
 });
 
-test('sortCatList : ordre alphabétique du nom affiché dans un même niveau', () => {
+test('sortCatList : même âge min → l’âge max départage (U7 avant U9)', () => {
   H.__set([
-    { code: 'U7GR', name: 'U7 GARCON' },
-    { code: 'EFR', name: 'ELITE FEMME' },
-    { code: '10FR', name: 'FILLE 10 ANS' },
-    { code: '7GR', name: 'GARCON 7 ANS' },
-    { code: 'EHR', name: 'ÉLITE REGIONALE HOMME' },
-  ], {
-    'U7GR': 'regional', 'EFR': 'regional', '10FR': 'regional', '7GR': 'regional', 'EHR': 'regional',
-  });
+    { code: 'nat:gU9', name: 'U9 Garçon', sex: 'M', format: '20p' },
+    { code: 'nat:fU7', name: 'U7 Fille', sex: 'F', format: '20p' },
+    { code: 'nat:gU7', name: 'U7 Garçon', sex: 'M', format: '20p' },
+    { code: 'nat:fU9', name: 'U9 Fille', sex: 'F', format: '20p' },
+  ]);
   H.sortCatList();
-  assert.deepEqual(H.__codes(), ['EFR', 'EHR', '10FR', '7GR', 'U7GR'],
-    '« élite » < « fille 10 » < « garçon 7 » < « u7 », accents ignorés');
+  assert.deepEqual(H.__codes(), ['nat:gU7', 'nat:fU7', 'nat:gU9', 'nat:fU9'],
+    'U7 (0-6) avant U9 (0-8), M avant F dans chaque tranche');
 });
 
-test('sortCatList : mêmes noms → ordre par code ; sans nom → repli code', () => {
+test('sortCatList : U19 (dont cruiser) → U23 → élite regroupés à la fin', () => {
   H.__set([
-    { code: 'CRH3039R', name: 'CRUISER HOMME 30/39' },
-    { code: 'CRH3034R', name: 'CRUISER HOMME 30/39' },
-    { code: 'NONAME', name: '' }, // nom manquant : tri par code
-    { code: 'AAA', name: 'Z' },   // nom présent : AAA passe après Z ? non, Z > nom
-  ], {
-    'CRH3039R': 'regional', 'CRH3034R': 'regional', 'NONAME': 'regional', 'AAA': 'regional',
-  });
+    { code: 'nat:eh', name: 'Elite Homme', sex: 'M', format: '20p' },
+    { code: 'nat:u23f', name: 'U23 Femme', sex: 'F', format: '20p' },
+    { code: 'nat:crU19F', name: 'Cruiser U19 Fille', sex: 'F', format: 'cruiser' },
+    { code: 'nat:u19f', name: 'U19 Fille', sex: 'F', format: '20p' },
+    { code: 'nat:u19h', name: 'U19 Homme', sex: 'M', format: '20p' },
+    { code: 'nat:m17-24', name: 'Homme 17/24', sex: 'M', format: '20p' },
+    { code: 'nat:u23h', name: 'U23 Homme', sex: 'M', format: '20p' },
+    { code: 'nat:crU17G', name: 'Cruiser U17 Garçon', sex: 'M', format: 'cruiser' },
+  ]);
   H.sortCatList();
-  assert.deepEqual(H.__codes(), ['CRH3034R', 'CRH3039R', 'NONAME', 'AAA'],
-    'même nom → codes CRH3034R < CRH3039R ; replis code « noname » < nom « z » (AAA)');
+  assert.deepEqual(H.__codes(), [
+    'nat:crU17G',  // 15/16 : reste dans la suite par âge
+    'nat:m17-24',  // 17/24
+    'nat:u19h', 'nat:u19f', 'nat:crU19F', // bloc U19 (20″ puis cruiser)
+    'nat:u23h', 'nat:u23f',               // bloc U23
+    'nat:eh',                             // élite tout dernier (âge min 18 < U23)
+  ]);
 });

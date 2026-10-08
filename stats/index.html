@@ -2735,6 +2735,19 @@
     return null;
   }
 
+  // Année de naissance d'un engagement : champ `by` (index générés depuis le
+  // 2026-10-07) ou, à défaut, dérivée de `age` (anciens index : by = année de
+  // l'épreuve − âge). Sans les deux → null. Testable.
+  function birthYearOfMatch(m) {
+    const c = m && m.competitor;
+    if (c && typeof c.by === 'number') return c.by;
+    const ev = (m && m.event) || {};
+    const y = Number((ev.eventDate || ev.eventEndDate || '').slice(0, 4));
+    const a = c && c.age;
+    if (Number.isInteger(y) && Number.isInteger(a) && a >= 1 && a <= 99 && y - a > 1900) return y - a;
+    return null;
+  }
+
   function renderPilotCard(matches, seriesMatches, stats, uciMatches = [], perfCareer = null, uecMatches = []) {
     const sortedEv = [...matches].sort((a, b) =>
       (b.event.eventDate || '').localeCompare(a.event.eventDate || ''));
@@ -2765,11 +2778,11 @@
                || sortedUciEv.find(m => m.competitor.groupName)?.competitor.groupName
                || sortedUecEv.find(m => m.competitor.groupName)?.competitor.groupName
                || null;
-    const byMatch = sortedEv.find(m => m.competitor.by != null)
-                 || sortedUciEv.find(m => m.competitor.by != null);
-    const birthYear = byMatch?.competitor.by ?? null;
+    const byMatch = sortedEv.find(m => birthYearOfMatch(m) != null)
+                 || sortedUciEv.find(m => birthYearOfMatch(m) != null);
+    const birthYear = byMatch ? birthYearOfMatch(byMatch) : null;
     // Âge dérivé (année de l'événement − année de naissance) pour pilotGrade (< 13).
-    const age = birthYear != null ? Number((byMatch.event.eventDate || '').slice(0, 4)) - birthYear : null;
+    const age = birthYear != null && byMatch ? Number((byMatch.event.eventDate || '').slice(0, 4)) - birthYear : null;
 
     const initials = [firstName[0], lastName[0]].filter(Boolean).join('').toUpperCase() || '?';
     const color    = avatarColor(fullName.toLowerCase());
@@ -2987,8 +3000,10 @@
     const p2Plate = p2Sorted.find(m => m.competitor.plate)?.competitor.plate || null;
     const p1Club = p1Sorted.find(m => m.competitor.groupName)?.competitor.groupName || null;
     const p2Club = p2Sorted.find(m => m.competitor.groupName)?.competitor.groupName || null;
-    const p1By  = p1Sorted.find(m => m.competitor.by != null)?.competitor.by ?? null;
-    const p2By  = p2Sorted.find(m => m.competitor.by != null)?.competitor.by ?? null;
+    const p1ByMatch = p1Sorted.find(m => birthYearOfMatch(m) != null);
+    const p2ByMatch = p2Sorted.find(m => birthYearOfMatch(m) != null);
+    const p1By = p1ByMatch ? birthYearOfMatch(p1ByMatch) : null;
+    const p2By = p2ByMatch ? birthYearOfMatch(p2ByMatch) : null;
     const p1Color = avatarColor(p1Name.toLowerCase());
     const _p2ColorRaw = avatarColor(p2Name.toLowerCase());
     const p2Color = _p2ColorRaw === p1Color
