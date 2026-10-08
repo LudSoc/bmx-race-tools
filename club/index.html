@@ -1058,6 +1058,16 @@ footer a:hover{text-decoration:underline}
   };
   }
 
+  // Une carte catégorie est cléée sur le groupe FR (g:…) ou le code brut
+  // (même règle que buildCatsData) : le filtre doit comparer la même chose.
+  // Repli sur className : certaines classes internationales n'ont pas de
+  // perpetualClassCode renseigné.
+  function catFilterMatches(cls) {
+    if (!catFilter) return true;
+    if (catFilter.startsWith('g:')) return CODE_TO_GROUP.get(cls.perpetualClassCode)?.key === catFilter;
+    return (cls.perpetualClassCode || cls.className || '') === catFilter;
+  }
+
   // --- Construction des données pilotes filtrées ---
   function buildPilotsData(ignoreCatFilter = false, ignoreYearFilter = false) {
     if (!selectedClubKey || !pilotsIndex) return [];
@@ -1066,15 +1076,12 @@ footer a:hover{text-decoration:underline}
 
     // Passe 0 : l'identité du club est définie par ses pilotes vus en FR (groupName = club).
     // Les index UEC/UCI/WC n'ont pas de groupement club (code pays) : on y matche par nom.
+    // SANS filtre catégorie : sinon une catégorie purement internationale (ex. Women U23
+    // UCI, absente de l'index FR) vide l'identité et donne « aucun résultat ».
     const clubPilotKeys = new Set();
     for (const ev of (pilotsIndex.events || [])) {
       if (yearsActive && !yearFilter.has((ev.event.eventDate || '').slice(0, 4))) continue;
       for (const cls of (ev.classes || [])) {
-        if (!ignoreCatFilter && catFilter) {
-          const code = cls.perpetualClassCode;
-          const ok = catFilter.startsWith('g:') ? CODE_TO_GROUP.get(code)?.key === catFilter : code === catFilter;
-          if (!ok) continue;
-        }
         for (const c of (cls.competitors || [])) {
           const gn = c.groupName || '';
           if (!gn || normClub(gn) !== selectedClubKey) continue;
@@ -1097,13 +1104,7 @@ footer a:hover{text-decoration:underline}
         if (yearsActive && !yearFilter.has(year)) continue;
 
         for (const cls of (ev.classes || [])) {
-          if (!ignoreCatFilter && catFilter) {
-            const code = cls.perpetualClassCode;
-            const catMatches = catFilter.startsWith('g:')
-              ? CODE_TO_GROUP.get(code)?.key === catFilter
-              : code === catFilter;
-            if (!catMatches) continue;
-          }
+          if (!ignoreCatFilter && !catFilterMatches(cls)) continue;
 
           for (const c of (cls.competitors || [])) {
             // FR : groupe club exigé. International : le nom doit appartenir au club.
@@ -1465,6 +1466,8 @@ footer a:hover{text-decoration:underline}
         case 'cat':     av = a.dominantCode; bv = b.dominantCode; break;
         case 'entries': av = a.stats.entries; bv = b.stats.entries; break;
         case 'wins':    av = a.stats.wins;    bv = b.stats.wins;    break;
+        case 'winRate': av = a.stats.entries ? a.stats.wins / a.stats.entries : 0;
+                        bv = b.stats.entries ? b.stats.wins / b.stats.entries : 0; break;
         case 'podiums': av = a.stats.podiums; bv = b.stats.podiums; break;
         case 'podRate': av = a.stats.entries ? a.stats.podiums / a.stats.entries : 0;
                         bv = b.stats.entries ? b.stats.podiums / b.stats.entries : 0; break;
@@ -1489,9 +1492,9 @@ footer a:hover{text-decoration:underline}
       { key: null,       label: 'Années',      nosort: true },
       { key: 'entries',  label: 'Particip.',   title: 'Participations' },
       { key: 'wins',     label: 'Victoires' },
-      { key: null,       label: '% victoires club', nosort: true, title: 'Part des victoires totales du club' },
+      { key: 'winRate',  label: '% Vict.', title: '% de victoires (victoires / participations)' },
       { key: 'podiums',  label: 'Podiums' },
-      { key: null,       label: '% podiums club',   nosort: true, title: 'Part des podiums totaux du club' },
+      { key: 'podRate',  label: '% Pod.',  title: '% de podiums (podiums / participations)' },
     ];
 
     const thHtml = cols.map(col => {
@@ -1519,9 +1522,9 @@ footer a:hover{text-decoration:underline}
         <td style="text-align:left;white-space:nowrap">${pilot.years.map(y => `<span style="display:inline-block;font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:99px;background:var(--card-soft);border:1px solid var(--line-strong);color:var(--ink-2);margin-right:2px">${escape(y)}</span>`).join('')}</td>
         <td>${s.entries}</td>
         <td>${winsCell}</td>
-        <td style="font-size:11px;color:var(--muted)">${totalWins > 0 ? Math.round(100 * s.wins / totalWins) + '%' : '—'}</td>
+        <td style="font-size:11px;color:var(--muted)">${s.entries > 0 ? Math.round(100 * s.wins / s.entries) + '%' : '—'}</td>
         <td>${s.podiums}</td>
-        <td style="font-size:11px;color:var(--muted)">${totalPodiums > 0 ? Math.round(100 * s.podiums / totalPodiums) + '%' : '—'}</td>
+        <td style="font-size:11px;color:var(--muted)">${s.entries > 0 ? Math.round(100 * s.podiums / s.entries) + '%' : '—'}</td>
       </tr>`;
     }).join('');
 

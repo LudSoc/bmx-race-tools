@@ -61,3 +61,42 @@ test('vue Toutes + tri cat : repli sur victoires desc', () => {
   const iPaul = out.indexOf('Paul Martin');
   assert.ok(iJean !== -1 && iPaul !== -1 && iJean < iPaul, 'trié par victoires desc (Jean 2v avant Paul 0v)');
 });
+
+const RATES = [
+  { key: 'alice', firstName: 'Alice', lastName: 'A', name: 'Alice A',
+    dominantCode: 'U11FR', years: ['2025'],
+    stats: { entries: 10, wins: 5, podiums: 8, avgRank: 4.0 } }, // 50% V, 80% P
+  { key: 'bob', firstName: 'Bob', lastName: 'B', name: 'Bob B',
+    dominantCode: 'U11GR', years: ['2025'],
+    stats: { entries: 4, wins: 3, podiums: 3, avgRank: 3.0 } },  // 75% V, 75% P
+];
+
+test('colonnes % Vict. / % Pod. : en-têtes triables', () => {
+  H.__set(new Set(), 'wins', 'desc');
+  const out = H.buildTableHtml(PILOTS, 2, 5);
+  assert.ok(out.includes('data-col="winRate"'), 'en-tête % Vict. triable');
+  assert.ok(out.includes('data-col="podRate"'), 'en-tête % Pod. triable');
+});
+
+test('tri winRate : taux individuel desc (Bob 75% avant Alice 50%)', () => {
+  H.__set(new Set(), 'winRate', 'desc');
+  const out = H.buildTableHtml(RATES, 8, 11);
+  const iAlice = out.indexOf('Alice A');
+  const iBob = out.indexOf('Bob B');
+  assert.ok(iBob !== -1 && iAlice !== -1 && iBob < iAlice, 'Bob (3/4) avant Alice (5/10)');
+});
+
+test('tri podRate : taux individuel desc (Alice 80% avant Bob 75%)', () => {
+  H.__set(new Set(), 'podRate', 'desc');
+  const out = H.buildTableHtml(RATES, 8, 11);
+  const iAlice = out.indexOf('Alice A');
+  const iBob = out.indexOf('Bob B');
+  assert.ok(iAlice !== -1 && iBob !== -1 && iAlice < iBob, 'Alice (8/10) avant Bob (3/4)');
+});
+
+test('cellules % : taux individuels, pas parts du club', () => {
+  H.__set(new Set(), 'wins', 'desc');
+  const out = H.buildTableHtml(RATES, 8, 11);
+  assert.ok(out.includes('75%') && out.includes('50%'), '% victoires individuels');
+  assert.ok(out.includes('80%'), '% podiums individuel');
+});
